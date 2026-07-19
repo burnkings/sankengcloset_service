@@ -33,6 +33,10 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
       - run: npm ci
+      - run: npm run migrate
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+          JWT_SECRET: ci-test-secret-that-is-longer-than-32-characters
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
