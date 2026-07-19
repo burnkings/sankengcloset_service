@@ -1,0 +1,196 @@
+import { conflict, notFound } from '../lib/problem.js';
+import { newId, nowIso } from '../lib/id.js';
+import type { AppRepository, FeedQuery, FeedResult } from './contracts.js';
+import type {
+  AiConfirmationInput,
+  AiImportTask,
+  FeedItem,
+  MediaObject,
+  Product,
+  SyncOperationInput,
+  SyncReceipt,
+  UserProfile,
+} from '../types.js';
+
+function seedProducts(): Product[] {
+  const now = nowIso();
+  return [
+    {
+      id: 'prd_jk_navy_45', brandId: 'br_rabbit', brandName: '兔缝缝', title: '深蓝格裙 45cm',
+      category: 'JK', status: 'ON_SALE', coverUrl: 'https://images.example.invalid/jk-navy-cover.jpg',
+      images: ['https://images.example.invalid/jk-navy-1.jpg', 'https://images.example.invalid/jk-navy-2.jpg'],
+      priceCents: 12800, originalPriceCents: 16800, description: '深蓝格纹制服裙演示数据', shopUrl: '', createdAt: now, updatedAt: now,
+    },
+    {
+      id: 'prd_lolita_moon', brandId: 'br_starcat', brandName: '星辰猫', title: '月光曲 JSK',
+      category: 'LOLITA', status: 'PRE_ORDER', coverUrl: 'https://images.example.invalid/moon-jsk-cover.jpg',
+      images: ['https://images.example.invalid/moon-jsk-1.jpg', 'https://images.example.invalid/moon-jsk-2.jpg'],
+      priceCents: 36800, originalPriceCents: 39800, description: '月光主题 JSK 演示数据', shopUrl: '', createdAt: now, updatedAt: now,
+    },
+    {
+      id: 'prd_hanfu_song', brandId: 'br_flower', brandName: '花笺', title: '宋制旋裙套装',
+      category: 'HANFU', status: 'UPCOMING', coverUrl: 'https://images.example.invalid/hanfu-song-cover.jpg',
+      images: ['https://images.example.invalid/hanfu-song-1.jpg'],
+      priceCents: 25800, originalPriceCents: 0, description: '宋制汉服演示数据', shopUrl: '', createdAt: now, updatedAt: now,
+    },
+  ];
+}
+
+function toFeed(product: Product): FeedItem {
+  return {
+    id: `feed_${product.id}`,
+    feedType: 'product',
+    entityId: product.id,
+    title: product.title,
+    subtitle: product.brandName,
+    coverUrl: product.coverUrl,
+    secondaryCoverUrl: product.images[1] ?? '',
+    brandId: product.brandId,
+    brandName: product.brandName,
+    price: product.priceCents,
+    originalPrice: product.originalPriceCents,
+    badgeText: product.status === 'PRE_ORDER' ? '预约' : product.status === 'UPCOMING' ? '新品' : '',
+    eventStartAt: '',
+    eventEndAt: '',
+    liked: false,
+    saved: false,
+    sourceLabel: '演示数据',
+    rankingScore: 1,
+    category: product.category,
+    createdAt: product.createdAt,
+  };
+}
+
+export class MemoryRepository implements AppRepository {
+  private readonly users = new Map<string, UserProfile>();
+  private readonly wechatUsers = new Map<string, string>();
+  private readonly products = seedProducts();
+  private readonly syncOps = new Map<string, SyncReceipt>();
+  private readonly syncCheckpoints = new Map<string, string>();
+  private readonly media = new Map<string, MediaObject>();
+  private readonly aiTasks = new Map<string, AiImportTask>();
+  private readonly assets = new Map<string, unknown>();
+
+  async close(): Promise<void> {}
+  async ready(): Promise<boolean> { return true; }
+
+  async ensureDevUser(nickname: string): Promise<UserProfile> {
+    const existing = this.users.get('usr_dev');
+    if (existing) return existing;
+    const user: UserProfile = { id: 'usr_dev', nickname, status: 'active', createdAt: nowIso() };
+    this.users.set(user.id, user);
+    return user;
+  }
+
+  async ensureWechatUser(openId: string, nickname: string): Promise<UserProfile> {
+    const existingId = this.wechatUsers.get(openId);
+    if (existingId) return this.users.get(existingId)!;
+    const user: UserProfile = { id: newId('usr'), nickname, status: 'active', createdAt: nowIso() };
+    this.users.set(user.id, user);
+    this.wechatUsers.set(openId, user.id);
+    return user;
+  }
+
+  async getUser(userId: string): Promise<UserProfile | null> {
+    return this.users.get(userId) ?? null;
+  }
+
+  async listFeed(_userId: string | null, query: FeedQuery): Promise<FeedResult> {
+    let rows = this.products;
+    if (query.category !== '') rows = rows.filter((item) => item.category === query.category);
+    if (query.channel === 'reservation') rows = rows.filter((item) => item.status === 'PRE_ORDER');
+    if (query.channel === 'new') rows = rows.filter((item) => item.status === 'UPCOMING');
+    const offset = Number.parseInt(query.cursor || '0', 10) || 0;
+    const items = rows.slice(offset, offset + query.limit).map(toFeed);
+    const next = offset + items.length;
+    return { items, nextCursor: next < rows.length ? String(next) : '', hasMore: next < rows.length, totalHint: rows.length };
+  }
+
+  async getProduct(_userId: string | null, productId: string): Promise<Product | null> {
+    return this.products.find((item) => item.id === productId) ?? null;
+  }
+
+  async applySyncBatch(userId: string, operations: SyncOperationInput[]): Promise<SyncReceipt[]> {
+    const receipts: SyncReceipt[] = [];
+    for (const operation of operations) {
+      const key = `${userId}:${operation.opId}`;
+      const existing = this.syncOps.get(key);
+      if (existing) {
+        receipts.push(existing);
+        continue;
+      }
+      const receipt: SyncReceipt = { opId: operation.opId, result: 'accepted', serverVersion: Date.now() };
+      this.syncOps.set(key, receipt);
+      receipts.push(receipt);
+    }
+    this.syncCheckpoints.set(userId, nowIso());
+    return receipts;
+  }
+
+  async getSyncCheckpoint(userId: string): Promise<string> {
+    return this.syncCheckpoints.get(userId) ?? '';
+  }
+
+  async createMedia(input: Omit<MediaObject, 'id' | 'createdAt' | 'deletedAt' | 'sizeBytes'>): Promise<MediaObject> {
+    const media: MediaObject = { ...input, id: newId('med'), sizeBytes: 0, createdAt: nowIso(), deletedAt: null };
+    this.media.set(media.uploadId, media);
+    return media;
+  }
+
+  async getMediaByUploadId(userId: string, uploadId: string): Promise<MediaObject | null> {
+    const media = this.media.get(uploadId);
+    return media?.ownerUserId === userId ? media : null;
+  }
+
+  async getMediaByObjectKey(userId: string, objectKey: string): Promise<MediaObject | null> {
+    for (const media of this.media.values()) {
+      if (media.ownerUserId === userId && media.objectKey === objectKey && media.deletedAt === null) return media;
+    }
+    return null;
+  }
+
+  async markMediaUploaded(userId: string, uploadId: string, sizeBytes: number): Promise<MediaObject> {
+    const media = await this.getMediaByUploadId(userId, uploadId);
+    if (!media) throw notFound('上传任务不存在');
+    media.sizeBytes = sizeBytes;
+    return media;
+  }
+
+  async deleteMediaByObjectKey(userId: string, objectKey: string): Promise<boolean> {
+    for (const media of this.media.values()) {
+      if (media.ownerUserId === userId && media.objectKey === objectKey && media.deletedAt === null) {
+        media.deletedAt = nowIso();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async createAiTask(task: AiImportTask): Promise<AiImportTask> {
+    this.aiTasks.set(task.taskId, task);
+    return task;
+  }
+
+  async getAiTask(userId: string, taskId: string): Promise<AiImportTask | null> {
+    const task = this.aiTasks.get(taskId);
+    return task?.userId === userId ? task : null;
+  }
+
+  async confirmAiTask(userId: string, taskId: string, input: AiConfirmationInput): Promise<AiImportTask> {
+    const task = await this.getAiTask(userId, taskId);
+    if (!task) throw notFound('AI 导入任务不存在');
+    if (task.state === 'confirmed') {
+      if (task.targetType !== input.targetType) throw conflict('该任务已经确认到其他目标');
+      return task;
+    }
+    const operationKey = `${userId}:ai:${input.opId}`;
+    if (this.assets.has(operationKey)) return task;
+    const targetId = newId(input.targetType === 'wardrobe' ? 'wdi' : 'wli');
+    this.assets.set(operationKey, { id: targetId, ...input.confirmed });
+    task.state = 'confirmed';
+    task.confirmedAt = nowIso();
+    task.targetType = input.targetType;
+    task.targetId = targetId;
+    return task;
+  }
+}
