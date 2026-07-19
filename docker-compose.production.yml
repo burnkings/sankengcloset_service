@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sankeng
+      POSTGRES_USER: sankeng
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - sankeng_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sankeng -d sankeng"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks: [internal]
+    security_opt: [no-new-privileges:true]
+
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8787
+      DATA_DRIVER: postgres
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?PUBLIC_BASE_URL is required}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      WECHAT_APP_ID: ${WECHAT_APP_ID:?WECHAT_APP_ID is required}
+      WECHAT_APP_SECRET: ${WECHAT_APP_SECRET:?WECHAT_APP_SECRET is required}
+      UPLOAD_DIR: /app/var/uploads
+      UPLOAD_MAX_BYTES: ${UPLOAD_MAX_BYTES:-10485760}
+      AI_PROVIDER: safe_mock
+      TRUST_PROXY: "true"
+    ports:
+      - "127.0.0.1:${API_PORT:-8787}:8787"
+    volumes:
+      - sankeng_uploads:/app/var/uploads
+    tmpfs:
+      - /tmp
+    read_only: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["sh", "-c", "node dist/scripts/migrate.js && node dist/src/server.js"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/ready').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks: [internal, edge]
+    security_opt: [no-new-privileges:true]
+
+networks:
+  internal:
+    internal: true
+  edge:
+
+volumes:
+  sankeng_pgdata:
+  sankeng_uploads:
