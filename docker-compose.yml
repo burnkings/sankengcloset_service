@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: sankeng
+      POSTGRES_USER: sankeng
+      POSTGRES_PASSWORD: sankeng
+    ports:
+      - "5432:5432"
+    volumes:
+      - sankeng_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sankeng -d sankeng"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    environment:
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      PORT: 8787
+      DATA_DRIVER: postgres
+      DATABASE_URL: postgres://sankeng:sankeng@postgres:5432/sankeng
+      JWT_SECRET: local-development-secret-change-before-production
+      PUBLIC_BASE_URL: http://localhost:8787
+      UPLOAD_DIR: /app/var/uploads
+      AI_PROVIDER: safe_mock
+    ports:
+      - "8787:8787"
+    volumes:
+      - sankeng_uploads:/app/var/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["sh", "-c", "node dist/scripts/migrate.js && node dist/scripts/seed.js && node dist/src/server.js"]
+
+volumes:
+  sankeng_pgdata:
+  sankeng_uploads:
