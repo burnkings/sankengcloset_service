@@ -16,6 +16,9 @@ import { registerContentRoutes } from './routes/content.js';
 import { registerSyncRoutes } from './routes/sync.js';
 import { registerUploadRoutes } from './routes/uploads.js';
 import { registerAiImportRoutes } from './routes/ai-import.js';
+import { readFile } from 'node:fs/promises';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export interface BuildAppOptions {
   config?: AppConfig;
@@ -70,6 +73,13 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
 
   const storage = new LocalObjectStorage(config.UPLOAD_DIR);
   await registerHealthRoutes(app, repository);
+
+  // 管理面板
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  app.get('/admin', async (_, reply) => {
+    const html = await readFile(resolve(__dirname, '../public/admin.html'), 'utf8');
+    return reply.type('text/html').send(html);
+  });
   await registerSessionRoutes(app, config, repository);
   await registerContentRoutes(app, repository);
   await registerSyncRoutes(app, repository);

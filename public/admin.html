@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三坑绮橱 · 数据管理面板</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f5f5;color:#333}
+.header{background:#1a1a2e;color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:18px;font-weight:600}
+.header .stats{font-size:13px;opacity:0.8}
+.tabs{display:flex;gap:4px;padding:12px 24px;background:#fff;border-bottom:1px solid #e0e0e0}
+.tab{padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;border:none;background:transparent;color:#666}
+.tab.active{background:#e8f0fe;color:#1a73e8;font-weight:500}
+.tab:hover{background:#f0f0f0}
+.content{padding:24px;max-width:1400px;margin:0 auto}
+.card{background:#fff;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.card h2{font-size:16px;margin-bottom:12px;color:#1a1a2e}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat-item{text-align:center;padding:16px;background:#f8f9fa;border-radius:8px}
+.stat-item .number{font-size:28px;font-weight:700;color:#1a73e8}
+.stat-item .label{font-size:12px;color:#666;margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;background:#f8f9fa;border-bottom:2px solid #e0e0e0;font-weight:600;color:#555}
+td{padding:8px 12px;border-bottom:1px solid #f0f0f0}
+tr:hover{background:#f8f9fa}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.badge-jk{background:#e3f2fd;color:#1565c0}
+.badge-lo{background:#fce4ec;color:#c62828}
+.badge-hf{background:#e8f5e9;color:#2e7d32}
+.badge-sale{background:#e8f5e9;color:#2e7d32}
+.badge-pre{background:#fff3e0;color:#e65100}
+.badge-up{background:#e3f2fd;color:#1565c0}
+.badge-ok{background:#e8f5e9;color:#2e7d32}
+.badge-pending{background:#fff3e0;color:#e65100}
+.price{color:#c62828;font-weight:600}
+.empty{text-align:center;padding:40px;color:#999}
+.loading{text-align:center;padding:40px;color:#999}
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:16px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:13px}
+.filter-btn.active{background:#1a73e8;color:#fff;border-color:#1a73e8}
+img{max-width:60px;max-height:60px;border-radius:4px;object-fit:cover}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🏪 三坑绮橱 · 数据管理面板</h1>
+  <div class="stats" id="headerStats">加载中...</div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="showTab('overview')">📊 概览</button>
+  <button class="tab" onclick="showTab('products')">📦 商品</button>
+  <button class="tab" onclick="showTab('brands')">🏷️ 品牌</button>
+  <button class="tab" onclick="showTab('review')">✅ 待审核</button>
+  <button class="tab" onclick="showTab('errors')">❌ 错误</button>
+</div>
+<div class="content" id="content"></div>
+
+<script>
+const API = '';
+let TOKEN = '';
+
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (TOKEN) headers['Authorization'] = `Bearer ${TOKEN}`;
+  const res = await fetch(API + path, { ...opts, headers });
+  return res.json();
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  const render = { overview: renderOverview, products: renderProducts, brands: renderBrands, review: renderReview, errors: renderErrors };
+  (render[name] || render.overview)();
+}
+
+async function renderOverview() {
+  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
+  const feed = await api('/api/v1/feed?limit=200');
+  const items = feed.data || [];
+  const brands = new Set(items.map(i => i.brandName));
+  const categories = {};
+  items.forEach(i => { categories[i.category] = (categories[i.category] || 0) + 1; });
+
+  document.getElementById('headerStats').textContent = `${items.length} 商品 · ${brands.size} 品牌`;
+  document.getElementById('content').innerHTML = `
+    <div class="card"><h2>数据概览</h2>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="number">${items.length}</div><div class="label">商品总数</div></div>
+      <div class="stat-item"><div class="number">${brands.size}</div><div class="label">品牌数</div></div>
+      <div class="stat-item"><div class="number">${Object.keys(categories).length}</div><div class="label">商品类型</div></div>
+      <div class="stat-item"><div class="number">${items.filter(i=>i.price>0).length}</div><div class="label">有价格</div></div>
+    </div></div>
+    <div class="card"><h2>坑向分布</h2>
+    <div class="stat-grid">
+      ${Object.entries(categories).map(([k,v]) => `<div class="stat-item"><div class="number">${v}</div><div class="label">${k}</div></div>`).join('')}
+    </div></div>`;
+}
+
+async function renderProducts() {
+  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
+  const feed = await api('/api/v1/feed?limit=200');
+  const items = feed.data || [];
+
+  const pitFilter = (cat) => cat === 'ALL' ? items : items.filter(i => i.category === cat);
+
+  let currentFilter = 'ALL';
+  function renderList(filter) {
+    currentFilter = filter;
+    const list = pitFilter(filter);
+    document.getElementById('productList').innerHTML = list.length ? `<table>
+      <tr><th>图片</th><th>名称</th><th>品牌</th><th>类型</th><th>价格</th><th>状态</th></tr>
+      ${list.map(i => `<tr>
+        <td>${i.coverUrl ? `<img src="${i.coverUrl}" onerror="this.style.display='none'">` : '-'}</td>
+        <td>${i.title}</td>
+        <td>${i.brandName}</td>
+        <td><span class="badge badge-${i.category==='JK'?'jk':i.category==='LOLITA'?'lo':'hf'}">${i.category}</span></td>
+        <td class="price">${i.price > 0 ? '¥' + (i.price/100).toFixed(0) : '-'}</td>
+        <td>${i.badgeText || '-'}</td>
+      </tr>`).join('')}
+    </table>` : '<div class="empty">无数据</div>';
+  }
+
+  document.getElementById('content').innerHTML = `
+    <div class="card"><h2>商品列表 (${items.length})</h2>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterProducts('ALL',this)">全部</button>
+      <button class="filter-btn" onclick="filterProducts('JK',this)">JK</button>
+      <button class="filter-btn" onclick="filterProducts('LOLITA',this)">Lolita</button>
+      <button class="filter-btn" onclick="filterProducts('HANFU',this)">汉服</button>
+    </div>
+    <div id="productList"></div></div>`;
+  window.filterProducts = (cat, btn) => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderList(cat);
+  };
+  renderList('ALL');
+}
+
+async function renderBrands() {
+  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
+  const feed = await api('/api/v1/feed?limit=200');
+  const items = feed.data || [];
+  const brandMap = {};
+  items.forEach(i => {
+    if (!brandMap[i.brandName]) brandMap[i.brandName] = { name: i.brandName, count: 0, category: i.category, prices: [] };
+    brandMap[i.brandName].count++;
+    if (i.price > 0) brandMap[i.brandName].prices.push(i.price);
+  });
+  const brands = Object.values(brandMap).sort((a,b) => b.count - a.count);
+
+  document.getElementById('content').innerHTML = `
+    <div class="card"><h2>品牌列表 (${brands.length})</h2>
+    <table>
+      <tr><th>品牌</th><th>坑向</th><th>商品数</th><th>价格范围</th></tr>
+      ${brands.map(b => {
+        const min = b.prices.length ? (Math.min(...b.prices)/100).toFixed(0) : '-';
+        const max = b.prices.length ? (Math.max(...b.prices)/100).toFixed(0) : '-';
+        return `<tr><td><strong>${b.name}</strong></td>
+          <td><span class="badge badge-${b.category==='JK'?'jk':b.category==='LOLITA'?'lo':'hf'}">${b.category}</span></td>
+          <td>${b.count}</td>
+          <td>${min !== '-' ? '¥'+min+' ~ ¥'+max : '-'}</td></tr>`;
+      }).join('')}
+    </table></div>`;
+}
+
+async function renderReview() {
+  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api('/api/admin/review/pending');
+    const items = data.items || [];
+    document.getElementById('content').innerHTML = `
+      <div class="card"><h2>待审核 (${items.length})</h2>
+      ${items.length ? `<table>
+        <tr><th>名称</th><th>品牌</th><th>坑向</th><th>价格</th><th>来源</th><th>置信度</th></tr>
+        ${items.map(i => `<tr>
+          <td>${i.display_name}</td><td>${i.brand_name||'-'}</td>
+          <td><span class="badge badge-${i.pit_type==='JK'?'jk':i.pit_type==='LOLITA'?'lo':'hf'}">${i.pit_type}</span></td>
+          <td class="price">${i.current_price>0?'¥'+(i.current_price/100).toFixed(0):'-'}</td>
+          <td>${i.source_platform}</td><td>${i.confidence}%</td>
+        </tr>`).join('')}
+      </table>` : '<div class="empty">🎉 无待审核数据</div>'}</div>`;
+  } catch { document.getElementById('content').innerHTML = '<div class="empty">需要管理员权限</div>'; }
+}
+
+async function renderErrors() {
+  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api('/api/admin/review/errors');
+    const errors = data.errors || [];
+    document.getElementById('content').innerHTML = `
+      <div class="card"><h2>采集错误 (${errors.length})</h2>
+      ${errors.length ? `<table>
+        <tr><th>时间</th><th>来源</th><th>状态</th><th>错误</th></tr>
+        ${errors.map(e => `<tr>
+          <td>${new Date(e.created_at).toLocaleString('zh-CN')}</td>
+          <td>${e.source_type}</td>
+          <td><span class="badge badge-pending">${e.status}</span></td>
+          <td>${e.error_message||'-'}</td>
+        </tr>`).join('')}
+      </table>` : '<div class="empty">🎉 无采集错误</div>'}</div>`;
+  } catch { document.getElementById('content').innerHTML = '<div class="empty">需要管理员权限</div>'; }
+}
+
+renderOverview();
+</script>
+</body>
+</html>
