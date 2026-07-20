@@ -162,10 +162,10 @@ async function generateReport(): Promise<void> {
   const sourceRecords = await sql`SELECT count(*) as count FROM source_records`;
 
   console.log('\n=== 数据质量报告 ===');
-  console.log(`品牌总数: ${brandCount[0].count}`);
-  console.log(`商品总数: ${productCount[0].count}`);
-  console.log(`价格快照: ${priceSnapshots[0].count}`);
-  console.log(`来源记录: ${sourceRecords[0].count}`);
+  console.log(`品牌总数: ${(brandCount[0] ?? {count: 0}).count}`);
+  console.log(`商品总数: ${(productCount[0] ?? {count: 0}).count}`);
+  console.log(`价格快照: ${(priceSnapshots[0] ?? {count: 0}).count}`);
+  console.log(`来源记录: ${(sourceRecords[0] ?? {count: 0}).count}`);
 
   console.log('\n--- 坑向分布 ---');
   for (const row of byPitType) {
@@ -182,7 +182,7 @@ async function generateReport(): Promise<void> {
     console.log(`  ${row.source_platform}: ${row.count}`);
   }
 
-  const c = completeness[0];
+  const c = completeness[0] ?? { total: 0, has_name: 0, has_brand: 0, has_price: 0, has_source: 0, has_desc: 0 };
   const total = Number(c.total);
   console.log('\n--- 必填字段完整率 ---');
   console.log(`  名称: ${c.has_name}/${total} (${(Number(c.has_name) / total * 100).toFixed(1)}%)`);
