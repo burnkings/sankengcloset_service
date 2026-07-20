@@ -1,0 +1,272 @@
+[
+  {
+    "id": "br_001",
+    "name": "兔缝缝",
+    "nameEn": "TuFengFeng",
+    "category": "JK",
+    "officialUrl": "https://tufengfeng.tmall.com",
+    "description": "JK制服头部品牌，以格裙闻名",
+    "followerCount": 500000
+  },
+  {
+    "id": "br_002",
+    "name": "With Puji",
+    "nameEn": "With Puji",
+    "category": "JK",
+    "officialUrl": "https://withpuji.tmall.com",
+    "description": "JK制服品牌，水手服系列知名",
+    "followerCount": 300000
+  },
+  {
+    "id": "br_003",
+    "name": "夏日和风铃",
+    "nameEn": "Summer Wind Bell",
+    "category": "JK",
+    "officialUrl": "https://xiarihefengling.tmall.com",
+    "description": "JK制服品牌，清新风格",
+    "followerCount": 200000
+  },
+  {
+    "id": "br_004",
+    "name": "梦境之约",
+    "nameEn": "Dream Promise",
+    "category": "JK",
+    "officialUrl": "https://mengjingzhiyue.tmall.com",
+    "description": "JK制服品牌",
+    "followerCount": 150000
+  },
+  {
+    "id": "br_005",
+    "name": "猫萌哒",
+    "nameEn": "MaoMengDa",
+    "category": "JK",
+    "officialUrl": "https://maomengda.tmall.com",
+    "description": "JK制服品牌，甜美风格",
+    "followerCount": 180000
+  },
+  {
+    "id": "br_006",
+    "name": "森林来信",
+    "nameEn": "Forest Letter",
+    "category": "JK",
+    "officialUrl": "https://senlinlaixin.tmall.com",
+    "description": "JK制服品牌",
+    "followerCount": 120000
+  },
+  {
+    "id": "br_007",
+    "name": "鹿野学舍",
+    "nameEn": "Luye Academy",
+    "category": "JK",
+    "officialUrl": "https://luyexueshe.tmall.com",
+    "description": "JK制服品牌",
+    "followerCount": 100000
+  },
+  {
+    "id": "br_008",
+    "name": "暗星之森",
+    "nameEn": "Dark Star Forest",
+    "category": "JK",
+    "officialUrl": "https://anzhixingsen.tmall.com",
+    "description": "JK/Lolita跨坑品牌",
+    "followerCount": 250000
+  },
+  {
+    "id": "br_009",
+    "name": "原创星球",
+    "nameEn": "Original Planet",
+    "category": "JK",
+    "officialUrl": "https://yuanchuangxingqiu.tmall.com",
+    "description": "JK制服品牌",
+    "followerCount": 90000
+  },
+  {
+    "id": "br_010",
+    "name": "深海之约",
+    "nameEn": "Deep Sea Promise",
+    "category": "JK",
+    "officialUrl": "https://shenhaizhiyue.tmall.com",
+    "description": "JK制服品牌",
+    "followerCount": 80000
+  },
+  {
+    "id": "br_011",
+    "name": "星辰猫",
+    "nameEn": "Star Cat",
+    "category": "LOLITA",
+    "officialUrl": "https://xingchenmao.tmall.com",
+    "description": "Lolita头部品牌，月光曲系列知名",
+    "followerCount": 400000
+  },
+  {
+    "id": "br_012",
+    "name": "仲夏物语",
+    "nameEn": "Midsummer Story",
+    "category": "LOLITA",
+    "officialUrl": "https://zhongxiawuyu.tmall.com",
+    "description": "Lolita品牌，田园风格",
+    "followerCount": 350000
+  },
+  {
+    "id": "br_013",
+    "name": "摇篮曲",
+    "nameEn": "Lullaby",
+    "category": "LOLITA",
+    "officialUrl": "https://yaolanqu.tmall.com",
+    "description": "Lolita品牌",
+    "followerCount": 280000
+  },
+  {
+    "id": "br_014",
+    "name": "表面咒语",
+    "nameEn": "Surface Spell",
+    "category": "LOLITA",
+    "officialUrl": "https://biaomianzhouyu.tmall.com",
+    "description": "Lolita品牌，哥特风格",
+    "followerCount": 220000
+  },
+  {
+    "id": "br_015",
+    "name": "花与珍珠匣",
+    "nameEn": "Flower & Pearl Box",
+    "category": "LOLITA",
+    "officialUrl": "https://huayuzhenzhuxia.tmall.com",
+    "description": "Lolita品牌",
+    "followerCount": 200000
+  },
+  {
+    "id": "br_016",
+    "name": "纹样派对",
+    "nameEn": "Pattern Party",
+    "category": "LOLITA",
+    "officialUrl": "https://wenyangpaidui.tmall.com",
+    "description": "Lolita品牌",
+    "followerCount": 180000
+  },
+  {
+    "id": "br_017",
+    "name": "Alice Girl",
+    "nameEn": "Alice Girl",
+    "category": "LOLITA",
+    "officialUrl": "https://alicegirl.tmall.com",
+    "description": "Lolita品牌",
+    "followerCount": 160000
+  },
+  {
+    "id": "br_018",
+    "name": "圆点点小姐",
+    "nameEn": "Miss Polka Dot",
+    "category": "LOLITA",
+    "officialUrl": "https://yuandiandian.tmall.com",
+    "description": "Lolita品牌",
+    "followerCount": 140000
+  },
+  {
+    "id": "br_019",
+    "name": "古典玩偶",
+    "nameEn": "Classical Doll",
+    "category": "LOLITA",
+    "officialUrl": "https://gudianwanou.tmall.com",
+    "description": "Lolita品牌",
+    "followerCount": 130000
+  },
+  {
+    "id": "br_020",
+    "name": "Elpress L",
+    "nameEn": "Elpress L",
+    "category": "LOLITA",
+    "officialUrl": "https://elpressl.tmall.com",
+    "description": "Lolita品牌",
+    "followerCount": 110000
+  },
+  {
+    "id": "br_021",
+    "name": "十三余",
+    "nameEn": "Shisan Yu",
+    "category": "HANFU",
+    "officialUrl": "https://shisanyu.tmall.com",
+    "description": "汉服头部品牌",
+    "followerCount": 600000
+  },
+  {
+    "id": "br_022",
+    "name": "花筵",
+    "nameEn": "Hua Yan",
+    "category": "HANFU",
+    "officialUrl": "https://huayan.tmall.com",
+    "description": "汉服品牌，宋制系列知名",
+    "followerCount": 300000
+  },
+  {
+    "id": "br_023",
+    "name": "婴梵塔",
+    "nameEn": "Ying Fan Ta",
+    "category": "HANFU",
+    "officialUrl": "https://yingfanta.tmall.com",
+    "description": "汉服品牌，明制系列",
+    "followerCount": 250000
+  },
+  {
+    "id": "br_024",
+    "name": "明华堂",
+    "nameEn": "Ming Hua Tang",
+    "category": "HANFU",
+    "officialUrl": "https://minghuatang.tmall.com",
+    "description": "汉服高端品牌",
+    "followerCount": 400000
+  },
+  {
+    "id": "br_025",
+    "name": "汉尚华莲",
+    "nameEn": "Han Shang Hua Lian",
+    "category": "HANFU",
+    "officialUrl": "https://hanshanghualian.tmall.com",
+    "description": "汉服品牌",
+    "followerCount": 350000
+  },
+  {
+    "id": "br_026",
+    "name": "织造司",
+    "nameEn": "Zhi Zao Si",
+    "category": "HANFU",
+    "officialUrl": "https://zhizaosi.tmall.com",
+    "description": "汉服品牌",
+    "followerCount": 200000
+  },
+  {
+    "id": "br_027",
+    "name": "重回汉唐",
+    "nameEn": "Return to Han Tang",
+    "category": "HANFU",
+    "officialUrl": "https://chonghuihantang.tmall.com",
+    "description": "汉服品牌",
+    "followerCount": 500000
+  },
+  {
+    "id": "br_028",
+    "name": "兰若庭",
+    "nameEn": "Lan Ruo Ting",
+    "category": "HANFU",
+    "officialUrl": "https://lanruoting.tmall.com",
+    "description": "汉服品牌",
+    "followerCount": 280000
+  },
+  {
+    "id": "br_029",
+    "name": "清欢纪",
+    "nameEn": "Qing Huan Ji",
+    "category": "HANFU",
+    "officialUrl": "https://qinghuanji.tmall.com",
+    "description": "汉服品牌",
+    "followerCount": 180000
+  },
+  {
+    "id": "br_030",
+    "name": "钟灵记",
+    "nameEn": "Zhong Ling Ji",
+    "category": "HANFU",
+    "officialUrl": "https://zhonglingji.tmall.com",
+    "description": "汉服品牌",
+    "followerCount": 150000
+  }
+]
