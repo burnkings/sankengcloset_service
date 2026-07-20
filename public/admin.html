@@ -3,208 +3,302 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>三坑绮橱 · 数据管理面板</title>
+<title>三坑绮橱 · 数据管理台</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f5f5;color:#333}
-.header{background:#1a1a2e;color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
-.header h1{font-size:18px;font-weight:600}
-.header .stats{font-size:13px;opacity:0.8}
-.tabs{display:flex;gap:4px;padding:12px 24px;background:#fff;border-bottom:1px solid #e0e0e0}
-.tab{padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;border:none;background:transparent;color:#666}
-.tab.active{background:#e8f0fe;color:#1a73e8;font-weight:500}
-.tab:hover{background:#f0f0f0}
-.content{padding:24px;max-width:1400px;margin:0 auto}
-.card{background:#fff;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
-.card h2{font-size:16px;margin-bottom:12px;color:#1a1a2e}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.stat-item{text-align:center;padding:16px;background:#f8f9fa;border-radius:8px}
-.stat-item .number{font-size:28px;font-weight:700;color:#1a73e8}
-.stat-item .label{font-size:12px;color:#666;margin-top:4px}
+:root{--primary:#1a73e8;--danger:#d93025;--success:#1e8e3e;--warn:#f9ab00;--bg:#f8f9fa;--card:#fff;--border:#dadce0;--text:#202124;--text2:#5f6368;--text3:#80868b}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+.header{background:#1a1a2e;color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.header h1{font-size:16px;font-weight:600}
+.header .user{font-size:12px;opacity:0.7}
+.nav{display:flex;gap:2px;padding:8px 20px;background:#fff;border-bottom:1px solid var(--border);overflow-x:auto}
+.nav-btn{padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;border:none;background:transparent;color:var(--text2);white-space:nowrap}
+.nav-btn.active{background:#e8f0fe;color:var(--primary);font-weight:500}
+.nav-btn:hover{background:#f0f0f0}
+.main{padding:20px;max-width:1400px;margin:0 auto}
+.card{background:var(--card);border-radius:8px;padding:16px;margin-bottom:12px;border:1px solid var(--border)}
+.card h2{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h2 .count{background:var(--primary);color:#fff;padding:1px 8px;border-radius:10px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{text-align:center;padding:14px;background:var(--bg);border-radius:8px}
+.stat .num{font-size:24px;font-weight:700;color:var(--primary)}
+.stat .lbl{font-size:11px;color:var(--text2);margin-top:2px}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:10px 12px;background:#f8f9fa;border-bottom:2px solid #e0e0e0;font-weight:600;color:#555}
-td{padding:8px 12px;border-bottom:1px solid #f0f0f0}
+th{text-align:left;padding:8px 10px;background:var(--bg);border-bottom:2px solid var(--border);font-weight:600;color:var(--text2);position:sticky;top:0}
+td{padding:6px 10px;border-bottom:1px solid #f0f0f0}
 tr:hover{background:#f8f9fa}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
-.badge-jk{background:#e3f2fd;color:#1565c0}
-.badge-lo{background:#fce4ec;color:#c62828}
-.badge-hf{background:#e8f5e9;color:#2e7d32}
-.badge-sale{background:#e8f5e9;color:#2e7d32}
-.badge-pre{background:#fff3e0;color:#e65100}
-.badge-up{background:#e3f2fd;color:#1565c0}
-.badge-ok{background:#e8f5e9;color:#2e7d32}
-.badge-pending{background:#fff3e0;color:#e65100}
+.b-jk{background:#e3f2fd;color:#1565c0}.b-lo{background:#fce4ec;color:#c62828}.b-hf{background:#e8f5e9;color:#2e7d32}
+.b-ok{background:#e8f5e9;color:#2e7d32}.b-pending{background:#fff3e0;color:#e65100}.b-reject{background:#ffebee;color:#c62828}
+.b-sale{background:#e8f5e9;color:#2e7d32}.b-pre{background:#fff3e0;color:#e65100}.b-up{background:#e3f2fd;color:#1565c0}
 .price{color:#c62828;font-weight:600}
-.empty{text-align:center;padding:40px;color:#999}
-.loading{text-align:center;padding:40px;color:#999}
-.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filter-btn{padding:6px 14px;border-radius:16px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:13px}
-.filter-btn.active{background:#1a73e8;color:#fff;border-color:#1a73e8}
-img{max-width:60px;max-height:60px;border-radius:4px;object-fit:cover}
+.filter-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.filter-bar select,.filter-bar input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+.btn{padding:6px 14px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:500}
+.btn-primary{background:var(--primary);color:#fff}.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}.btn-warn{background:var(--warn);color:#fff}
+.btn-outline{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn:hover{opacity:0.9}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.actions{display:flex;gap:6px;margin-top:8px}
+.empty{text-align:center;padding:30px;color:var(--text3)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:12px;padding:24px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto}
+.modal h3{margin-bottom:16px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+.form-group textarea{min-height:60px;resize:vertical}
+.detail-row{display:flex;gap:12px;margin-bottom:8px}
+.detail-row .label{color:var(--text2);min-width:80px;font-size:12px}
+.detail-row .value{flex:1}
+.img-thumb{width:60px;height:60px;object-fit:cover;border-radius:4px}
+.tabs-inner{display:flex;gap:4px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.tab-inner{padding:4px 12px;cursor:pointer;font-size:13px;border-radius:4px;color:var(--text2)}
+.tab-inner.active{background:var(--bg);color:var(--primary);font-weight:500}
+.login-box{max-width:360px;margin:80px auto;text-align:center}
+.login-box h2{margin-bottom:20px}
+.login-box input{width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;margin-bottom:10px;font-size:14px}
+.login-box .btn{width:100%;padding:10px;font-size:14px}
+.quality-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.quality-item .count{font-weight:600}
+.scroll-table{max-height:500px;overflow-y:auto}
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>🏪 三坑绮橱 · 数据管理面板</h1>
-  <div class="stats" id="headerStats">加载中...</div>
+  <h1>🏪 三坑绮橱 · 数据管理台</h1>
+  <div class="user" id="userInfo"></div>
 </div>
-<div class="tabs">
-  <button class="tab active" onclick="showTab('overview')">📊 概览</button>
-  <button class="tab" onclick="showTab('products')">📦 商品</button>
-  <button class="tab" onclick="showTab('brands')">🏷️ 品牌</button>
-  <button class="tab" onclick="showTab('review')">✅ 待审核</button>
-  <button class="tab" onclick="showTab('errors')">❌ 错误</button>
-</div>
-<div class="content" id="content"></div>
+<div class="nav" id="nav"></div>
+<div class="main" id="app"></div>
 
 <script>
 const API = '';
-let TOKEN = '';
+let TOKEN = localStorage.getItem('admin_token') || '';
 
 async function api(path, opts = {}) {
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = {'Content-Type':'application/json'};
   if (TOKEN) headers['Authorization'] = `Bearer ${TOKEN}`;
-  const res = await fetch(API + path, { ...opts, headers });
-  return res.json();
+  try {
+    const res = await fetch(API + path, {...opts, headers});
+    if (res.status === 401) { TOKEN = ''; localStorage.removeItem('admin_token'); showLogin(); return null; }
+    return await res.json();
+  } catch(e) { console.error(e); return null; }
 }
 
-function showTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  const render = { overview: renderOverview, products: renderProducts, brands: renderBrands, review: renderReview, errors: renderErrors };
-  (render[name] || render.overview)();
+function showLogin() {
+  document.getElementById('nav').innerHTML = '';
+  document.getElementById('app').innerHTML = `
+    <div class="login-box"><h2>🔐 登录</h2>
+    <input id="loginUser" placeholder="用户名" value="admin">
+    <input id="loginPass" type="password" placeholder="密码">
+    <button class="btn btn-primary" onclick="doLogin()">登录</button></div>`;
+}
+async function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  const r = await api('/api/admin/login', {method:'POST', body:JSON.stringify({username:u,password:p})});
+  if (r && r.token) { TOKEN = r.token; localStorage.setItem('admin_token', TOKEN); init(); }
+  else alert('登录失败');
 }
 
+const TABS = [
+  {id:'overview',icon:'📊',label:'概览'},
+  {id:'brands',icon:'🏷️',label:'品牌'},
+  {id:'products',icon:'📦',label:'商品'},
+  {id:'review',icon:'✅',label:'审核'},
+  {id:'quality',icon:'📈',label:'质量'},
+  {id:'crawl',icon:'🔄',label:'采集'},
+];
+let currentTab = 'overview';
+
+function init() {
+  document.getElementById('userInfo').textContent = '已登录';
+  const nav = document.getElementById('nav');
+  nav.innerHTML = TABS.map(t => `<button class="nav-btn${t.id===currentTab?' active':''}" onclick="switchTab('${t.id}')">${t.icon} ${t.label}</button>`).join('');
+  loadTab(currentTab);
+}
+function switchTab(id) { currentTab = id; init(); }
+
+async function loadTab(id) {
+  const app = document.getElementById('app');
+  app.innerHTML = '<div class="empty">加载中...</div>';
+  const render = { overview:renderOverview, brands:renderBrands, products:renderProducts, review:renderReview, quality:renderQuality, crawl:renderCrawl };
+  await (render[id] || render.overview)();
+}
+
+// ====== 概览 ======
 async function renderOverview() {
-  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
-  const feed = await api('/api/v1/feed?limit=200');
-  const items = feed.data || [];
-  const brands = new Set(items.map(i => i.brandName));
-  const categories = {};
-  items.forEach(i => { categories[i.category] = (categories[i.category] || 0) + 1; });
-
-  document.getElementById('headerStats').textContent = `${items.length} 商品 · ${brands.size} 品牌`;
-  document.getElementById('content').innerHTML = `
-    <div class="card"><h2>数据概览</h2>
-    <div class="stat-grid">
-      <div class="stat-item"><div class="number">${items.length}</div><div class="label">商品总数</div></div>
-      <div class="stat-item"><div class="number">${brands.size}</div><div class="label">品牌数</div></div>
-      <div class="stat-item"><div class="number">${Object.keys(categories).length}</div><div class="label">商品类型</div></div>
-      <div class="stat-item"><div class="number">${items.filter(i=>i.price>0).length}</div><div class="label">有价格</div></div>
+  const feed = await api('/api/v1/feed?limit=500');
+  const items = feed?.data || [];
+  const brands = new Set(items.map(i=>i.brandName));
+  const cats = {}; items.forEach(i=>{cats[i.category]=(cats[i.category]||0)+1});
+  const review = await api('/api/admin/review/pending');
+  const pending = review?.total || 0;
+  document.getElementById('app').innerHTML = `
+    <div class="card"><h2>数据概览</h2><div class="grid">
+      <div class="stat"><div class="num">${items.length}</div><div class="lbl">商品总数</div></div>
+      <div class="stat"><div class="num">${brands.size}</div><div class="lbl">品牌数</div></div>
+      <div class="stat"><div class="num">${pending}</div><div class="lbl">待审核</div></div>
+      <div class="stat"><div class="num">${Object.keys(cats).length}</div><div class="lbl">商品类型</div></div>
     </div></div>
-    <div class="card"><h2>坑向分布</h2>
-    <div class="stat-grid">
-      ${Object.entries(categories).map(([k,v]) => `<div class="stat-item"><div class="number">${v}</div><div class="label">${k}</div></div>`).join('')}
+    <div class="card"><h2>坑向分布</h2><div class="grid">
+      ${Object.entries(cats).map(([k,v])=>`<div class="stat"><div class="num">${v}</div><div class="lbl">${k}</div></div>`).join('')}
     </div></div>`;
 }
 
-async function renderProducts() {
-  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
-  const feed = await api('/api/v1/feed?limit=200');
-  const items = feed.data || [];
-
-  const pitFilter = (cat) => cat === 'ALL' ? items : items.filter(i => i.category === cat);
-
-  let currentFilter = 'ALL';
-  function renderList(filter) {
-    currentFilter = filter;
-    const list = pitFilter(filter);
-    document.getElementById('productList').innerHTML = list.length ? `<table>
-      <tr><th>图片</th><th>名称</th><th>品牌</th><th>类型</th><th>价格</th><th>状态</th></tr>
-      ${list.map(i => `<tr>
-        <td>${i.coverUrl ? `<img src="${i.coverUrl}" onerror="this.style.display='none'">` : '-'}</td>
-        <td>${i.title}</td>
-        <td>${i.brandName}</td>
-        <td><span class="badge badge-${i.category==='JK'?'jk':i.category==='LOLITA'?'lo':'hf'}">${i.category}</span></td>
-        <td class="price">${i.price > 0 ? '¥' + (i.price/100).toFixed(0) : '-'}</td>
-        <td>${i.badgeText || '-'}</td>
-      </tr>`).join('')}
-    </table>` : '<div class="empty">无数据</div>';
-  }
-
-  document.getElementById('content').innerHTML = `
-    <div class="card"><h2>商品列表 (${items.length})</h2>
-    <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterProducts('ALL',this)">全部</button>
-      <button class="filter-btn" onclick="filterProducts('JK',this)">JK</button>
-      <button class="filter-btn" onclick="filterProducts('LOLITA',this)">Lolita</button>
-      <button class="filter-btn" onclick="filterProducts('HANFU',this)">汉服</button>
-    </div>
-    <div id="productList"></div></div>`;
-  window.filterProducts = (cat, btn) => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderList(cat);
-  };
-  renderList('ALL');
-}
-
+// ====== 品牌管理 ======
 async function renderBrands() {
-  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
-  const feed = await api('/api/v1/feed?limit=200');
-  const items = feed.data || [];
-  const brandMap = {};
+  const r = await api('/api/v1/feed?limit=500');
+  const items = r?.data || [];
+  const map = {};
   items.forEach(i => {
-    if (!brandMap[i.brandName]) brandMap[i.brandName] = { name: i.brandName, count: 0, category: i.category, prices: [] };
-    brandMap[i.brandName].count++;
-    if (i.price > 0) brandMap[i.brandName].prices.push(i.price);
+    if (!map[i.brandName]) map[i.brandName] = {name:i.brandName, category:i.category, count:0, prices:[]};
+    map[i.brandName].count++;
+    if (i.price>0) map[i.brandName].prices.push(i.price);
   });
-  const brands = Object.values(brandMap).sort((a,b) => b.count - a.count);
-
-  document.getElementById('content').innerHTML = `
-    <div class="card"><h2>品牌列表 (${brands.length})</h2>
-    <table>
-      <tr><th>品牌</th><th>坑向</th><th>商品数</th><th>价格范围</th></tr>
-      ${brands.map(b => {
-        const min = b.prices.length ? (Math.min(...b.prices)/100).toFixed(0) : '-';
-        const max = b.prices.length ? (Math.max(...b.prices)/100).toFixed(0) : '-';
-        return `<tr><td><strong>${b.name}</strong></td>
-          <td><span class="badge badge-${b.category==='JK'?'jk':b.category==='LOLITA'?'lo':'hf'}">${b.category}</span></td>
-          <td>${b.count}</td>
-          <td>${min !== '-' ? '¥'+min+' ~ ¥'+max : '-'}</td></tr>`;
-      }).join('')}
-    </table></div>`;
+  const brands = Object.values(map).sort((a,b)=>b.count-a.count);
+  document.getElementById('app').innerHTML = `
+    <div class="card"><h2>品牌管理 <span class="count">${brands.length}</span></h2>
+    <div class="scroll-table"><table>
+      <tr><th>品牌</th><th>坑向</th><th>商品数</th><th>价格范围</th><th>操作</th></tr>
+      ${brands.map(b=>`<tr>
+        <td><strong>${b.name}</strong></td>
+        <td><span class="badge b-${b.category==='JK'?'jk':b.category==='LOLITA'?'lo':'hf'}">${b.category}</span></td>
+        <td>${b.count}</td>
+        <td>${b.prices.length?'¥'+Math.min(...b.prices)/100+' ~ ¥'+Math.max(...b.prices)/100:'-'}</td>
+        <td><button class="btn btn-outline" onclick="viewBrand('${b.name}')">查看</button></td>
+      </tr>`).join('')}
+    </table></div></div>`;
+}
+async function viewBrand(name) {
+  const r = await api('/api/v1/feed?limit=500');
+  const items = (r?.data||[]).filter(i=>i.brandName===name);
+  document.getElementById('app').innerHTML = `
+    <div class="card"><h2>${name} 的商品 (${items.length})</h2>
+    <button class="btn btn-outline" onclick="switchTab('brands')" style="margin-bottom:12px">← 返回品牌列表</button>
+    <div class="scroll-table"><table>
+      <tr><th>名称</th><th>类型</th><th>价格</th><th>状态</th></tr>
+      ${items.map(i=>`<tr><td>${i.title}</td><td><span class="badge b-${i.category==='JK'?'jk':i.category==='LOLITA'?'lo':'hf'}">${i.category}</span></td><td class="price">${i.price>0?'¥'+(i.price/100).toFixed(0):'-'}</td><td>${i.badgeText||'-'}</td></tr>`).join('')}
+    </table></div></div>`;
 }
 
+// ====== 商品管理 ======
+async function renderProducts() {
+  const r = await api('/api/v1/feed?limit=500');
+  const all = r?.data || [];
+  let filtered = [...all];
+  let filter = {pit:'ALL', search:''};
+  function applyFilter() {
+    filtered = all;
+    if (filter.pit!=='ALL') filtered = filtered.filter(i=>i.category===filter.pit);
+    if (filter.search) { const q=filter.search.toLowerCase(); filtered=filtered.filter(i=>i.title.toLowerCase().includes(q)||i.brandName.toLowerCase().includes(q)); }
+    renderList();
+  }
+  function renderList() {
+    document.getElementById('plist').innerHTML = filtered.length ? `<table>
+      <tr><th>名称</th><th>品牌</th><th>类型</th><th>价格</th><th>状态</th><th>来源</th></tr>
+      ${filtered.map(i=>`<tr onclick="viewProduct('${i.entityId}')" style="cursor:pointer">
+        <td>${i.title}</td><td>${i.brandName}</td>
+        <td><span class="badge b-${i.category==='JK'?'jk':i.category==='LOLITA'?'lo':'hf'}">${i.category}</span></td>
+        <td class="price">${i.price>0?'¥'+(i.price/100).toFixed(0):'-'}</td>
+        <td>${i.badgeText||'-'}</td><td>${i.sourceLabel||'-'}</td>
+      </tr>`).join('')}
+    </table>` : '<div class="empty">无匹配商品</div>';
+  }
+  document.getElementById('app').innerHTML = `
+    <div class="card"><h2>商品管理 <span class="count" id="pcount">${all.length}</span></h2>
+    <div class="filter-bar">
+      <select id="fPit" onchange="filter.pit=this.value;applyFilter()">
+        <option value="ALL">全部坑向</option><option value="JK">JK</option><option value="LOLITA">Lolita</option><option value="HANFU">汉服</option>
+      </select>
+      <input id="fSearch" placeholder="搜索名称/品牌..." oninput="filter.search=this.value;applyFilter()">
+    </div>
+    <div class="scroll-table" id="plist"></div></div>`;
+  applyFilter();
+}
+async function viewProduct(id) {
+  const r = await api('/api/v1/products/'+id);
+  const p = r?.data;
+  if (!p) { alert('商品不存在'); return; }
+  document.getElementById('app').innerHTML = `
+    <div class="card"><h2>${p.title}</h2>
+    <button class="btn btn-outline" onclick="switchTab('products')" style="margin-bottom:12px">← 返回商品列表</button>
+    <div class="detail-row"><div class="label">品牌</div><div class="value">${p.brandName}</div></div>
+    <div class="detail-row"><div class="label">类型</div><div class="value">${p.category}</div></div>
+    <div class="detail-row"><div class="label">价格</div><div class="value price">${p.price>0?'¥'+(p.price/100).toFixed(0):'-'}</div></div>
+    <div class="detail-row"><div class="label">原价</div><div class="value">${p.originalPrice>0?'¥'+(p.originalPrice/100).toFixed(0):'-'}</div></div>
+    <div class="detail-row"><div class="label">状态</div><div class="value">${p.badgeText||'-'}</div></div>
+    <div class="detail-row"><div class="label">来源</div><div class="value">${p.sourceLabel||'-'}</div></div>
+    <div class="detail-row"><div class="label">描述</div><div class="value">${p.description||'-'}</div></div>
+    ${p.coverUrl?`<div class="detail-row"><div class="label">图片</div><div class="value"><img src="${p.coverUrl}" class="img-thumb" onerror="this.style.display='none'"></div></div>`:''}
+    </div>`;
+}
+
+// ====== 审核队列 ======
 async function renderReview() {
-  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
-  try {
-    const data = await api('/api/admin/review/pending');
-    const items = data.items || [];
-    document.getElementById('content').innerHTML = `
-      <div class="card"><h2>待审核 (${items.length})</h2>
-      ${items.length ? `<table>
-        <tr><th>名称</th><th>品牌</th><th>坑向</th><th>价格</th><th>来源</th><th>置信度</th></tr>
-        ${items.map(i => `<tr>
-          <td>${i.display_name}</td><td>${i.brand_name||'-'}</td>
-          <td><span class="badge badge-${i.pit_type==='JK'?'jk':i.pit_type==='LOLITA'?'lo':'hf'}">${i.pit_type}</span></td>
-          <td class="price">${i.current_price>0?'¥'+(i.current_price/100).toFixed(0):'-'}</td>
-          <td>${i.source_platform}</td><td>${i.confidence}%</td>
-        </tr>`).join('')}
-      </table>` : '<div class="empty">🎉 无待审核数据</div>'}</div>`;
-  } catch { document.getElementById('content').innerHTML = '<div class="empty">需要管理员权限</div>'; }
+  const r = await api('/api/admin/review/pending');
+  const items = r?.items || [];
+  document.getElementById('app').innerHTML = `
+    <div class="card"><h2>待审核队列 <span class="count">${items.length}</span></h2>
+    ${items.length?`<div class="scroll-table"><table>
+      <tr><th>名称</th><th>品牌</th><th>坑向</th><th>价格</th><th>来源</th><th>置信度</th><th>操作</th></tr>
+      ${items.map(i=>`<tr>
+        <td>${i.display_name}</td><td>${i.brand_name||'-'}</td>
+        <td><span class="badge b-${i.pit_type==='JK'?'jk':i.pit_type==='LOLITA'?'lo':'hf'}">${i.pit_type}</span></td>
+        <td class="price">${i.current_price>0?'¥'+(i.current_price/100).toFixed(0):'-'}</td>
+        <td>${i.source_platform}</td><td>${i.confidence}%</td>
+        <td><button class="btn btn-success btn-sm" onclick="reviewAction('${i.id}','approve')">通过</button>
+        <button class="btn btn-danger btn-sm" onclick="reviewAction('${i.id}','reject')">驳回</button></td>
+      </tr>`).join('')}
+    </table></div>`:'<div class="empty">🎉 无待审核数据</div>'}</div>`;
+}
+async function reviewAction(id, action) {
+  const reason = action==='reject' ? prompt('驳回原因：') : '审核通过';
+  if (action==='reject' && !reason) return;
+  await api(`/api/admin/review/${id}/${action}`, {method:'POST', body:JSON.stringify({reason})});
+  renderReview();
 }
 
-async function renderErrors() {
-  document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
-  try {
-    const data = await api('/api/admin/review/errors');
-    const errors = data.errors || [];
-    document.getElementById('content').innerHTML = `
-      <div class="card"><h2>采集错误 (${errors.length})</h2>
-      ${errors.length ? `<table>
-        <tr><th>时间</th><th>来源</th><th>状态</th><th>错误</th></tr>
-        ${errors.map(e => `<tr>
-          <td>${new Date(e.created_at).toLocaleString('zh-CN')}</td>
-          <td>${e.source_type}</td>
-          <td><span class="badge badge-pending">${e.status}</span></td>
-          <td>${e.error_message||'-'}</td>
-        </tr>`).join('')}
-      </table>` : '<div class="empty">🎉 无采集错误</div>'}</div>`;
-  } catch { document.getElementById('content').innerHTML = '<div class="empty">需要管理员权限</div>'; }
+// ====== 数据质量 ======
+async function renderQuality() {
+  const r = await api('/api/v1/feed?limit=500');
+  const items = r?.data || [];
+  const noCover = items.filter(i=>!i.coverUrl);
+  const noBrand = items.filter(i=>!i.brandName);
+  const noPrice = items.filter(i=>!i.price||i.price<=0);
+  const noBadge = items.filter(i=>!i.badgeText);
+  document.getElementById('app').innerHTML = `
+    <div class="card"><h2>数据质量</h2>
+    <div class="quality-item"><span>缺封面图</span><span class="count" style="color:${noCover.length?'#d93025':'#1e8e3e'}">${noCover.length}/${items.length}</span></div>
+    <div class="quality-item"><span>缺品牌</span><span class="count" style="color:${noBrand.length?'#d93025':'#1e8e3e'}">${noBrand.length}/${items.length}</span></div>
+    <div class="quality-item"><span>缺价格</span><span class="count" style="color:${noPrice.length?'#d93025':'#1e8e3e'}">${noPrice.length}/${items.length}</span></div>
+    <div class="quality-item"><span>缺状态标签</span><span class="count" style="color:${noBadge.length?'#f9ab00':'#1e8e3e'}">${noBadge.length}/${items.length}</span></div>
+    <div class="quality-item"><span>完整率</span><span class="count">${((items.length-noCover.length-noBrand.length)/items.length*100).toFixed(1)}%</span></div>
+    </div>`;
 }
 
-renderOverview();
+// ====== 采集记录 ======
+async function renderCrawl() {
+  const r = await api('/api/admin/review/errors');
+  const errors = r?.errors || [];
+  document.getElementById('app').innerHTML = `
+    <div class="card"><h2>采集任务记录 <span class="count">${errors.length}</span></h2>
+    ${errors.length?`<div class="scroll-table"><table>
+      <tr><th>时间</th><th>来源</th><th>状态</th><th>抓取</th><th>成功</th><th>失败</th><th>错误</th></tr>
+      ${errors.map(e=>`<tr>
+        <td>${new Date(e.created_at).toLocaleString('zh-CN')}</td>
+        <td>${e.source_type}</td>
+        <td><span class="badge b-${e.status==='SUCCESS'?'ok':'pending'}">${e.status}</span></td>
+        <td>${e.items_total}</td><td>${e.items_success}</td><td>${e.items_failed}</td>
+        <td title="${e.error_message||''}">${(e.error_message||'').slice(0,40)}${(e.error_message||'').length>40?'...':''}</td>
+      </tr>`).join('')}
+    </table></div>`:'<div class="empty">无采集记录</div>'}</div>`;
+}
+
+// 初始化
+if (TOKEN) init(); else showLogin();
 </script>
 </body>
 </html>
