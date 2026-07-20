@@ -22,9 +22,9 @@ export class Persistence {
           sale_status = ${item.saleStatus},
           last_seen_at = now(),
           updated_at = now()
-        WHERE id = ${existing[0].id}
+        WHERE id = ${existing[0]!.id}
       `;
-      return String(existing[0].id);
+      return String(existing[0]!.id);
     }
     // 插入新产品
     const id = 'prd_' + crypto.randomUUID().replace(/-/g, '');
