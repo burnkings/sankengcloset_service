@@ -1,0 +1,59 @@
+{
+  "source": "weibo",
+  "account": {
+    "id": "weibo_tufengfeng",
+    "name": "兔缝缝JK制服",
+    "verified": true,
+    "category": "JK"
+  },
+  "posts": [
+    {
+      "id": "wb_001",
+      "title": "新色格裙预告｜星空蓝格裙即将上架",
+      "content": "星空蓝格裙，采用进口涤纶面料，格纹细腻。预计3月中旬上架，敬请期待！#JK制服# #兔缝缝#",
+      "publishTime": "2025-02-20T14:30:00+08:00",
+      "images": [
+        "https://wx1.sinaimg.cn/large/weibo_tufengfeng_wb001_1.jpg",
+        "https://wx1.sinaimg.cn/large/weibo_tufengfeng_wb001_2.jpg"
+      ],
+      "productHint": {
+        "name": "星空蓝格裙 45cm",
+        "category": "格裙",
+        "estimatedPrice": 138.00,
+        "status": "upcoming"
+      }
+    },
+    {
+      "id": "wb_002",
+      "title": "现货补货｜绀色格裙大量到货",
+      "content": "绀色格裙补货到库，S/M/L/XL全尺码现货，即刻下单48小时内发货。#现货# #JK格裙#",
+      "publishTime": "2025-02-18T10:00:00+08:00",
+      "images": [
+        "https://wx1.sinaimg.cn/large/weibo_tufengfeng_wb002_1.jpg"
+      ],
+      "productHint": {
+        "name": "绀色格裙 42cm",
+        "category": "格裙",
+        "estimatedPrice": 118.00,
+        "status": "on_sale"
+      }
+    },
+    {
+      "id": "wb_003",
+      "title": "粉色衬衫预售开启",
+      "content": "粉格关西襟衬衫预售中，定金30元，尾款59元。限量200件，售完即止。",
+      "publishTime": "2025-02-15T09:00:00+08:00",
+      "images": [
+        "https://wx1.sinaimg.cn/large/weibo_tufengfeng_wb003_1.jpg"
+      ],
+      "productHint": {
+        "name": "粉格关西襟衬衫",
+        "category": "衬衫",
+        "estimatedPrice": 89.00,
+        "status": "pre_order",
+        "deposit": 30.00,
+        "balance": 59.00
+      }
+    }
+  ]
+}

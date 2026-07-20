@@ -1,0 +1,62 @@
+{
+  "source": "wechat_mp",
+  "account": {
+    "id": "mp_tufengfeng",
+    "name": "兔缝缝JK制服",
+    "category": "JK"
+  },
+  "articles": [
+    {
+      "id": "mp_001",
+      "title": "春季新品｜星空蓝系列全面上架",
+      "summary": "星空蓝格裙、配套衬衫、领结全系列上架，限时9折优惠。",
+      "publishTime": "2025-02-22T08:00:00+08:00",
+      "url": "https://mp.weixin.qq.com/s/mp001",
+      "images": [
+        "https://mmbiz.qpic.cn/wechat_mp001_1.jpg"
+      ],
+      "products": [
+        {
+          "name": "星空蓝格裙 45cm",
+          "category": "格裙",
+          "price": 128.00,
+          "originalPrice": 138.00,
+          "status": "on_sale"
+        },
+        {
+          "name": "星空蓝配套衬衫",
+          "category": "衬衫",
+          "price": 79.00,
+          "originalPrice": 89.00,
+          "status": "on_sale"
+        },
+        {
+          "name": "星空蓝领结",
+          "category": "配饰",
+          "price": 25.00,
+          "originalPrice": 28.00,
+          "status": "on_sale"
+        }
+      ]
+    },
+    {
+      "id": "mp_002",
+      "title": "绀色格裙补货通知",
+      "summary": "绀色格裙全尺码补货到库，即刻可发。",
+      "publishTime": "2025-02-19T12:00:00+08:00",
+      "url": "https://mp.weixin.qq.com/s/mp002",
+      "images": [
+        "https://mmbiz.qpic.cn/wechat_mp002_1.jpg"
+      ],
+      "products": [
+        {
+          "name": "绀色格裙 42cm",
+          "category": "格裙",
+          "price": 118.00,
+          "originalPrice": 118.00,
+          "status": "on_sale"
+        }
+      ]
+    }
+  ]
+}
