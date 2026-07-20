@@ -1,0 +1,126 @@
+{
+  "brand": {
+    "id": "tufengfeng",
+    "name": "兔缝缝",
+    "nameEn": "TuFengFeng",
+    "category": "JK",
+    "officialUrl": "https://tufengfeng.com",
+    "description": "JK制服头部品牌，以格裙闻名"
+  },
+  "products": [
+    {
+      "id": "TF-2025-001",
+      "name": "深蓝格裙 45cm",
+      "category": "格裙",
+      "subcategory": "百褶裙",
+      "price": 128.00,
+      "originalPrice": 168.00,
+      "status": "on_sale",
+      "description": "经典深蓝格裙，采用高密度涤纶面料，百搭日常款。45cm裙长适合大多数身高。",
+      "coverImage": "https://tufengfeng.com/images/products/TF-2025-001/cover.jpg",
+      "images": [
+        "https://tufengfeng.com/images/products/TF-2025-001/cover.jpg",
+        "https://tufengfeng.com/images/products/TF-2025-001/detail-1.jpg",
+        "https://tufengfeng.com/images/products/TF-2025-001/detail-2.jpg"
+      ],
+      "shopUrl": "https://tufengfeng.tmall.com",
+      "tags": ["格裙", "日常", "蓝色", "百搭"],
+      "publishedAt": "2025-01-15T10:00:00+08:00",
+      "specs": [
+        { "color": "深蓝", "size": "S", "stock": 50 },
+        { "color": "深蓝", "size": "M", "stock": 80 },
+        { "color": "深蓝", "size": "L", "stock": 60 },
+        { "color": "深蓝", "size": "XL", "stock": 30 }
+      ]
+    },
+    {
+      "id": "TF-2025-002",
+      "name": "粉格关西襟衬衫",
+      "category": "衬衫",
+      "subcategory": "关西襟",
+      "price": 89.00,
+      "originalPrice": 89.00,
+      "status": "on_sale",
+      "description": "粉色格纹关西襟衬衫，JK制服搭配必备。",
+      "coverImage": "https://tufengfeng.com/images/products/TF-2025-002/cover.jpg",
+      "images": [
+        "https://tufengfeng.com/images/products/TF-2025-002/cover.jpg"
+      ],
+      "shopUrl": "https://tufengfeng.tmall.com",
+      "tags": ["衬衫", "粉色", "关西襟"],
+      "publishedAt": "2025-02-01T09:00:00+08:00",
+      "specs": [
+        { "color": "粉色", "size": "S", "stock": 40 },
+        { "color": "粉色", "size": "M", "stock": 60 },
+        { "color": "粉色", "size": "L", "stock": 45 }
+      ]
+    },
+    {
+      "id": "TF-2025-003",
+      "name": "格裙套装 粉色",
+      "category": "套装",
+      "subcategory": "衬衫+裙子",
+      "price": 228.00,
+      "originalPrice": 258.00,
+      "status": "on_sale",
+      "description": "粉色格裙套装，含衬衫+裙子，入门JK制服首选。",
+      "coverImage": "https://tufengfeng.com/images/products/TF-2025-003/cover.jpg",
+      "images": [
+        "https://tufengfeng.com/images/products/TF-2025-003/cover.jpg",
+        "https://tufengfeng.com/images/products/TF-2025-003/detail-1.jpg"
+      ],
+      "shopUrl": "https://tufengfeng.tmall.com",
+      "tags": ["套装", "粉色", "入门"],
+      "publishedAt": "2025-03-01T08:00:00+08:00",
+      "specs": [
+        { "color": "粉色", "size": "S", "stock": 30 },
+        { "color": "粉色", "size": "M", "stock": 50 },
+        { "color": "粉色", "size": "L", "stock": 40 }
+      ]
+    },
+    {
+      "id": "TF-2025-004",
+      "name": "绀色格裙 42cm",
+      "category": "格裙",
+      "subcategory": "百褶裙",
+      "price": 118.00,
+      "originalPrice": 118.00,
+      "status": "on_sale",
+      "description": "绀色格裙，经典配色，适合正式场合。",
+      "coverImage": "https://tufengfeng.com/images/products/TF-2025-004/cover.jpg",
+      "images": [
+        "https://tufengfeng.com/images/products/TF-2025-004/cover.jpg"
+      ],
+      "shopUrl": "https://tufengfeng.tmall.com",
+      "tags": ["格裙", "绀色", "正式"],
+      "publishedAt": "2025-01-20T10:00:00+08:00",
+      "specs": [
+        { "color": "绀色", "size": "S", "stock": 45 },
+        { "color": "绀色", "size": "M", "stock": 70 },
+        { "color": "绀色", "size": "L", "stock": 55 }
+      ]
+    },
+    {
+      "id": "TF-2025-005",
+      "name": "JK领结",
+      "category": "配饰",
+      "subcategory": "领结",
+      "price": 28.00,
+      "originalPrice": 28.00,
+      "status": "on_sale",
+      "description": "JK制服搭配领结，多色可选。",
+      "coverImage": "https://tufengfeng.com/images/products/TF-2025-005/cover.jpg",
+      "images": [
+        "https://tufengfeng.com/images/products/TF-2025-005/cover.jpg"
+      ],
+      "shopUrl": "https://tufengfeng.tmall.com",
+      "tags": ["领结", "配饰"],
+      "publishedAt": "2025-02-15T09:00:00+08:00",
+      "specs": [
+        { "color": "深蓝", "size": "均码", "stock": 100 },
+        { "color": "粉色", "size": "均码", "stock": 80 },
+        { "color": "绀色", "size": "均码", "stock": 90 }
+      ]
+    }
+  ]
+}
