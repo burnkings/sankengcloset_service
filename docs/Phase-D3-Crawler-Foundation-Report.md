@@ -206,4 +206,16 @@ Test Files  14 passed | 1 skipped (15)
 
 ---
 
-**结论**: Phase D3.1 采集框架加固完成，131 tests 全过，Directus 集成验证通过。框架具备生产接入能力，可进入下一阶段。
+**结论**: Phase D3 采集框架加固完成，131 tests 全过，Directus 集成验证通过。框架具备生产接入能力，已进入 Phase D4。
+
+---
+
+## 附录：Phase D3.1 → D3 最终状态
+
+| 指标 | 值 |
+|------|-----|
+| 测试总数 | 131 passed, 0 failed |
+| Fixture 场景 | 10 种（现货/预售/尾款/区间/无价/预约/降价/无品牌/重复/日期冲突） |
+| 类型系统 | RawCrawlItem + NormalizedProductCandidate + 兼容旧 ParsedItem/NormalizedItem |
+| 数据库表 | 22 tables（含 4 核心采集表） |
+| Directus | 运行中，4 表可见 |
