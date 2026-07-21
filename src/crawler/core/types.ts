@@ -1,5 +1,9 @@
 // crawler/core/types.ts — 采集框架核心类型
 
+// ============================================================
+// 1. 网络层
+// ============================================================
+
 export interface FetchResult {
   url: string;
   statusCode: number;
@@ -9,6 +13,78 @@ export interface FetchResult {
   fetchedAt: Date;
   durationMs: number;
 }
+
+// ============================================================
+// 2. 领域层 — 原始采集项（RawCrawlItem）
+//    描述从外部数据源获取的原始数据，未解析
+// ============================================================
+
+export interface RawCrawlItem {
+  /** 数据来源平台标识，如 OFFICIAL / WEIBO / WECHAT_MP */
+  sourcePlatform: string;
+  /** 原始 URL */
+  sourceUrl: string;
+  /** 外部平台唯一 ID */
+  externalId: string;
+  /** 原始标题（未清洗） */
+  rawTitle: string;
+  /** 原始描述（未清洗） */
+  rawDescription: string;
+  /** 原始价格文本（如 "¥128-168" / "定金100尾款268"） */
+  rawPriceText: string;
+  /** 原始日期文本（如 "2025年1月15日" / "3天后"） */
+  rawDateText: string;
+  /** 原始图片 URL 列表 */
+  rawImageUrls: string[];
+  /** 原始数据负载（HTML/JSON 片段） */
+  rawPayload: unknown;
+  /** 采集时间 */
+  fetchedAt: Date;
+  /** 解析器版本 */
+  parserVersion: string;
+}
+
+// ============================================================
+// 3. 领域层 — 标准化商品候选（NormalizedProductCandidate）
+//    经过解析、清洗、标准化后的商品数据，等待验证和入库
+// ============================================================
+
+export interface NormalizedProductCandidate {
+  /** 商品标准化名称 */
+  name: string;
+  /** 品牌名称 */
+  brand: string;
+  /** 坑向：JK / LOLITA / HANFU / OTHER */
+  pitType: 'JK' | 'LOLITA' | 'HANFU' | 'OTHER';
+  /** 细分类目 */
+  category: string;
+  /** 销售状态 */
+  saleStatus: 'UPCOMING' | 'ON_SALE' | 'PRE_ORDER' | 'SOLD_OUT' | 'ENDED';
+  /** 当前价格（分） */
+  currentPrice: number;
+  /** 原价（分） */
+  originalPrice: number;
+  /** 定金（分） */
+  depositPrice: number;
+  /** 尾款（分） */
+  balancePrice: number;
+  /** 预售开始时间 */
+  preorderStartAt: Date | null;
+  /** 预售结束时间 */
+  preorderEndAt: Date | null;
+  /** 图片 URL 列表 */
+  imageUrls: string[];
+  /** 来源 URL */
+  sourceUrl: string;
+  /** 置信度 0-100 */
+  confidence: number;
+  /** 校验错误列表（空 = 通过校验） */
+  validationErrors: ValidationError[];
+}
+
+// ============================================================
+// 4. 解析层 — ParsedItem（兼容旧接口）
+// ============================================================
 
 export interface ParsedItem {
   sourceUrl: string;
@@ -34,11 +110,19 @@ export interface ParsedItem {
   tags: string[];
 }
 
+// ============================================================
+// 5. 标准化层 — NormalizedItem（兼容旧接口）
+// ============================================================
+
 export interface NormalizedItem extends ParsedItem {
   canonicalName: string;
   normalizedBrandName: string;
   confidence: number;
 }
+
+// ============================================================
+// 6. 校验层
+// ============================================================
 
 export interface ValidationResult {
   valid: boolean;
@@ -53,11 +137,19 @@ export interface ValidationError {
   severity: 'error' | 'warning';
 }
 
+// ============================================================
+// 7. 去重层
+// ============================================================
+
 export interface DedupResult {
   action: 'insert' | 'update' | 'skip_dedup' | 'skip_review';
   existingId: string | null;
   reason: string;
 }
+
+// ============================================================
+// 8. 采集管道配置与统计
+// ============================================================
 
 export interface CrawlJobConfig {
   sourceType: string;
@@ -87,6 +179,10 @@ export interface CrawlJobStats {
   errorCount: number;
   errors: string[];
 }
+
+// ============================================================
+// 9. 接口契约
+// ============================================================
 
 export interface SourceAdapter {
   readonly sourceType: string;

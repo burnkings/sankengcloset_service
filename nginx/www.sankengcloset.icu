@@ -1,0 +1,35 @@
+# www.sankengcloset.icu — 主域名 / HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name sankengcloset.icu www.sankengcloset.icu;
+    # HTTP → HTTPS 跳转
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name sankengcloset.icu www.sankengcloset.icu;
+
+    ssl_certificate /etc/nginx/ssl/sankengcloset.icu.pem;
+    ssl_certificate_key /etc/nginx/ssl/sankengcloset.icu.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    root /var/www/sankengcloset;
+    index index.html;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/sankengcloset;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+}

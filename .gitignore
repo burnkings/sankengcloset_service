@@ -4,3 +4,5 @@ dist/
 var/uploads/
 coverage/
 *.log
+.env.infra
+docs/DIRECTUS-CREDENTIALS.md
