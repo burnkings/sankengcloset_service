@@ -6,3 +6,4 @@ coverage/
 *.log
 .env.infra
 docs/DIRECTUS-CREDENTIALS.md
+spike-d7.6/

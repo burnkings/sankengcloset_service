@@ -1,0 +1,2097 @@
+{
+  "brand": "森萌哒",
+  "brandId": "br_sm",
+  "pitType": "JK",
+  "products": [
+    {
+      "id": "br_sm_p0001",
+      "name": "日常系列 绀色格裙",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "日常系列 绀色格裙，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/1/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/1/1.jpg",
+        "https://img.example.com/br_sm/1/2.jpg",
+        "https://img.example.com/br_sm/1/3.jpg"
+      ],
+      "publishedAt": "2024-10-17T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0002",
+      "name": "限定系列 红色格裙 #2",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "pre_order",
+      "description": "限定系列 红色格裙 #2，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/2/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/2/1.jpg",
+        "https://img.example.com/br_sm/2/2.jpg",
+        "https://img.example.com/br_sm/2/3.jpg"
+      ],
+      "publishedAt": "2024-03-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0003",
+      "name": "复古系列 粉色格裙 #3",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "复古系列 粉色格裙 #3，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/3/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/3/1.jpg",
+        "https://img.example.com/br_sm/3/2.jpg",
+        "https://img.example.com/br_sm/3/3.jpg"
+      ],
+      "publishedAt": "2024-09-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0004",
+      "name": "简约系列 粉色格裙 #4",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "简约系列 粉色格裙 #4，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/4/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/4/1.jpg",
+        "https://img.example.com/br_sm/4/2.jpg",
+        "https://img.example.com/br_sm/4/3.jpg"
+      ],
+      "publishedAt": "2024-03-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0005",
+      "name": "日常系列 黑色格裙 #5",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "日常系列 黑色格裙 #5，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/5/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/5/1.jpg",
+        "https://img.example.com/br_sm/5/2.jpg",
+        "https://img.example.com/br_sm/5/3.jpg"
+      ],
+      "publishedAt": "2024-11-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0006",
+      "name": "华丽系列 棕色格裙 #6",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "on_sale",
+      "description": "华丽系列 棕色格裙 #6，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/6/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/6/1.jpg",
+        "https://img.example.com/br_sm/6/2.jpg",
+        "https://img.example.com/br_sm/6/3.jpg"
+      ],
+      "publishedAt": "2024-02-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0007",
+      "name": "甜美系列 紫色格裙 #7",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "甜美系列 紫色格裙 #7，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/7/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/7/1.jpg",
+        "https://img.example.com/br_sm/7/2.jpg",
+        "https://img.example.com/br_sm/7/3.jpg"
+      ],
+      "publishedAt": "2024-07-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0008",
+      "name": "复古系列 紫色格裙 #8",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "复古系列 紫色格裙 #8，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/8/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/8/1.jpg",
+        "https://img.example.com/br_sm/8/2.jpg",
+        "https://img.example.com/br_sm/8/3.jpg"
+      ],
+      "publishedAt": "2024-11-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0009",
+      "name": "简约系列 蓝色格裙 #9",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "简约系列 蓝色格裙 #9，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/9/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/9/1.jpg",
+        "https://img.example.com/br_sm/9/2.jpg",
+        "https://img.example.com/br_sm/9/3.jpg"
+      ],
+      "publishedAt": "2024-10-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0010",
+      "name": "暗黑系列 绀色格裙 #10",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "暗黑系列 绀色格裙 #10，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/10/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/10/1.jpg",
+        "https://img.example.com/br_sm/10/2.jpg",
+        "https://img.example.com/br_sm/10/3.jpg"
+      ],
+      "publishedAt": "2024-03-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0011",
+      "name": "限定系列 粉色格裙 #11",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "限定系列 粉色格裙 #11，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/11/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/11/1.jpg",
+        "https://img.example.com/br_sm/11/2.jpg",
+        "https://img.example.com/br_sm/11/3.jpg"
+      ],
+      "publishedAt": "2024-05-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0012",
+      "name": "复古系列 粉色格裙 #12",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "复古系列 粉色格裙 #12，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/12/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/12/1.jpg",
+        "https://img.example.com/br_sm/12/2.jpg",
+        "https://img.example.com/br_sm/12/3.jpg"
+      ],
+      "publishedAt": "2024-06-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0013",
+      "name": "清新系列 红色格裙 #13",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "清新系列 红色格裙 #13，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/13/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/13/1.jpg",
+        "https://img.example.com/br_sm/13/2.jpg",
+        "https://img.example.com/br_sm/13/3.jpg"
+      ],
+      "publishedAt": "2024-09-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0014",
+      "name": "学院系列 蓝色格裙 #14",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "学院系列 蓝色格裙 #14，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/14/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/14/1.jpg",
+        "https://img.example.com/br_sm/14/2.jpg",
+        "https://img.example.com/br_sm/14/3.jpg"
+      ],
+      "publishedAt": "2024-09-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0015",
+      "name": "简约系列 蓝色格裙 #15",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "简约系列 蓝色格裙 #15，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/15/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/15/1.jpg",
+        "https://img.example.com/br_sm/15/2.jpg",
+        "https://img.example.com/br_sm/15/3.jpg"
+      ],
+      "publishedAt": "2024-10-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0016",
+      "name": "经典系列 黑色格裙 #16",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "经典系列 黑色格裙 #16，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/16/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/16/1.jpg",
+        "https://img.example.com/br_sm/16/2.jpg",
+        "https://img.example.com/br_sm/16/3.jpg"
+      ],
+      "publishedAt": "2024-05-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0017",
+      "name": "复古系列 粉色格裙 #17",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "复古系列 粉色格裙 #17，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/17/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/17/1.jpg",
+        "https://img.example.com/br_sm/17/2.jpg",
+        "https://img.example.com/br_sm/17/3.jpg"
+      ],
+      "publishedAt": "2024-07-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0018",
+      "name": "甜美系列 棕色格裙 #18",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "甜美系列 棕色格裙 #18，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/18/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/18/1.jpg",
+        "https://img.example.com/br_sm/18/2.jpg",
+        "https://img.example.com/br_sm/18/3.jpg"
+      ],
+      "publishedAt": "2024-09-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0019",
+      "name": "日常系列 红色格裙 #19",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "日常系列 红色格裙 #19，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/19/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/19/1.jpg",
+        "https://img.example.com/br_sm/19/2.jpg",
+        "https://img.example.com/br_sm/19/3.jpg"
+      ],
+      "publishedAt": "2024-01-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0020",
+      "name": "华丽系列 棕色格裙 #20",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "华丽系列 棕色格裙 #20，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/20/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/20/1.jpg",
+        "https://img.example.com/br_sm/20/2.jpg",
+        "https://img.example.com/br_sm/20/3.jpg"
+      ],
+      "publishedAt": "2024-12-06T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0021",
+      "name": "经典系列 紫色格裙 #21",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "经典系列 紫色格裙 #21，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/21/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/21/1.jpg",
+        "https://img.example.com/br_sm/21/2.jpg",
+        "https://img.example.com/br_sm/21/3.jpg"
+      ],
+      "publishedAt": "2024-04-17T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0022",
+      "name": "简约系列 绀色格裙 #22",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "on_sale",
+      "description": "简约系列 绀色格裙 #22，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/22/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/22/1.jpg",
+        "https://img.example.com/br_sm/22/2.jpg",
+        "https://img.example.com/br_sm/22/3.jpg"
+      ],
+      "publishedAt": "2024-09-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0023",
+      "name": "华丽系列 蓝色格裙 #23",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "on_sale",
+      "description": "华丽系列 蓝色格裙 #23，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/23/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/23/1.jpg",
+        "https://img.example.com/br_sm/23/2.jpg",
+        "https://img.example.com/br_sm/23/3.jpg"
+      ],
+      "publishedAt": "2024-02-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0024",
+      "name": "甜美系列 棕色格裙 #24",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "甜美系列 棕色格裙 #24，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/24/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/24/1.jpg",
+        "https://img.example.com/br_sm/24/2.jpg",
+        "https://img.example.com/br_sm/24/3.jpg"
+      ],
+      "publishedAt": "2024-10-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0025",
+      "name": "甜美系列 绿色格裙 #25",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "甜美系列 绿色格裙 #25，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/25/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/25/1.jpg",
+        "https://img.example.com/br_sm/25/2.jpg",
+        "https://img.example.com/br_sm/25/3.jpg"
+      ],
+      "publishedAt": "2024-03-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0026",
+      "name": "日常系列 灰色格裙 #26",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "日常系列 灰色格裙 #26，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/26/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/26/1.jpg",
+        "https://img.example.com/br_sm/26/2.jpg",
+        "https://img.example.com/br_sm/26/3.jpg"
+      ],
+      "publishedAt": "2024-05-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0027",
+      "name": "清新系列 蓝色格裙 #27",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "清新系列 蓝色格裙 #27，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/27/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/27/1.jpg",
+        "https://img.example.com/br_sm/27/2.jpg",
+        "https://img.example.com/br_sm/27/3.jpg"
+      ],
+      "publishedAt": "2024-03-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0028",
+      "name": "限定系列 棕色格裙 #28",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "pre_order",
+      "description": "限定系列 棕色格裙 #28，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/28/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/28/1.jpg",
+        "https://img.example.com/br_sm/28/2.jpg",
+        "https://img.example.com/br_sm/28/3.jpg"
+      ],
+      "publishedAt": "2024-03-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0029",
+      "name": "经典系列 紫色格裙 #29",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "经典系列 紫色格裙 #29，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/29/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/29/1.jpg",
+        "https://img.example.com/br_sm/29/2.jpg",
+        "https://img.example.com/br_sm/29/3.jpg"
+      ],
+      "publishedAt": "2024-12-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0030",
+      "name": "简约系列 蓝色格裙 #30",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "简约系列 蓝色格裙 #30，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/30/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/30/1.jpg",
+        "https://img.example.com/br_sm/30/2.jpg",
+        "https://img.example.com/br_sm/30/3.jpg"
+      ],
+      "publishedAt": "2024-01-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0031",
+      "name": "学院系列 灰色格裙 #31",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "学院系列 灰色格裙 #31，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/31/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/31/1.jpg",
+        "https://img.example.com/br_sm/31/2.jpg",
+        "https://img.example.com/br_sm/31/3.jpg"
+      ],
+      "publishedAt": "2024-04-20T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0032",
+      "name": "华丽系列 红色格裙 #32",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "华丽系列 红色格裙 #32，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/32/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/32/1.jpg",
+        "https://img.example.com/br_sm/32/2.jpg",
+        "https://img.example.com/br_sm/32/3.jpg"
+      ],
+      "publishedAt": "2024-08-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0033",
+      "name": "清新系列 灰色格裙 #33",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "清新系列 灰色格裙 #33，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/33/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/33/1.jpg",
+        "https://img.example.com/br_sm/33/2.jpg",
+        "https://img.example.com/br_sm/33/3.jpg"
+      ],
+      "publishedAt": "2024-08-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0034",
+      "name": "日常系列 蓝色格裙 #34",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "日常系列 蓝色格裙 #34，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/34/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/34/1.jpg",
+        "https://img.example.com/br_sm/34/2.jpg",
+        "https://img.example.com/br_sm/34/3.jpg"
+      ],
+      "publishedAt": "2024-01-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0035",
+      "name": "甜美系列 红色格裙 #35",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "甜美系列 红色格裙 #35，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/35/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/35/1.jpg",
+        "https://img.example.com/br_sm/35/2.jpg",
+        "https://img.example.com/br_sm/35/3.jpg"
+      ],
+      "publishedAt": "2024-08-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0036",
+      "name": "学院系列 黑色格裙 #36",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "pre_order",
+      "description": "学院系列 黑色格裙 #36，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/36/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/36/1.jpg",
+        "https://img.example.com/br_sm/36/2.jpg",
+        "https://img.example.com/br_sm/36/3.jpg"
+      ],
+      "publishedAt": "2024-07-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0037",
+      "name": "经典系列 灰色格裙 #37",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "经典系列 灰色格裙 #37，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/37/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/37/1.jpg",
+        "https://img.example.com/br_sm/37/2.jpg",
+        "https://img.example.com/br_sm/37/3.jpg"
+      ],
+      "publishedAt": "2024-12-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0038",
+      "name": "学院系列 棕色格裙 #38",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "学院系列 棕色格裙 #38，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/38/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/38/1.jpg",
+        "https://img.example.com/br_sm/38/2.jpg",
+        "https://img.example.com/br_sm/38/3.jpg"
+      ],
+      "publishedAt": "2024-08-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0039",
+      "name": "经典系列 红色格裙 #39",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "经典系列 红色格裙 #39，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/39/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/39/1.jpg",
+        "https://img.example.com/br_sm/39/2.jpg",
+        "https://img.example.com/br_sm/39/3.jpg"
+      ],
+      "publishedAt": "2024-01-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0040",
+      "name": "甜美系列 棕色格裙 #40",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "甜美系列 棕色格裙 #40，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/40/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/40/1.jpg",
+        "https://img.example.com/br_sm/40/2.jpg",
+        "https://img.example.com/br_sm/40/3.jpg"
+      ],
+      "publishedAt": "2024-07-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0041",
+      "name": "简约系列 黑色格裙 #41",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "简约系列 黑色格裙 #41，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/41/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/41/1.jpg",
+        "https://img.example.com/br_sm/41/2.jpg",
+        "https://img.example.com/br_sm/41/3.jpg"
+      ],
+      "publishedAt": "2024-01-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0042",
+      "name": "清新系列 蓝色格裙 #42",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "清新系列 蓝色格裙 #42，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/42/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/42/1.jpg",
+        "https://img.example.com/br_sm/42/2.jpg",
+        "https://img.example.com/br_sm/42/3.jpg"
+      ],
+      "publishedAt": "2024-09-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0043",
+      "name": "日常系列 灰色格裙 #43",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "日常系列 灰色格裙 #43，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/43/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/43/1.jpg",
+        "https://img.example.com/br_sm/43/2.jpg",
+        "https://img.example.com/br_sm/43/3.jpg"
+      ],
+      "publishedAt": "2024-06-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0044",
+      "name": "经典系列 蓝色格裙 #44",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "经典系列 蓝色格裙 #44，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/44/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/44/1.jpg",
+        "https://img.example.com/br_sm/44/2.jpg",
+        "https://img.example.com/br_sm/44/3.jpg"
+      ],
+      "publishedAt": "2024-08-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0045",
+      "name": "简约系列 紫色格裙 #45",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "简约系列 紫色格裙 #45，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/45/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/45/1.jpg",
+        "https://img.example.com/br_sm/45/2.jpg",
+        "https://img.example.com/br_sm/45/3.jpg"
+      ],
+      "publishedAt": "2024-12-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0046",
+      "name": "复古系列 粉色格裙 #46",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "复古系列 粉色格裙 #46，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/46/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/46/1.jpg",
+        "https://img.example.com/br_sm/46/2.jpg",
+        "https://img.example.com/br_sm/46/3.jpg"
+      ],
+      "publishedAt": "2024-10-06T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0047",
+      "name": "甜美系列 棕色格裙 #47",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "甜美系列 棕色格裙 #47，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/47/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/47/1.jpg",
+        "https://img.example.com/br_sm/47/2.jpg",
+        "https://img.example.com/br_sm/47/3.jpg"
+      ],
+      "publishedAt": "2024-06-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0048",
+      "name": "日常系列 蓝色格裙 #48",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "日常系列 蓝色格裙 #48，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/48/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/48/1.jpg",
+        "https://img.example.com/br_sm/48/2.jpg",
+        "https://img.example.com/br_sm/48/3.jpg"
+      ],
+      "publishedAt": "2024-01-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0049",
+      "name": "简约系列 绿色格裙 #49",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "简约系列 绿色格裙 #49，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/49/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/49/1.jpg",
+        "https://img.example.com/br_sm/49/2.jpg",
+        "https://img.example.com/br_sm/49/3.jpg"
+      ],
+      "publishedAt": "2024-02-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0050",
+      "name": "华丽系列 绀色格裙 #50",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "pre_order",
+      "description": "华丽系列 绀色格裙 #50，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/50/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/50/1.jpg",
+        "https://img.example.com/br_sm/50/2.jpg",
+        "https://img.example.com/br_sm/50/3.jpg"
+      ],
+      "publishedAt": "2024-08-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0051",
+      "name": "暗黑系列 棕色格裙 #51",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "暗黑系列 棕色格裙 #51，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/51/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/51/1.jpg",
+        "https://img.example.com/br_sm/51/2.jpg",
+        "https://img.example.com/br_sm/51/3.jpg"
+      ],
+      "publishedAt": "2024-04-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0052",
+      "name": "暗黑系列 黑色格裙 #52",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "暗黑系列 黑色格裙 #52，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/52/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/52/1.jpg",
+        "https://img.example.com/br_sm/52/2.jpg",
+        "https://img.example.com/br_sm/52/3.jpg"
+      ],
+      "publishedAt": "2024-10-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0053",
+      "name": "华丽系列 棕色格裙 #53",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "华丽系列 棕色格裙 #53，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/53/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/53/1.jpg",
+        "https://img.example.com/br_sm/53/2.jpg",
+        "https://img.example.com/br_sm/53/3.jpg"
+      ],
+      "publishedAt": "2024-04-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0054",
+      "name": "日常系列 蓝色格裙 #54",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "日常系列 蓝色格裙 #54，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/54/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/54/1.jpg",
+        "https://img.example.com/br_sm/54/2.jpg",
+        "https://img.example.com/br_sm/54/3.jpg"
+      ],
+      "publishedAt": "2024-01-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0055",
+      "name": "学院系列 灰色格裙 #55",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "学院系列 灰色格裙 #55，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/55/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/55/1.jpg",
+        "https://img.example.com/br_sm/55/2.jpg",
+        "https://img.example.com/br_sm/55/3.jpg"
+      ],
+      "publishedAt": "2024-02-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0056",
+      "name": "日常系列 蓝色格裙 #56",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "日常系列 蓝色格裙 #56，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/56/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/56/1.jpg",
+        "https://img.example.com/br_sm/56/2.jpg",
+        "https://img.example.com/br_sm/56/3.jpg"
+      ],
+      "publishedAt": "2024-12-20T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0057",
+      "name": "学院系列 棕色格裙 #57",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "学院系列 棕色格裙 #57，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/57/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/57/1.jpg",
+        "https://img.example.com/br_sm/57/2.jpg",
+        "https://img.example.com/br_sm/57/3.jpg"
+      ],
+      "publishedAt": "2024-06-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0058",
+      "name": "限定系列 绿色格裙 #58",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "限定系列 绿色格裙 #58，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/58/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/58/1.jpg",
+        "https://img.example.com/br_sm/58/2.jpg",
+        "https://img.example.com/br_sm/58/3.jpg"
+      ],
+      "publishedAt": "2024-07-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0059",
+      "name": "清新系列 粉色格裙 #59",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "清新系列 粉色格裙 #59，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/59/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/59/1.jpg",
+        "https://img.example.com/br_sm/59/2.jpg",
+        "https://img.example.com/br_sm/59/3.jpg"
+      ],
+      "publishedAt": "2024-12-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0060",
+      "name": "简约系列 紫色格裙 #60",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "on_sale",
+      "description": "简约系列 紫色格裙 #60，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/60/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/60/1.jpg",
+        "https://img.example.com/br_sm/60/2.jpg",
+        "https://img.example.com/br_sm/60/3.jpg"
+      ],
+      "publishedAt": "2024-12-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0061",
+      "name": "学院系列 绀色格裙 #61",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "学院系列 绀色格裙 #61，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/61/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/61/1.jpg",
+        "https://img.example.com/br_sm/61/2.jpg",
+        "https://img.example.com/br_sm/61/3.jpg"
+      ],
+      "publishedAt": "2024-09-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0062",
+      "name": "暗黑系列 灰色格裙 #62",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "暗黑系列 灰色格裙 #62，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/62/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/62/1.jpg",
+        "https://img.example.com/br_sm/62/2.jpg",
+        "https://img.example.com/br_sm/62/3.jpg"
+      ],
+      "publishedAt": "2024-05-17T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0063",
+      "name": "学院系列 灰色格裙 #63",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "学院系列 灰色格裙 #63，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/63/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/63/1.jpg",
+        "https://img.example.com/br_sm/63/2.jpg",
+        "https://img.example.com/br_sm/63/3.jpg"
+      ],
+      "publishedAt": "2024-08-17T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0064",
+      "name": "暗黑系列 黑色格裙 #64",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "暗黑系列 黑色格裙 #64，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/64/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/64/1.jpg",
+        "https://img.example.com/br_sm/64/2.jpg",
+        "https://img.example.com/br_sm/64/3.jpg"
+      ],
+      "publishedAt": "2024-05-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0065",
+      "name": "经典系列 粉色格裙 #65",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "经典系列 粉色格裙 #65，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/65/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/65/1.jpg",
+        "https://img.example.com/br_sm/65/2.jpg",
+        "https://img.example.com/br_sm/65/3.jpg"
+      ],
+      "publishedAt": "2024-12-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0066",
+      "name": "华丽系列 灰色格裙 #66",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "华丽系列 灰色格裙 #66，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/66/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/66/1.jpg",
+        "https://img.example.com/br_sm/66/2.jpg",
+        "https://img.example.com/br_sm/66/3.jpg"
+      ],
+      "publishedAt": "2024-06-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0067",
+      "name": "华丽系列 绀色格裙 #67",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "华丽系列 绀色格裙 #67，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/67/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/67/1.jpg",
+        "https://img.example.com/br_sm/67/2.jpg",
+        "https://img.example.com/br_sm/67/3.jpg"
+      ],
+      "publishedAt": "2024-05-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0068",
+      "name": "清新系列 棕色格裙 #68",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "sold_out",
+      "description": "清新系列 棕色格裙 #68，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/68/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/68/1.jpg",
+        "https://img.example.com/br_sm/68/2.jpg",
+        "https://img.example.com/br_sm/68/3.jpg"
+      ],
+      "publishedAt": "2024-06-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0069",
+      "name": "甜美系列 灰色格裙 #69",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "甜美系列 灰色格裙 #69，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/69/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/69/1.jpg",
+        "https://img.example.com/br_sm/69/2.jpg",
+        "https://img.example.com/br_sm/69/3.jpg"
+      ],
+      "publishedAt": "2024-04-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0070",
+      "name": "复古系列 黑色格裙 #70",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "复古系列 黑色格裙 #70，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/70/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/70/1.jpg",
+        "https://img.example.com/br_sm/70/2.jpg",
+        "https://img.example.com/br_sm/70/3.jpg"
+      ],
+      "publishedAt": "2024-08-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0071",
+      "name": "暗黑系列 棕色格裙 #71",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "pre_order",
+      "description": "暗黑系列 棕色格裙 #71，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/71/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/71/1.jpg",
+        "https://img.example.com/br_sm/71/2.jpg",
+        "https://img.example.com/br_sm/71/3.jpg"
+      ],
+      "publishedAt": "2024-12-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0072",
+      "name": "清新系列 绿色格裙 #72",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "清新系列 绿色格裙 #72，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/72/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/72/1.jpg",
+        "https://img.example.com/br_sm/72/2.jpg",
+        "https://img.example.com/br_sm/72/3.jpg"
+      ],
+      "publishedAt": "2024-01-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0073",
+      "name": "学院系列 紫色格裙 #73",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "pre_order",
+      "description": "学院系列 紫色格裙 #73，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/73/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/73/1.jpg",
+        "https://img.example.com/br_sm/73/2.jpg",
+        "https://img.example.com/br_sm/73/3.jpg"
+      ],
+      "publishedAt": "2024-01-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0074",
+      "name": "甜美系列 棕色格裙 #74",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "甜美系列 棕色格裙 #74，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/74/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/74/1.jpg",
+        "https://img.example.com/br_sm/74/2.jpg",
+        "https://img.example.com/br_sm/74/3.jpg"
+      ],
+      "publishedAt": "2024-03-20T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0075",
+      "name": "限定系列 绿色格裙 #75",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "pre_order",
+      "description": "限定系列 绿色格裙 #75，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/75/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/75/1.jpg",
+        "https://img.example.com/br_sm/75/2.jpg",
+        "https://img.example.com/br_sm/75/3.jpg"
+      ],
+      "publishedAt": "2024-02-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0076",
+      "name": "华丽系列 紫色格裙 #76",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "华丽系列 紫色格裙 #76，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/76/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/76/1.jpg",
+        "https://img.example.com/br_sm/76/2.jpg",
+        "https://img.example.com/br_sm/76/3.jpg"
+      ],
+      "publishedAt": "2024-05-06T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0077",
+      "name": "限定系列 紫色格裙 #77",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "限定系列 紫色格裙 #77，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/77/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/77/1.jpg",
+        "https://img.example.com/br_sm/77/2.jpg",
+        "https://img.example.com/br_sm/77/3.jpg"
+      ],
+      "publishedAt": "2024-09-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0078",
+      "name": "暗黑系列 棕色格裙 #78",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "暗黑系列 棕色格裙 #78，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/78/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/78/1.jpg",
+        "https://img.example.com/br_sm/78/2.jpg",
+        "https://img.example.com/br_sm/78/3.jpg"
+      ],
+      "publishedAt": "2024-12-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0079",
+      "name": "清新系列 绿色格裙 #79",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "清新系列 绿色格裙 #79，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/79/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/79/1.jpg",
+        "https://img.example.com/br_sm/79/2.jpg",
+        "https://img.example.com/br_sm/79/3.jpg"
+      ],
+      "publishedAt": "2024-09-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0080",
+      "name": "日常系列 红色格裙 #80",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "日常系列 红色格裙 #80，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/80/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/80/1.jpg",
+        "https://img.example.com/br_sm/80/2.jpg",
+        "https://img.example.com/br_sm/80/3.jpg"
+      ],
+      "publishedAt": "2024-09-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0081",
+      "name": "经典系列 绿色格裙 #81",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "经典系列 绿色格裙 #81，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/81/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/81/1.jpg",
+        "https://img.example.com/br_sm/81/2.jpg",
+        "https://img.example.com/br_sm/81/3.jpg"
+      ],
+      "publishedAt": "2024-06-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0082",
+      "name": "经典系列 粉色格裙 #82",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "经典系列 粉色格裙 #82，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/82/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/82/1.jpg",
+        "https://img.example.com/br_sm/82/2.jpg",
+        "https://img.example.com/br_sm/82/3.jpg"
+      ],
+      "publishedAt": "2024-05-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0083",
+      "name": "华丽系列 紫色格裙 #83",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "华丽系列 紫色格裙 #83，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/83/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/83/1.jpg",
+        "https://img.example.com/br_sm/83/2.jpg",
+        "https://img.example.com/br_sm/83/3.jpg"
+      ],
+      "publishedAt": "2024-09-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0084",
+      "name": "暗黑系列 粉色格裙 #84",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "暗黑系列 粉色格裙 #84，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/84/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/84/1.jpg",
+        "https://img.example.com/br_sm/84/2.jpg",
+        "https://img.example.com/br_sm/84/3.jpg"
+      ],
+      "publishedAt": "2024-02-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0085",
+      "name": "学院系列 棕色格裙 #85",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "学院系列 棕色格裙 #85，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/85/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/85/1.jpg",
+        "https://img.example.com/br_sm/85/2.jpg",
+        "https://img.example.com/br_sm/85/3.jpg"
+      ],
+      "publishedAt": "2024-06-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0086",
+      "name": "复古系列 绿色格裙 #86",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "复古系列 绿色格裙 #86，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/86/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/86/1.jpg",
+        "https://img.example.com/br_sm/86/2.jpg",
+        "https://img.example.com/br_sm/86/3.jpg"
+      ],
+      "publishedAt": "2024-03-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0087",
+      "name": "简约系列 灰色格裙 #87",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "on_sale",
+      "description": "简约系列 灰色格裙 #87，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/87/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/87/1.jpg",
+        "https://img.example.com/br_sm/87/2.jpg",
+        "https://img.example.com/br_sm/87/3.jpg"
+      ],
+      "publishedAt": "2024-03-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0088",
+      "name": "暗黑系列 绀色格裙 #88",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "on_sale",
+      "description": "暗黑系列 绀色格裙 #88，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/88/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/88/1.jpg",
+        "https://img.example.com/br_sm/88/2.jpg",
+        "https://img.example.com/br_sm/88/3.jpg"
+      ],
+      "publishedAt": "2024-07-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0089",
+      "name": "日常系列 灰色格裙 #89",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "pre_order",
+      "description": "日常系列 灰色格裙 #89，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/89/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/89/1.jpg",
+        "https://img.example.com/br_sm/89/2.jpg",
+        "https://img.example.com/br_sm/89/3.jpg"
+      ],
+      "publishedAt": "2024-05-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0090",
+      "name": "华丽系列 棕色格裙 #90",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "华丽系列 棕色格裙 #90，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/90/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/90/1.jpg",
+        "https://img.example.com/br_sm/90/2.jpg",
+        "https://img.example.com/br_sm/90/3.jpg"
+      ],
+      "publishedAt": "2024-02-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0091",
+      "name": "暗黑系列 粉色格裙 #91",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "暗黑系列 粉色格裙 #91，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/91/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/91/1.jpg",
+        "https://img.example.com/br_sm/91/2.jpg",
+        "https://img.example.com/br_sm/91/3.jpg"
+      ],
+      "publishedAt": "2024-12-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0092",
+      "name": "暗黑系列 黑色格裙 #92",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "暗黑系列 黑色格裙 #92，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/92/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/92/1.jpg",
+        "https://img.example.com/br_sm/92/2.jpg",
+        "https://img.example.com/br_sm/92/3.jpg"
+      ],
+      "publishedAt": "2024-05-12T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0093",
+      "name": "甜美系列 蓝色格裙 #93",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "甜美系列 蓝色格裙 #93，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/93/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/93/1.jpg",
+        "https://img.example.com/br_sm/93/2.jpg",
+        "https://img.example.com/br_sm/93/3.jpg"
+      ],
+      "publishedAt": "2024-01-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0094",
+      "name": "暗黑系列 粉色格裙 #94",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "暗黑系列 粉色格裙 #94，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/94/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/94/1.jpg",
+        "https://img.example.com/br_sm/94/2.jpg",
+        "https://img.example.com/br_sm/94/3.jpg"
+      ],
+      "publishedAt": "2024-05-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0095",
+      "name": "复古系列 灰色格裙 #95",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "复古系列 灰色格裙 #95，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/95/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/95/1.jpg",
+        "https://img.example.com/br_sm/95/2.jpg",
+        "https://img.example.com/br_sm/95/3.jpg"
+      ],
+      "publishedAt": "2024-07-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0096",
+      "name": "限定系列 紫色格裙 #96",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "pre_order",
+      "description": "限定系列 紫色格裙 #96，欧根纱面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/96/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/96/1.jpg",
+        "https://img.example.com/br_sm/96/2.jpg",
+        "https://img.example.com/br_sm/96/3.jpg"
+      ],
+      "publishedAt": "2024-09-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0097",
+      "name": "甜美系列 灰色格裙 #97",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "甜美系列 灰色格裙 #97，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/97/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/97/1.jpg",
+        "https://img.example.com/br_sm/97/2.jpg",
+        "https://img.example.com/br_sm/97/3.jpg"
+      ],
+      "publishedAt": "2024-09-06T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0098",
+      "name": "暗黑系列 白色格裙 #98",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "暗黑系列 白色格裙 #98，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/98/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/98/1.jpg",
+        "https://img.example.com/br_sm/98/2.jpg",
+        "https://img.example.com/br_sm/98/3.jpg"
+      ],
+      "publishedAt": "2024-10-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0099",
+      "name": "甜美系列 灰色格裙 #99",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "马面裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "on_sale",
+      "description": "甜美系列 灰色格裙 #99，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/99/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/99/1.jpg",
+        "https://img.example.com/br_sm/99/2.jpg",
+        "https://img.example.com/br_sm/99/3.jpg"
+      ],
+      "publishedAt": "2024-03-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0100",
+      "name": "限定系列 灰色格裙 #100",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "限定系列 灰色格裙 #100，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/100/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/100/1.jpg",
+        "https://img.example.com/br_sm/100/2.jpg",
+        "https://img.example.com/br_sm/100/3.jpg"
+      ],
+      "publishedAt": "2024-08-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0101",
+      "name": "清新系列 粉色格裙 #101",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "清新系列 粉色格裙 #101，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/101/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/101/1.jpg",
+        "https://img.example.com/br_sm/101/2.jpg",
+        "https://img.example.com/br_sm/101/3.jpg"
+      ],
+      "publishedAt": "2024-02-20T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0102",
+      "name": "限定系列 灰色格裙 #102",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "限定系列 灰色格裙 #102，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/102/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/102/1.jpg",
+        "https://img.example.com/br_sm/102/2.jpg",
+        "https://img.example.com/br_sm/102/3.jpg"
+      ],
+      "publishedAt": "2024-11-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0103",
+      "name": "限定系列 红色格裙 #103",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "限定系列 红色格裙 #103，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/103/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/103/1.jpg",
+        "https://img.example.com/br_sm/103/2.jpg",
+        "https://img.example.com/br_sm/103/3.jpg"
+      ],
+      "publishedAt": "2024-01-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0104",
+      "name": "日常系列 蓝色格裙 #104",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "日常系列 蓝色格裙 #104，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/104/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/104/1.jpg",
+        "https://img.example.com/br_sm/104/2.jpg",
+        "https://img.example.com/br_sm/104/3.jpg"
+      ],
+      "publishedAt": "2024-10-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0105",
+      "name": "暗黑系列 红色格裙 #105",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "OP",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "暗黑系列 红色格裙 #105，棉面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/105/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/105/1.jpg",
+        "https://img.example.com/br_sm/105/2.jpg",
+        "https://img.example.com/br_sm/105/3.jpg"
+      ],
+      "publishedAt": "2024-11-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0106",
+      "name": "甜美系列 紫色格裙 #106",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "格裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "甜美系列 紫色格裙 #106，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/106/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/106/1.jpg",
+        "https://img.example.com/br_sm/106/2.jpg",
+        "https://img.example.com/br_sm/106/3.jpg"
+      ],
+      "publishedAt": "2024-09-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0107",
+      "name": "日常系列 绿色格裙 #107",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "套装",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "日常系列 绿色格裙 #107，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/107/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/107/1.jpg",
+        "https://img.example.com/br_sm/107/2.jpg",
+        "https://img.example.com/br_sm/107/3.jpg"
+      ],
+      "publishedAt": "2024-01-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0108",
+      "name": "清新系列 紫色格裙 #108",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "襦裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "清新系列 紫色格裙 #108，涤纶面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/108/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/108/1.jpg",
+        "https://img.example.com/br_sm/108/2.jpg",
+        "https://img.example.com/br_sm/108/3.jpg"
+      ],
+      "publishedAt": "2024-04-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0109",
+      "name": "学院系列 白色格裙 #109",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "SK",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "学院系列 白色格裙 #109，雪纺面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/109/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/109/1.jpg",
+        "https://img.example.com/br_sm/109/2.jpg",
+        "https://img.example.com/br_sm/109/3.jpg"
+      ],
+      "publishedAt": "2024-07-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_sm_p0110",
+      "name": "华丽系列 蓝色格裙 #110",
+      "brandId": "br_sm",
+      "pitType": "JK",
+      "category": "JSK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "华丽系列 蓝色格裙 #110，蕾丝面料，森萌哒原创",
+      "coverImage": "https://img.example.com/br_sm/110/cover.jpg",
+      "images": [
+        "https://img.example.com/br_sm/110/1.jpg",
+        "https://img.example.com/br_sm/110/2.jpg",
+        "https://img.example.com/br_sm/110/3.jpg"
+      ],
+      "publishedAt": "2024-07-27T10:00:00+08:00"
+    }
+  ]
+}

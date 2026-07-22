@@ -1,0 +1,2097 @@
+{
+  "brand": "With Puji",
+  "brandId": "br_002",
+  "pitType": "LOLITA",
+  "products": [
+    {
+      "id": "br_002_p0001",
+      "name": "限定系列 绀色JSK",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "限定系列 绀色JSK，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/1/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/1/1.jpg",
+        "https://img.example.com/br_002/1/2.jpg",
+        "https://img.example.com/br_002/1/3.jpg"
+      ],
+      "publishedAt": "2024-12-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0002",
+      "name": "清新系列 粉色JSK #2",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "on_sale",
+      "description": "清新系列 粉色JSK #2，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/2/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/2/1.jpg",
+        "https://img.example.com/br_002/2/2.jpg",
+        "https://img.example.com/br_002/2/3.jpg"
+      ],
+      "publishedAt": "2024-02-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0003",
+      "name": "华丽系列 棕色JSK #3",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "华丽系列 棕色JSK #3，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/3/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/3/1.jpg",
+        "https://img.example.com/br_002/3/2.jpg",
+        "https://img.example.com/br_002/3/3.jpg"
+      ],
+      "publishedAt": "2024-12-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0004",
+      "name": "清新系列 白色JSK #4",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "pre_order",
+      "description": "清新系列 白色JSK #4，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/4/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/4/1.jpg",
+        "https://img.example.com/br_002/4/2.jpg",
+        "https://img.example.com/br_002/4/3.jpg"
+      ],
+      "publishedAt": "2024-01-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0005",
+      "name": "日常系列 白色JSK #5",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "日常系列 白色JSK #5，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/5/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/5/1.jpg",
+        "https://img.example.com/br_002/5/2.jpg",
+        "https://img.example.com/br_002/5/3.jpg"
+      ],
+      "publishedAt": "2024-06-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0006",
+      "name": "限定系列 白色JSK #6",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "限定系列 白色JSK #6，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/6/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/6/1.jpg",
+        "https://img.example.com/br_002/6/2.jpg",
+        "https://img.example.com/br_002/6/3.jpg"
+      ],
+      "publishedAt": "2024-10-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0007",
+      "name": "经典系列 黑色JSK #7",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "经典系列 黑色JSK #7，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/7/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/7/1.jpg",
+        "https://img.example.com/br_002/7/2.jpg",
+        "https://img.example.com/br_002/7/3.jpg"
+      ],
+      "publishedAt": "2024-09-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0008",
+      "name": "学院系列 紫色JSK #8",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "学院系列 紫色JSK #8，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/8/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/8/1.jpg",
+        "https://img.example.com/br_002/8/2.jpg",
+        "https://img.example.com/br_002/8/3.jpg"
+      ],
+      "publishedAt": "2024-01-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0009",
+      "name": "华丽系列 绿色JSK #9",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "华丽系列 绿色JSK #9，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/9/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/9/1.jpg",
+        "https://img.example.com/br_002/9/2.jpg",
+        "https://img.example.com/br_002/9/3.jpg"
+      ],
+      "publishedAt": "2024-07-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0010",
+      "name": "暗黑系列 紫色JSK #10",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "暗黑系列 紫色JSK #10，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/10/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/10/1.jpg",
+        "https://img.example.com/br_002/10/2.jpg",
+        "https://img.example.com/br_002/10/3.jpg"
+      ],
+      "publishedAt": "2024-11-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0011",
+      "name": "限定系列 灰色JSK #11",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "on_sale",
+      "description": "限定系列 灰色JSK #11，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/11/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/11/1.jpg",
+        "https://img.example.com/br_002/11/2.jpg",
+        "https://img.example.com/br_002/11/3.jpg"
+      ],
+      "publishedAt": "2024-03-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0012",
+      "name": "甜美系列 绿色JSK #12",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "甜美系列 绿色JSK #12，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/12/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/12/1.jpg",
+        "https://img.example.com/br_002/12/2.jpg",
+        "https://img.example.com/br_002/12/3.jpg"
+      ],
+      "publishedAt": "2024-01-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0013",
+      "name": "经典系列 紫色JSK #13",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "经典系列 紫色JSK #13，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/13/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/13/1.jpg",
+        "https://img.example.com/br_002/13/2.jpg",
+        "https://img.example.com/br_002/13/3.jpg"
+      ],
+      "publishedAt": "2024-10-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0014",
+      "name": "复古系列 红色JSK #14",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "复古系列 红色JSK #14，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/14/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/14/1.jpg",
+        "https://img.example.com/br_002/14/2.jpg",
+        "https://img.example.com/br_002/14/3.jpg"
+      ],
+      "publishedAt": "2024-03-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0015",
+      "name": "日常系列 红色JSK #15",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "日常系列 红色JSK #15，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/15/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/15/1.jpg",
+        "https://img.example.com/br_002/15/2.jpg",
+        "https://img.example.com/br_002/15/3.jpg"
+      ],
+      "publishedAt": "2024-10-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0016",
+      "name": "学院系列 白色JSK #16",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "学院系列 白色JSK #16，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/16/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/16/1.jpg",
+        "https://img.example.com/br_002/16/2.jpg",
+        "https://img.example.com/br_002/16/3.jpg"
+      ],
+      "publishedAt": "2024-08-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0017",
+      "name": "经典系列 粉色JSK #17",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "经典系列 粉色JSK #17，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/17/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/17/1.jpg",
+        "https://img.example.com/br_002/17/2.jpg",
+        "https://img.example.com/br_002/17/3.jpg"
+      ],
+      "publishedAt": "2024-07-20T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0018",
+      "name": "限定系列 白色JSK #18",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "限定系列 白色JSK #18，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/18/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/18/1.jpg",
+        "https://img.example.com/br_002/18/2.jpg",
+        "https://img.example.com/br_002/18/3.jpg"
+      ],
+      "publishedAt": "2024-05-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0019",
+      "name": "经典系列 粉色JSK #19",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "经典系列 粉色JSK #19，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/19/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/19/1.jpg",
+        "https://img.example.com/br_002/19/2.jpg",
+        "https://img.example.com/br_002/19/3.jpg"
+      ],
+      "publishedAt": "2024-06-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0020",
+      "name": "简约系列 白色JSK #20",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "简约系列 白色JSK #20，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/20/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/20/1.jpg",
+        "https://img.example.com/br_002/20/2.jpg",
+        "https://img.example.com/br_002/20/3.jpg"
+      ],
+      "publishedAt": "2024-12-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0021",
+      "name": "清新系列 蓝色JSK #21",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "清新系列 蓝色JSK #21，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/21/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/21/1.jpg",
+        "https://img.example.com/br_002/21/2.jpg",
+        "https://img.example.com/br_002/21/3.jpg"
+      ],
+      "publishedAt": "2024-05-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0022",
+      "name": "清新系列 灰色JSK #22",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "清新系列 灰色JSK #22，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/22/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/22/1.jpg",
+        "https://img.example.com/br_002/22/2.jpg",
+        "https://img.example.com/br_002/22/3.jpg"
+      ],
+      "publishedAt": "2024-09-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0023",
+      "name": "清新系列 绀色JSK #23",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "清新系列 绀色JSK #23，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/23/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/23/1.jpg",
+        "https://img.example.com/br_002/23/2.jpg",
+        "https://img.example.com/br_002/23/3.jpg"
+      ],
+      "publishedAt": "2024-02-12T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0024",
+      "name": "简约系列 红色JSK #24",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "简约系列 红色JSK #24，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/24/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/24/1.jpg",
+        "https://img.example.com/br_002/24/2.jpg",
+        "https://img.example.com/br_002/24/3.jpg"
+      ],
+      "publishedAt": "2024-02-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0025",
+      "name": "暗黑系列 粉色JSK #25",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "暗黑系列 粉色JSK #25，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/25/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/25/1.jpg",
+        "https://img.example.com/br_002/25/2.jpg",
+        "https://img.example.com/br_002/25/3.jpg"
+      ],
+      "publishedAt": "2024-08-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0026",
+      "name": "日常系列 绿色JSK #26",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "日常系列 绿色JSK #26，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/26/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/26/1.jpg",
+        "https://img.example.com/br_002/26/2.jpg",
+        "https://img.example.com/br_002/26/3.jpg"
+      ],
+      "publishedAt": "2024-09-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0027",
+      "name": "华丽系列 绿色JSK #27",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "华丽系列 绿色JSK #27，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/27/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/27/1.jpg",
+        "https://img.example.com/br_002/27/2.jpg",
+        "https://img.example.com/br_002/27/3.jpg"
+      ],
+      "publishedAt": "2024-08-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0028",
+      "name": "华丽系列 红色JSK #28",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "华丽系列 红色JSK #28，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/28/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/28/1.jpg",
+        "https://img.example.com/br_002/28/2.jpg",
+        "https://img.example.com/br_002/28/3.jpg"
+      ],
+      "publishedAt": "2024-09-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0029",
+      "name": "学院系列 红色JSK #29",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "学院系列 红色JSK #29，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/29/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/29/1.jpg",
+        "https://img.example.com/br_002/29/2.jpg",
+        "https://img.example.com/br_002/29/3.jpg"
+      ],
+      "publishedAt": "2024-01-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0030",
+      "name": "限定系列 绀色JSK #30",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "限定系列 绀色JSK #30，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/30/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/30/1.jpg",
+        "https://img.example.com/br_002/30/2.jpg",
+        "https://img.example.com/br_002/30/3.jpg"
+      ],
+      "publishedAt": "2024-05-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0031",
+      "name": "暗黑系列 红色JSK #31",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "暗黑系列 红色JSK #31，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/31/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/31/1.jpg",
+        "https://img.example.com/br_002/31/2.jpg",
+        "https://img.example.com/br_002/31/3.jpg"
+      ],
+      "publishedAt": "2024-10-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0032",
+      "name": "华丽系列 黑色JSK #32",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "华丽系列 黑色JSK #32，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/32/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/32/1.jpg",
+        "https://img.example.com/br_002/32/2.jpg",
+        "https://img.example.com/br_002/32/3.jpg"
+      ],
+      "publishedAt": "2024-11-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0033",
+      "name": "复古系列 白色JSK #33",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "复古系列 白色JSK #33，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/33/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/33/1.jpg",
+        "https://img.example.com/br_002/33/2.jpg",
+        "https://img.example.com/br_002/33/3.jpg"
+      ],
+      "publishedAt": "2024-01-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0034",
+      "name": "限定系列 绀色JSK #34",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "限定系列 绀色JSK #34，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/34/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/34/1.jpg",
+        "https://img.example.com/br_002/34/2.jpg",
+        "https://img.example.com/br_002/34/3.jpg"
+      ],
+      "publishedAt": "2024-04-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0035",
+      "name": "华丽系列 棕色JSK #35",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "华丽系列 棕色JSK #35，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/35/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/35/1.jpg",
+        "https://img.example.com/br_002/35/2.jpg",
+        "https://img.example.com/br_002/35/3.jpg"
+      ],
+      "publishedAt": "2024-05-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0036",
+      "name": "华丽系列 粉色JSK #36",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "on_sale",
+      "description": "华丽系列 粉色JSK #36，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/36/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/36/1.jpg",
+        "https://img.example.com/br_002/36/2.jpg",
+        "https://img.example.com/br_002/36/3.jpg"
+      ],
+      "publishedAt": "2024-11-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0037",
+      "name": "经典系列 粉色JSK #37",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "经典系列 粉色JSK #37，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/37/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/37/1.jpg",
+        "https://img.example.com/br_002/37/2.jpg",
+        "https://img.example.com/br_002/37/3.jpg"
+      ],
+      "publishedAt": "2024-08-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0038",
+      "name": "甜美系列 绀色JSK #38",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "甜美系列 绀色JSK #38，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/38/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/38/1.jpg",
+        "https://img.example.com/br_002/38/2.jpg",
+        "https://img.example.com/br_002/38/3.jpg"
+      ],
+      "publishedAt": "2024-05-26T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0039",
+      "name": "暗黑系列 绿色JSK #39",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "暗黑系列 绿色JSK #39，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/39/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/39/1.jpg",
+        "https://img.example.com/br_002/39/2.jpg",
+        "https://img.example.com/br_002/39/3.jpg"
+      ],
+      "publishedAt": "2024-08-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0040",
+      "name": "华丽系列 绿色JSK #40",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "sold_out",
+      "description": "华丽系列 绿色JSK #40，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/40/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/40/1.jpg",
+        "https://img.example.com/br_002/40/2.jpg",
+        "https://img.example.com/br_002/40/3.jpg"
+      ],
+      "publishedAt": "2024-09-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0041",
+      "name": "复古系列 绀色JSK #41",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "复古系列 绀色JSK #41，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/41/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/41/1.jpg",
+        "https://img.example.com/br_002/41/2.jpg",
+        "https://img.example.com/br_002/41/3.jpg"
+      ],
+      "publishedAt": "2024-09-06T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0042",
+      "name": "经典系列 棕色JSK #42",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "经典系列 棕色JSK #42，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/42/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/42/1.jpg",
+        "https://img.example.com/br_002/42/2.jpg",
+        "https://img.example.com/br_002/42/3.jpg"
+      ],
+      "publishedAt": "2024-02-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0043",
+      "name": "华丽系列 白色JSK #43",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "华丽系列 白色JSK #43，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/43/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/43/1.jpg",
+        "https://img.example.com/br_002/43/2.jpg",
+        "https://img.example.com/br_002/43/3.jpg"
+      ],
+      "publishedAt": "2024-10-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0044",
+      "name": "学院系列 粉色JSK #44",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "学院系列 粉色JSK #44，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/44/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/44/1.jpg",
+        "https://img.example.com/br_002/44/2.jpg",
+        "https://img.example.com/br_002/44/3.jpg"
+      ],
+      "publishedAt": "2024-06-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0045",
+      "name": "华丽系列 紫色JSK #45",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "华丽系列 紫色JSK #45，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/45/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/45/1.jpg",
+        "https://img.example.com/br_002/45/2.jpg",
+        "https://img.example.com/br_002/45/3.jpg"
+      ],
+      "publishedAt": "2024-11-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0046",
+      "name": "简约系列 黑色JSK #46",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "pre_order",
+      "description": "简约系列 黑色JSK #46，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/46/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/46/1.jpg",
+        "https://img.example.com/br_002/46/2.jpg",
+        "https://img.example.com/br_002/46/3.jpg"
+      ],
+      "publishedAt": "2024-10-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0047",
+      "name": "限定系列 粉色JSK #47",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "限定系列 粉色JSK #47，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/47/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/47/1.jpg",
+        "https://img.example.com/br_002/47/2.jpg",
+        "https://img.example.com/br_002/47/3.jpg"
+      ],
+      "publishedAt": "2024-03-12T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0048",
+      "name": "限定系列 红色JSK #48",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "pre_order",
+      "description": "限定系列 红色JSK #48，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/48/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/48/1.jpg",
+        "https://img.example.com/br_002/48/2.jpg",
+        "https://img.example.com/br_002/48/3.jpg"
+      ],
+      "publishedAt": "2024-09-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0049",
+      "name": "简约系列 灰色JSK #49",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "sold_out",
+      "description": "简约系列 灰色JSK #49，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/49/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/49/1.jpg",
+        "https://img.example.com/br_002/49/2.jpg",
+        "https://img.example.com/br_002/49/3.jpg"
+      ],
+      "publishedAt": "2024-05-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0050",
+      "name": "限定系列 蓝色JSK #50",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "限定系列 蓝色JSK #50，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/50/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/50/1.jpg",
+        "https://img.example.com/br_002/50/2.jpg",
+        "https://img.example.com/br_002/50/3.jpg"
+      ],
+      "publishedAt": "2024-09-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0051",
+      "name": "简约系列 绿色JSK #51",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "简约系列 绿色JSK #51，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/51/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/51/1.jpg",
+        "https://img.example.com/br_002/51/2.jpg",
+        "https://img.example.com/br_002/51/3.jpg"
+      ],
+      "publishedAt": "2024-04-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0052",
+      "name": "简约系列 棕色JSK #52",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "简约系列 棕色JSK #52，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/52/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/52/1.jpg",
+        "https://img.example.com/br_002/52/2.jpg",
+        "https://img.example.com/br_002/52/3.jpg"
+      ],
+      "publishedAt": "2024-02-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0053",
+      "name": "甜美系列 绿色JSK #53",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "甜美系列 绿色JSK #53，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/53/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/53/1.jpg",
+        "https://img.example.com/br_002/53/2.jpg",
+        "https://img.example.com/br_002/53/3.jpg"
+      ],
+      "publishedAt": "2024-11-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0054",
+      "name": "日常系列 黑色JSK #54",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "on_sale",
+      "description": "日常系列 黑色JSK #54，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/54/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/54/1.jpg",
+        "https://img.example.com/br_002/54/2.jpg",
+        "https://img.example.com/br_002/54/3.jpg"
+      ],
+      "publishedAt": "2024-02-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0055",
+      "name": "日常系列 棕色JSK #55",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "日常系列 棕色JSK #55，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/55/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/55/1.jpg",
+        "https://img.example.com/br_002/55/2.jpg",
+        "https://img.example.com/br_002/55/3.jpg"
+      ],
+      "publishedAt": "2024-03-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0056",
+      "name": "日常系列 绀色JSK #56",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "日常系列 绀色JSK #56，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/56/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/56/1.jpg",
+        "https://img.example.com/br_002/56/2.jpg",
+        "https://img.example.com/br_002/56/3.jpg"
+      ],
+      "publishedAt": "2024-06-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0057",
+      "name": "华丽系列 粉色JSK #57",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "华丽系列 粉色JSK #57，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/57/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/57/1.jpg",
+        "https://img.example.com/br_002/57/2.jpg",
+        "https://img.example.com/br_002/57/3.jpg"
+      ],
+      "publishedAt": "2024-10-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0058",
+      "name": "日常系列 红色JSK #58",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "日常系列 红色JSK #58，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/58/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/58/1.jpg",
+        "https://img.example.com/br_002/58/2.jpg",
+        "https://img.example.com/br_002/58/3.jpg"
+      ],
+      "publishedAt": "2024-03-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0059",
+      "name": "复古系列 白色JSK #59",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "复古系列 白色JSK #59，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/59/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/59/1.jpg",
+        "https://img.example.com/br_002/59/2.jpg",
+        "https://img.example.com/br_002/59/3.jpg"
+      ],
+      "publishedAt": "2024-02-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0060",
+      "name": "经典系列 黑色JSK #60",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "经典系列 黑色JSK #60，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/60/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/60/1.jpg",
+        "https://img.example.com/br_002/60/2.jpg",
+        "https://img.example.com/br_002/60/3.jpg"
+      ],
+      "publishedAt": "2024-06-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0061",
+      "name": "华丽系列 红色JSK #61",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "华丽系列 红色JSK #61，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/61/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/61/1.jpg",
+        "https://img.example.com/br_002/61/2.jpg",
+        "https://img.example.com/br_002/61/3.jpg"
+      ],
+      "publishedAt": "2024-05-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0062",
+      "name": "限定系列 绿色JSK #62",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "限定系列 绿色JSK #62，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/62/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/62/1.jpg",
+        "https://img.example.com/br_002/62/2.jpg",
+        "https://img.example.com/br_002/62/3.jpg"
+      ],
+      "publishedAt": "2024-09-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0063",
+      "name": "经典系列 粉色JSK #63",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "经典系列 粉色JSK #63，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/63/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/63/1.jpg",
+        "https://img.example.com/br_002/63/2.jpg",
+        "https://img.example.com/br_002/63/3.jpg"
+      ],
+      "publishedAt": "2024-01-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0064",
+      "name": "学院系列 白色JSK #64",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "学院系列 白色JSK #64，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/64/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/64/1.jpg",
+        "https://img.example.com/br_002/64/2.jpg",
+        "https://img.example.com/br_002/64/3.jpg"
+      ],
+      "publishedAt": "2024-09-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0065",
+      "name": "甜美系列 灰色JSK #65",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "甜美系列 灰色JSK #65，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/65/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/65/1.jpg",
+        "https://img.example.com/br_002/65/2.jpg",
+        "https://img.example.com/br_002/65/3.jpg"
+      ],
+      "publishedAt": "2024-07-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0066",
+      "name": "清新系列 棕色JSK #66",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "清新系列 棕色JSK #66，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/66/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/66/1.jpg",
+        "https://img.example.com/br_002/66/2.jpg",
+        "https://img.example.com/br_002/66/3.jpg"
+      ],
+      "publishedAt": "2024-11-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0067",
+      "name": "学院系列 紫色JSK #67",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "pre_order",
+      "description": "学院系列 紫色JSK #67，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/67/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/67/1.jpg",
+        "https://img.example.com/br_002/67/2.jpg",
+        "https://img.example.com/br_002/67/3.jpg"
+      ],
+      "publishedAt": "2024-11-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0068",
+      "name": "复古系列 白色JSK #68",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "on_sale",
+      "description": "复古系列 白色JSK #68，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/68/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/68/1.jpg",
+        "https://img.example.com/br_002/68/2.jpg",
+        "https://img.example.com/br_002/68/3.jpg"
+      ],
+      "publishedAt": "2024-07-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0069",
+      "name": "甜美系列 蓝色JSK #69",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "甜美系列 蓝色JSK #69，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/69/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/69/1.jpg",
+        "https://img.example.com/br_002/69/2.jpg",
+        "https://img.example.com/br_002/69/3.jpg"
+      ],
+      "publishedAt": "2024-09-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0070",
+      "name": "经典系列 绿色JSK #70",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "经典系列 绿色JSK #70，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/70/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/70/1.jpg",
+        "https://img.example.com/br_002/70/2.jpg",
+        "https://img.example.com/br_002/70/3.jpg"
+      ],
+      "publishedAt": "2024-10-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0071",
+      "name": "复古系列 黑色JSK #71",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "复古系列 黑色JSK #71，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/71/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/71/1.jpg",
+        "https://img.example.com/br_002/71/2.jpg",
+        "https://img.example.com/br_002/71/3.jpg"
+      ],
+      "publishedAt": "2024-09-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0072",
+      "name": "日常系列 粉色JSK #72",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "日常系列 粉色JSK #72，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/72/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/72/1.jpg",
+        "https://img.example.com/br_002/72/2.jpg",
+        "https://img.example.com/br_002/72/3.jpg"
+      ],
+      "publishedAt": "2024-10-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0073",
+      "name": "限定系列 红色JSK #73",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "限定系列 红色JSK #73，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/73/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/73/1.jpg",
+        "https://img.example.com/br_002/73/2.jpg",
+        "https://img.example.com/br_002/73/3.jpg"
+      ],
+      "publishedAt": "2024-03-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0074",
+      "name": "经典系列 红色JSK #74",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "经典系列 红色JSK #74，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/74/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/74/1.jpg",
+        "https://img.example.com/br_002/74/2.jpg",
+        "https://img.example.com/br_002/74/3.jpg"
+      ],
+      "publishedAt": "2024-08-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0075",
+      "name": "学院系列 红色JSK #75",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "学院系列 红色JSK #75，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/75/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/75/1.jpg",
+        "https://img.example.com/br_002/75/2.jpg",
+        "https://img.example.com/br_002/75/3.jpg"
+      ],
+      "publishedAt": "2024-03-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0076",
+      "name": "经典系列 粉色JSK #76",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "经典系列 粉色JSK #76，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/76/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/76/1.jpg",
+        "https://img.example.com/br_002/76/2.jpg",
+        "https://img.example.com/br_002/76/3.jpg"
+      ],
+      "publishedAt": "2024-09-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0077",
+      "name": "经典系列 棕色JSK #77",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "经典系列 棕色JSK #77，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/77/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/77/1.jpg",
+        "https://img.example.com/br_002/77/2.jpg",
+        "https://img.example.com/br_002/77/3.jpg"
+      ],
+      "publishedAt": "2024-08-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0078",
+      "name": "清新系列 棕色JSK #78",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "清新系列 棕色JSK #78，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/78/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/78/1.jpg",
+        "https://img.example.com/br_002/78/2.jpg",
+        "https://img.example.com/br_002/78/3.jpg"
+      ],
+      "publishedAt": "2024-10-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0079",
+      "name": "清新系列 白色JSK #79",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "清新系列 白色JSK #79，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/79/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/79/1.jpg",
+        "https://img.example.com/br_002/79/2.jpg",
+        "https://img.example.com/br_002/79/3.jpg"
+      ],
+      "publishedAt": "2024-08-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0080",
+      "name": "简约系列 红色JSK #80",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "简约系列 红色JSK #80，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/80/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/80/1.jpg",
+        "https://img.example.com/br_002/80/2.jpg",
+        "https://img.example.com/br_002/80/3.jpg"
+      ],
+      "publishedAt": "2024-04-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0081",
+      "name": "暗黑系列 粉色JSK #81",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "暗黑系列 粉色JSK #81，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/81/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/81/1.jpg",
+        "https://img.example.com/br_002/81/2.jpg",
+        "https://img.example.com/br_002/81/3.jpg"
+      ],
+      "publishedAt": "2024-06-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0082",
+      "name": "限定系列 蓝色JSK #82",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "限定系列 蓝色JSK #82，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/82/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/82/1.jpg",
+        "https://img.example.com/br_002/82/2.jpg",
+        "https://img.example.com/br_002/82/3.jpg"
+      ],
+      "publishedAt": "2024-03-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0083",
+      "name": "华丽系列 粉色JSK #83",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "华丽系列 粉色JSK #83，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/83/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/83/1.jpg",
+        "https://img.example.com/br_002/83/2.jpg",
+        "https://img.example.com/br_002/83/3.jpg"
+      ],
+      "publishedAt": "2024-08-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0084",
+      "name": "经典系列 红色JSK #84",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "经典系列 红色JSK #84，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/84/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/84/1.jpg",
+        "https://img.example.com/br_002/84/2.jpg",
+        "https://img.example.com/br_002/84/3.jpg"
+      ],
+      "publishedAt": "2024-12-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0085",
+      "name": "学院系列 白色JSK #85",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "pre_order",
+      "description": "学院系列 白色JSK #85，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/85/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/85/1.jpg",
+        "https://img.example.com/br_002/85/2.jpg",
+        "https://img.example.com/br_002/85/3.jpg"
+      ],
+      "publishedAt": "2024-07-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0086",
+      "name": "甜美系列 棕色JSK #86",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "甜美系列 棕色JSK #86，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/86/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/86/1.jpg",
+        "https://img.example.com/br_002/86/2.jpg",
+        "https://img.example.com/br_002/86/3.jpg"
+      ],
+      "publishedAt": "2024-04-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0087",
+      "name": "甜美系列 黑色JSK #87",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "甜美系列 黑色JSK #87，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/87/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/87/1.jpg",
+        "https://img.example.com/br_002/87/2.jpg",
+        "https://img.example.com/br_002/87/3.jpg"
+      ],
+      "publishedAt": "2024-11-26T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0088",
+      "name": "甜美系列 蓝色JSK #88",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "甜美系列 蓝色JSK #88，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/88/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/88/1.jpg",
+        "https://img.example.com/br_002/88/2.jpg",
+        "https://img.example.com/br_002/88/3.jpg"
+      ],
+      "publishedAt": "2024-01-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0089",
+      "name": "学院系列 灰色JSK #89",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "pre_order",
+      "description": "学院系列 灰色JSK #89，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/89/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/89/1.jpg",
+        "https://img.example.com/br_002/89/2.jpg",
+        "https://img.example.com/br_002/89/3.jpg"
+      ],
+      "publishedAt": "2024-03-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0090",
+      "name": "暗黑系列 蓝色JSK #90",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "pre_order",
+      "description": "暗黑系列 蓝色JSK #90，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/90/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/90/1.jpg",
+        "https://img.example.com/br_002/90/2.jpg",
+        "https://img.example.com/br_002/90/3.jpg"
+      ],
+      "publishedAt": "2024-04-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0091",
+      "name": "复古系列 紫色JSK #91",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "pre_order",
+      "description": "复古系列 紫色JSK #91，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/91/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/91/1.jpg",
+        "https://img.example.com/br_002/91/2.jpg",
+        "https://img.example.com/br_002/91/3.jpg"
+      ],
+      "publishedAt": "2024-05-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0092",
+      "name": "限定系列 黑色JSK #92",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "限定系列 黑色JSK #92，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/92/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/92/1.jpg",
+        "https://img.example.com/br_002/92/2.jpg",
+        "https://img.example.com/br_002/92/3.jpg"
+      ],
+      "publishedAt": "2024-04-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0093",
+      "name": "限定系列 绀色JSK #93",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "JSK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "限定系列 绀色JSK #93，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/93/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/93/1.jpg",
+        "https://img.example.com/br_002/93/2.jpg",
+        "https://img.example.com/br_002/93/3.jpg"
+      ],
+      "publishedAt": "2024-10-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0094",
+      "name": "华丽系列 蓝色JSK #94",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "华丽系列 蓝色JSK #94，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/94/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/94/1.jpg",
+        "https://img.example.com/br_002/94/2.jpg",
+        "https://img.example.com/br_002/94/3.jpg"
+      ],
+      "publishedAt": "2024-08-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0095",
+      "name": "简约系列 紫色JSK #95",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "简约系列 紫色JSK #95，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/95/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/95/1.jpg",
+        "https://img.example.com/br_002/95/2.jpg",
+        "https://img.example.com/br_002/95/3.jpg"
+      ],
+      "publishedAt": "2024-12-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0096",
+      "name": "日常系列 绿色JSK #96",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "日常系列 绿色JSK #96，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/96/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/96/1.jpg",
+        "https://img.example.com/br_002/96/2.jpg",
+        "https://img.example.com/br_002/96/3.jpg"
+      ],
+      "publishedAt": "2024-10-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0097",
+      "name": "甜美系列 白色JSK #97",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "甜美系列 白色JSK #97，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/97/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/97/1.jpg",
+        "https://img.example.com/br_002/97/2.jpg",
+        "https://img.example.com/br_002/97/3.jpg"
+      ],
+      "publishedAt": "2024-11-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0098",
+      "name": "限定系列 绿色JSK #98",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "限定系列 绿色JSK #98，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/98/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/98/1.jpg",
+        "https://img.example.com/br_002/98/2.jpg",
+        "https://img.example.com/br_002/98/3.jpg"
+      ],
+      "publishedAt": "2024-01-12T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0099",
+      "name": "清新系列 白色JSK #99",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "清新系列 白色JSK #99，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/99/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/99/1.jpg",
+        "https://img.example.com/br_002/99/2.jpg",
+        "https://img.example.com/br_002/99/3.jpg"
+      ],
+      "publishedAt": "2024-06-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0100",
+      "name": "甜美系列 黑色JSK #100",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "甜美系列 黑色JSK #100，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/100/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/100/1.jpg",
+        "https://img.example.com/br_002/100/2.jpg",
+        "https://img.example.com/br_002/100/3.jpg"
+      ],
+      "publishedAt": "2024-08-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0101",
+      "name": "日常系列 白色JSK #101",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "日常系列 白色JSK #101，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/101/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/101/1.jpg",
+        "https://img.example.com/br_002/101/2.jpg",
+        "https://img.example.com/br_002/101/3.jpg"
+      ],
+      "publishedAt": "2024-10-26T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0102",
+      "name": "清新系列 黑色JSK #102",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "襦裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "清新系列 黑色JSK #102，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/102/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/102/1.jpg",
+        "https://img.example.com/br_002/102/2.jpg",
+        "https://img.example.com/br_002/102/3.jpg"
+      ],
+      "publishedAt": "2024-10-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0103",
+      "name": "复古系列 红色JSK #103",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "复古系列 红色JSK #103，涤纶面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/103/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/103/1.jpg",
+        "https://img.example.com/br_002/103/2.jpg",
+        "https://img.example.com/br_002/103/3.jpg"
+      ],
+      "publishedAt": "2024-08-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0104",
+      "name": "学院系列 白色JSK #104",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "pre_order",
+      "description": "学院系列 白色JSK #104，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/104/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/104/1.jpg",
+        "https://img.example.com/br_002/104/2.jpg",
+        "https://img.example.com/br_002/104/3.jpg"
+      ],
+      "publishedAt": "2024-03-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0105",
+      "name": "华丽系列 紫色JSK #105",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "华丽系列 紫色JSK #105，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/105/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/105/1.jpg",
+        "https://img.example.com/br_002/105/2.jpg",
+        "https://img.example.com/br_002/105/3.jpg"
+      ],
+      "publishedAt": "2024-12-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0106",
+      "name": "清新系列 绀色JSK #106",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "格裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "清新系列 绀色JSK #106，欧根纱面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/106/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/106/1.jpg",
+        "https://img.example.com/br_002/106/2.jpg",
+        "https://img.example.com/br_002/106/3.jpg"
+      ],
+      "publishedAt": "2024-12-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0107",
+      "name": "暗黑系列 棕色JSK #107",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "马面裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "暗黑系列 棕色JSK #107，棉面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/107/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/107/1.jpg",
+        "https://img.example.com/br_002/107/2.jpg",
+        "https://img.example.com/br_002/107/3.jpg"
+      ],
+      "publishedAt": "2024-08-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0108",
+      "name": "经典系列 粉色JSK #108",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "SK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "经典系列 粉色JSK #108，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/108/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/108/1.jpg",
+        "https://img.example.com/br_002/108/2.jpg",
+        "https://img.example.com/br_002/108/3.jpg"
+      ],
+      "publishedAt": "2024-04-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0109",
+      "name": "学院系列 紫色JSK #109",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "套装",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "学院系列 紫色JSK #109，蕾丝面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/109/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/109/1.jpg",
+        "https://img.example.com/br_002/109/2.jpg",
+        "https://img.example.com/br_002/109/3.jpg"
+      ],
+      "publishedAt": "2024-07-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_002_p0110",
+      "name": "清新系列 紫色JSK #110",
+      "brandId": "br_002",
+      "pitType": "LOLITA",
+      "category": "OP",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "pre_order",
+      "description": "清新系列 紫色JSK #110，雪纺面料，With Puji原创",
+      "coverImage": "https://img.example.com/br_002/110/cover.jpg",
+      "images": [
+        "https://img.example.com/br_002/110/1.jpg",
+        "https://img.example.com/br_002/110/2.jpg",
+        "https://img.example.com/br_002/110/3.jpg"
+      ],
+      "publishedAt": "2024-05-08T10:00:00+08:00"
+    }
+  ]
+}

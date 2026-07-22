@@ -1,0 +1,2097 @@
+{
+  "brand": "织造司",
+  "brandId": "br_026",
+  "pitType": "HANFU",
+  "products": [
+    {
+      "id": "br_026_p0001",
+      "name": "暗黑系列 棕色汉服",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "pre_order",
+      "description": "暗黑系列 棕色汉服，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/1/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/1/1.jpg",
+        "https://img.example.com/br_026/1/2.jpg",
+        "https://img.example.com/br_026/1/3.jpg"
+      ],
+      "publishedAt": "2024-07-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0002",
+      "name": "学院系列 粉色汉服 #2",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "学院系列 粉色汉服 #2，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/2/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/2/1.jpg",
+        "https://img.example.com/br_026/2/2.jpg",
+        "https://img.example.com/br_026/2/3.jpg"
+      ],
+      "publishedAt": "2024-06-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0003",
+      "name": "学院系列 白色汉服 #3",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "学院系列 白色汉服 #3，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/3/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/3/1.jpg",
+        "https://img.example.com/br_026/3/2.jpg",
+        "https://img.example.com/br_026/3/3.jpg"
+      ],
+      "publishedAt": "2024-12-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0004",
+      "name": "简约系列 灰色汉服 #4",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "简约系列 灰色汉服 #4，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/4/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/4/1.jpg",
+        "https://img.example.com/br_026/4/2.jpg",
+        "https://img.example.com/br_026/4/3.jpg"
+      ],
+      "publishedAt": "2024-07-12T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0005",
+      "name": "暗黑系列 灰色汉服 #5",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "pre_order",
+      "description": "暗黑系列 灰色汉服 #5，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/5/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/5/1.jpg",
+        "https://img.example.com/br_026/5/2.jpg",
+        "https://img.example.com/br_026/5/3.jpg"
+      ],
+      "publishedAt": "2024-03-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0006",
+      "name": "暗黑系列 粉色汉服 #6",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "pre_order",
+      "description": "暗黑系列 粉色汉服 #6，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/6/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/6/1.jpg",
+        "https://img.example.com/br_026/6/2.jpg",
+        "https://img.example.com/br_026/6/3.jpg"
+      ],
+      "publishedAt": "2024-04-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0007",
+      "name": "日常系列 绀色汉服 #7",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "日常系列 绀色汉服 #7，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/7/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/7/1.jpg",
+        "https://img.example.com/br_026/7/2.jpg",
+        "https://img.example.com/br_026/7/3.jpg"
+      ],
+      "publishedAt": "2024-08-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0008",
+      "name": "经典系列 蓝色汉服 #8",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "马面裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "经典系列 蓝色汉服 #8，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/8/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/8/1.jpg",
+        "https://img.example.com/br_026/8/2.jpg",
+        "https://img.example.com/br_026/8/3.jpg"
+      ],
+      "publishedAt": "2024-03-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0009",
+      "name": "学院系列 灰色汉服 #9",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "马面裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "学院系列 灰色汉服 #9，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/9/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/9/1.jpg",
+        "https://img.example.com/br_026/9/2.jpg",
+        "https://img.example.com/br_026/9/3.jpg"
+      ],
+      "publishedAt": "2024-08-26T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0010",
+      "name": "暗黑系列 红色汉服 #10",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "暗黑系列 红色汉服 #10，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/10/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/10/1.jpg",
+        "https://img.example.com/br_026/10/2.jpg",
+        "https://img.example.com/br_026/10/3.jpg"
+      ],
+      "publishedAt": "2024-05-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0011",
+      "name": "复古系列 棕色汉服 #11",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "复古系列 棕色汉服 #11，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/11/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/11/1.jpg",
+        "https://img.example.com/br_026/11/2.jpg",
+        "https://img.example.com/br_026/11/3.jpg"
+      ],
+      "publishedAt": "2024-07-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0012",
+      "name": "甜美系列 黑色汉服 #12",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "甜美系列 黑色汉服 #12，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/12/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/12/1.jpg",
+        "https://img.example.com/br_026/12/2.jpg",
+        "https://img.example.com/br_026/12/3.jpg"
+      ],
+      "publishedAt": "2024-01-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0013",
+      "name": "日常系列 棕色汉服 #13",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "日常系列 棕色汉服 #13，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/13/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/13/1.jpg",
+        "https://img.example.com/br_026/13/2.jpg",
+        "https://img.example.com/br_026/13/3.jpg"
+      ],
+      "publishedAt": "2024-03-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0014",
+      "name": "甜美系列 黑色汉服 #14",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "马面裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "甜美系列 黑色汉服 #14，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/14/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/14/1.jpg",
+        "https://img.example.com/br_026/14/2.jpg",
+        "https://img.example.com/br_026/14/3.jpg"
+      ],
+      "publishedAt": "2024-11-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0015",
+      "name": "清新系列 灰色汉服 #15",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "清新系列 灰色汉服 #15，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/15/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/15/1.jpg",
+        "https://img.example.com/br_026/15/2.jpg",
+        "https://img.example.com/br_026/15/3.jpg"
+      ],
+      "publishedAt": "2024-09-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0016",
+      "name": "甜美系列 绿色汉服 #16",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "甜美系列 绿色汉服 #16，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/16/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/16/1.jpg",
+        "https://img.example.com/br_026/16/2.jpg",
+        "https://img.example.com/br_026/16/3.jpg"
+      ],
+      "publishedAt": "2024-11-12T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0017",
+      "name": "简约系列 紫色汉服 #17",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "简约系列 紫色汉服 #17，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/17/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/17/1.jpg",
+        "https://img.example.com/br_026/17/2.jpg",
+        "https://img.example.com/br_026/17/3.jpg"
+      ],
+      "publishedAt": "2024-03-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0018",
+      "name": "复古系列 紫色汉服 #18",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "sold_out",
+      "description": "复古系列 紫色汉服 #18，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/18/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/18/1.jpg",
+        "https://img.example.com/br_026/18/2.jpg",
+        "https://img.example.com/br_026/18/3.jpg"
+      ],
+      "publishedAt": "2024-06-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0019",
+      "name": "限定系列 白色汉服 #19",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "限定系列 白色汉服 #19，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/19/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/19/1.jpg",
+        "https://img.example.com/br_026/19/2.jpg",
+        "https://img.example.com/br_026/19/3.jpg"
+      ],
+      "publishedAt": "2024-01-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0020",
+      "name": "华丽系列 红色汉服 #20",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "华丽系列 红色汉服 #20，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/20/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/20/1.jpg",
+        "https://img.example.com/br_026/20/2.jpg",
+        "https://img.example.com/br_026/20/3.jpg"
+      ],
+      "publishedAt": "2024-12-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0021",
+      "name": "简约系列 粉色汉服 #21",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "简约系列 粉色汉服 #21，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/21/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/21/1.jpg",
+        "https://img.example.com/br_026/21/2.jpg",
+        "https://img.example.com/br_026/21/3.jpg"
+      ],
+      "publishedAt": "2024-06-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0022",
+      "name": "暗黑系列 白色汉服 #22",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "暗黑系列 白色汉服 #22，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/22/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/22/1.jpg",
+        "https://img.example.com/br_026/22/2.jpg",
+        "https://img.example.com/br_026/22/3.jpg"
+      ],
+      "publishedAt": "2024-01-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0023",
+      "name": "暗黑系列 灰色汉服 #23",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "暗黑系列 灰色汉服 #23，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/23/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/23/1.jpg",
+        "https://img.example.com/br_026/23/2.jpg",
+        "https://img.example.com/br_026/23/3.jpg"
+      ],
+      "publishedAt": "2024-07-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0024",
+      "name": "学院系列 粉色汉服 #24",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "马面裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "学院系列 粉色汉服 #24，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/24/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/24/1.jpg",
+        "https://img.example.com/br_026/24/2.jpg",
+        "https://img.example.com/br_026/24/3.jpg"
+      ],
+      "publishedAt": "2024-04-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0025",
+      "name": "暗黑系列 棕色汉服 #25",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "暗黑系列 棕色汉服 #25，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/25/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/25/1.jpg",
+        "https://img.example.com/br_026/25/2.jpg",
+        "https://img.example.com/br_026/25/3.jpg"
+      ],
+      "publishedAt": "2024-06-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0026",
+      "name": "华丽系列 黑色汉服 #26",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "华丽系列 黑色汉服 #26，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/26/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/26/1.jpg",
+        "https://img.example.com/br_026/26/2.jpg",
+        "https://img.example.com/br_026/26/3.jpg"
+      ],
+      "publishedAt": "2024-05-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0027",
+      "name": "简约系列 灰色汉服 #27",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "简约系列 灰色汉服 #27，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/27/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/27/1.jpg",
+        "https://img.example.com/br_026/27/2.jpg",
+        "https://img.example.com/br_026/27/3.jpg"
+      ],
+      "publishedAt": "2024-02-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0028",
+      "name": "学院系列 粉色汉服 #28",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "学院系列 粉色汉服 #28，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/28/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/28/1.jpg",
+        "https://img.example.com/br_026/28/2.jpg",
+        "https://img.example.com/br_026/28/3.jpg"
+      ],
+      "publishedAt": "2024-10-26T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0029",
+      "name": "清新系列 黑色汉服 #29",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "on_sale",
+      "description": "清新系列 黑色汉服 #29，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/29/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/29/1.jpg",
+        "https://img.example.com/br_026/29/2.jpg",
+        "https://img.example.com/br_026/29/3.jpg"
+      ],
+      "publishedAt": "2024-11-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0030",
+      "name": "简约系列 棕色汉服 #30",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "马面裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "简约系列 棕色汉服 #30，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/30/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/30/1.jpg",
+        "https://img.example.com/br_026/30/2.jpg",
+        "https://img.example.com/br_026/30/3.jpg"
+      ],
+      "publishedAt": "2024-06-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0031",
+      "name": "甜美系列 白色汉服 #31",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "甜美系列 白色汉服 #31，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/31/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/31/1.jpg",
+        "https://img.example.com/br_026/31/2.jpg",
+        "https://img.example.com/br_026/31/3.jpg"
+      ],
+      "publishedAt": "2024-11-25T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0032",
+      "name": "清新系列 蓝色汉服 #32",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "on_sale",
+      "description": "清新系列 蓝色汉服 #32，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/32/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/32/1.jpg",
+        "https://img.example.com/br_026/32/2.jpg",
+        "https://img.example.com/br_026/32/3.jpg"
+      ],
+      "publishedAt": "2024-10-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0033",
+      "name": "华丽系列 黑色汉服 #33",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "华丽系列 黑色汉服 #33，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/33/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/33/1.jpg",
+        "https://img.example.com/br_026/33/2.jpg",
+        "https://img.example.com/br_026/33/3.jpg"
+      ],
+      "publishedAt": "2024-07-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0034",
+      "name": "经典系列 棕色汉服 #34",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "经典系列 棕色汉服 #34，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/34/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/34/1.jpg",
+        "https://img.example.com/br_026/34/2.jpg",
+        "https://img.example.com/br_026/34/3.jpg"
+      ],
+      "publishedAt": "2024-04-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0035",
+      "name": "简约系列 白色汉服 #35",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "简约系列 白色汉服 #35，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/35/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/35/1.jpg",
+        "https://img.example.com/br_026/35/2.jpg",
+        "https://img.example.com/br_026/35/3.jpg"
+      ],
+      "publishedAt": "2024-11-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0036",
+      "name": "甜美系列 绿色汉服 #36",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "甜美系列 绿色汉服 #36，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/36/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/36/1.jpg",
+        "https://img.example.com/br_026/36/2.jpg",
+        "https://img.example.com/br_026/36/3.jpg"
+      ],
+      "publishedAt": "2024-10-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0037",
+      "name": "甜美系列 红色汉服 #37",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "甜美系列 红色汉服 #37，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/37/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/37/1.jpg",
+        "https://img.example.com/br_026/37/2.jpg",
+        "https://img.example.com/br_026/37/3.jpg"
+      ],
+      "publishedAt": "2024-04-26T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0038",
+      "name": "简约系列 黑色汉服 #38",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "简约系列 黑色汉服 #38，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/38/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/38/1.jpg",
+        "https://img.example.com/br_026/38/2.jpg",
+        "https://img.example.com/br_026/38/3.jpg"
+      ],
+      "publishedAt": "2024-11-02T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0039",
+      "name": "华丽系列 蓝色汉服 #39",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "华丽系列 蓝色汉服 #39，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/39/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/39/1.jpg",
+        "https://img.example.com/br_026/39/2.jpg",
+        "https://img.example.com/br_026/39/3.jpg"
+      ],
+      "publishedAt": "2024-05-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0040",
+      "name": "清新系列 蓝色汉服 #40",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "on_sale",
+      "description": "清新系列 蓝色汉服 #40，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/40/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/40/1.jpg",
+        "https://img.example.com/br_026/40/2.jpg",
+        "https://img.example.com/br_026/40/3.jpg"
+      ],
+      "publishedAt": "2024-01-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0041",
+      "name": "限定系列 紫色汉服 #41",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "限定系列 紫色汉服 #41，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/41/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/41/1.jpg",
+        "https://img.example.com/br_026/41/2.jpg",
+        "https://img.example.com/br_026/41/3.jpg"
+      ],
+      "publishedAt": "2024-07-12T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0042",
+      "name": "限定系列 白色汉服 #42",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "限定系列 白色汉服 #42，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/42/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/42/1.jpg",
+        "https://img.example.com/br_026/42/2.jpg",
+        "https://img.example.com/br_026/42/3.jpg"
+      ],
+      "publishedAt": "2024-12-17T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0043",
+      "name": "限定系列 棕色汉服 #43",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "限定系列 棕色汉服 #43，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/43/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/43/1.jpg",
+        "https://img.example.com/br_026/43/2.jpg",
+        "https://img.example.com/br_026/43/3.jpg"
+      ],
+      "publishedAt": "2024-02-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0044",
+      "name": "学院系列 粉色汉服 #44",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "sold_out",
+      "description": "学院系列 粉色汉服 #44，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/44/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/44/1.jpg",
+        "https://img.example.com/br_026/44/2.jpg",
+        "https://img.example.com/br_026/44/3.jpg"
+      ],
+      "publishedAt": "2024-12-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0045",
+      "name": "华丽系列 白色汉服 #45",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "华丽系列 白色汉服 #45，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/45/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/45/1.jpg",
+        "https://img.example.com/br_026/45/2.jpg",
+        "https://img.example.com/br_026/45/3.jpg"
+      ],
+      "publishedAt": "2024-04-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0046",
+      "name": "暗黑系列 白色汉服 #46",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "暗黑系列 白色汉服 #46，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/46/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/46/1.jpg",
+        "https://img.example.com/br_026/46/2.jpg",
+        "https://img.example.com/br_026/46/3.jpg"
+      ],
+      "publishedAt": "2024-09-12T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0047",
+      "name": "限定系列 紫色汉服 #47",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "限定系列 紫色汉服 #47，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/47/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/47/1.jpg",
+        "https://img.example.com/br_026/47/2.jpg",
+        "https://img.example.com/br_026/47/3.jpg"
+      ],
+      "publishedAt": "2024-04-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0048",
+      "name": "日常系列 紫色汉服 #48",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "日常系列 紫色汉服 #48，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/48/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/48/1.jpg",
+        "https://img.example.com/br_026/48/2.jpg",
+        "https://img.example.com/br_026/48/3.jpg"
+      ],
+      "publishedAt": "2024-01-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0049",
+      "name": "学院系列 绀色汉服 #49",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "学院系列 绀色汉服 #49，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/49/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/49/1.jpg",
+        "https://img.example.com/br_026/49/2.jpg",
+        "https://img.example.com/br_026/49/3.jpg"
+      ],
+      "publishedAt": "2024-07-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0050",
+      "name": "复古系列 粉色汉服 #50",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "复古系列 粉色汉服 #50，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/50/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/50/1.jpg",
+        "https://img.example.com/br_026/50/2.jpg",
+        "https://img.example.com/br_026/50/3.jpg"
+      ],
+      "publishedAt": "2024-07-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0051",
+      "name": "甜美系列 绿色汉服 #51",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "甜美系列 绿色汉服 #51，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/51/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/51/1.jpg",
+        "https://img.example.com/br_026/51/2.jpg",
+        "https://img.example.com/br_026/51/3.jpg"
+      ],
+      "publishedAt": "2024-05-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0052",
+      "name": "日常系列 黑色汉服 #52",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "on_sale",
+      "description": "日常系列 黑色汉服 #52，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/52/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/52/1.jpg",
+        "https://img.example.com/br_026/52/2.jpg",
+        "https://img.example.com/br_026/52/3.jpg"
+      ],
+      "publishedAt": "2024-05-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0053",
+      "name": "限定系列 黑色汉服 #53",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "限定系列 黑色汉服 #53，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/53/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/53/1.jpg",
+        "https://img.example.com/br_026/53/2.jpg",
+        "https://img.example.com/br_026/53/3.jpg"
+      ],
+      "publishedAt": "2024-12-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0054",
+      "name": "限定系列 蓝色汉服 #54",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "限定系列 蓝色汉服 #54，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/54/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/54/1.jpg",
+        "https://img.example.com/br_026/54/2.jpg",
+        "https://img.example.com/br_026/54/3.jpg"
+      ],
+      "publishedAt": "2024-07-20T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0055",
+      "name": "清新系列 紫色汉服 #55",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "清新系列 紫色汉服 #55，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/55/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/55/1.jpg",
+        "https://img.example.com/br_026/55/2.jpg",
+        "https://img.example.com/br_026/55/3.jpg"
+      ],
+      "publishedAt": "2024-11-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0056",
+      "name": "日常系列 黑色汉服 #56",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "日常系列 黑色汉服 #56，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/56/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/56/1.jpg",
+        "https://img.example.com/br_026/56/2.jpg",
+        "https://img.example.com/br_026/56/3.jpg"
+      ],
+      "publishedAt": "2024-11-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0057",
+      "name": "复古系列 灰色汉服 #57",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "复古系列 灰色汉服 #57，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/57/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/57/1.jpg",
+        "https://img.example.com/br_026/57/2.jpg",
+        "https://img.example.com/br_026/57/3.jpg"
+      ],
+      "publishedAt": "2024-09-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0058",
+      "name": "日常系列 灰色汉服 #58",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "日常系列 灰色汉服 #58，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/58/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/58/1.jpg",
+        "https://img.example.com/br_026/58/2.jpg",
+        "https://img.example.com/br_026/58/3.jpg"
+      ],
+      "publishedAt": "2024-12-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0059",
+      "name": "简约系列 蓝色汉服 #59",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "pre_order",
+      "description": "简约系列 蓝色汉服 #59，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/59/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/59/1.jpg",
+        "https://img.example.com/br_026/59/2.jpg",
+        "https://img.example.com/br_026/59/3.jpg"
+      ],
+      "publishedAt": "2024-04-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0060",
+      "name": "甜美系列 紫色汉服 #60",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "sold_out",
+      "description": "甜美系列 紫色汉服 #60，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/60/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/60/1.jpg",
+        "https://img.example.com/br_026/60/2.jpg",
+        "https://img.example.com/br_026/60/3.jpg"
+      ],
+      "publishedAt": "2024-04-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0061",
+      "name": "经典系列 棕色汉服 #61",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "经典系列 棕色汉服 #61，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/61/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/61/1.jpg",
+        "https://img.example.com/br_026/61/2.jpg",
+        "https://img.example.com/br_026/61/3.jpg"
+      ],
+      "publishedAt": "2024-04-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0062",
+      "name": "日常系列 绀色汉服 #62",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "日常系列 绀色汉服 #62，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/62/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/62/1.jpg",
+        "https://img.example.com/br_026/62/2.jpg",
+        "https://img.example.com/br_026/62/3.jpg"
+      ],
+      "publishedAt": "2024-05-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0063",
+      "name": "限定系列 紫色汉服 #63",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "限定系列 紫色汉服 #63，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/63/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/63/1.jpg",
+        "https://img.example.com/br_026/63/2.jpg",
+        "https://img.example.com/br_026/63/3.jpg"
+      ],
+      "publishedAt": "2024-12-17T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0064",
+      "name": "甜美系列 黑色汉服 #64",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "sold_out",
+      "description": "甜美系列 黑色汉服 #64，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/64/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/64/1.jpg",
+        "https://img.example.com/br_026/64/2.jpg",
+        "https://img.example.com/br_026/64/3.jpg"
+      ],
+      "publishedAt": "2024-04-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0065",
+      "name": "简约系列 绿色汉服 #65",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "简约系列 绿色汉服 #65，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/65/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/65/1.jpg",
+        "https://img.example.com/br_026/65/2.jpg",
+        "https://img.example.com/br_026/65/3.jpg"
+      ],
+      "publishedAt": "2024-04-20T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0066",
+      "name": "华丽系列 绿色汉服 #66",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "华丽系列 绿色汉服 #66，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/66/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/66/1.jpg",
+        "https://img.example.com/br_026/66/2.jpg",
+        "https://img.example.com/br_026/66/3.jpg"
+      ],
+      "publishedAt": "2024-03-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0067",
+      "name": "简约系列 绿色汉服 #67",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "简约系列 绿色汉服 #67，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/67/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/67/1.jpg",
+        "https://img.example.com/br_026/67/2.jpg",
+        "https://img.example.com/br_026/67/3.jpg"
+      ],
+      "publishedAt": "2024-06-19T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0068",
+      "name": "暗黑系列 粉色汉服 #68",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "pre_order",
+      "description": "暗黑系列 粉色汉服 #68，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/68/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/68/1.jpg",
+        "https://img.example.com/br_026/68/2.jpg",
+        "https://img.example.com/br_026/68/3.jpg"
+      ],
+      "publishedAt": "2024-12-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0069",
+      "name": "华丽系列 白色汉服 #69",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "华丽系列 白色汉服 #69，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/69/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/69/1.jpg",
+        "https://img.example.com/br_026/69/2.jpg",
+        "https://img.example.com/br_026/69/3.jpg"
+      ],
+      "publishedAt": "2024-02-18T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0070",
+      "name": "经典系列 绀色汉服 #70",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "经典系列 绀色汉服 #70，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/70/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/70/1.jpg",
+        "https://img.example.com/br_026/70/2.jpg",
+        "https://img.example.com/br_026/70/3.jpg"
+      ],
+      "publishedAt": "2024-10-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0071",
+      "name": "学院系列 绀色汉服 #71",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "学院系列 绀色汉服 #71，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/71/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/71/1.jpg",
+        "https://img.example.com/br_026/71/2.jpg",
+        "https://img.example.com/br_026/71/3.jpg"
+      ],
+      "publishedAt": "2024-07-10T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0072",
+      "name": "甜美系列 紫色汉服 #72",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "sold_out",
+      "description": "甜美系列 紫色汉服 #72，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/72/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/72/1.jpg",
+        "https://img.example.com/br_026/72/2.jpg",
+        "https://img.example.com/br_026/72/3.jpg"
+      ],
+      "publishedAt": "2024-03-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0073",
+      "name": "日常系列 棕色汉服 #73",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "日常系列 棕色汉服 #73，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/73/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/73/1.jpg",
+        "https://img.example.com/br_026/73/2.jpg",
+        "https://img.example.com/br_026/73/3.jpg"
+      ],
+      "publishedAt": "2024-02-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0074",
+      "name": "清新系列 白色汉服 #74",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "pre_order",
+      "description": "清新系列 白色汉服 #74，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/74/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/74/1.jpg",
+        "https://img.example.com/br_026/74/2.jpg",
+        "https://img.example.com/br_026/74/3.jpg"
+      ],
+      "publishedAt": "2024-01-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0075",
+      "name": "暗黑系列 绿色汉服 #75",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "暗黑系列 绿色汉服 #75，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/75/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/75/1.jpg",
+        "https://img.example.com/br_026/75/2.jpg",
+        "https://img.example.com/br_026/75/3.jpg"
+      ],
+      "publishedAt": "2024-10-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0076",
+      "name": "简约系列 棕色汉服 #76",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "简约系列 棕色汉服 #76，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/76/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/76/1.jpg",
+        "https://img.example.com/br_026/76/2.jpg",
+        "https://img.example.com/br_026/76/3.jpg"
+      ],
+      "publishedAt": "2024-12-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0077",
+      "name": "日常系列 棕色汉服 #77",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "on_sale",
+      "description": "日常系列 棕色汉服 #77，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/77/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/77/1.jpg",
+        "https://img.example.com/br_026/77/2.jpg",
+        "https://img.example.com/br_026/77/3.jpg"
+      ],
+      "publishedAt": "2024-01-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0078",
+      "name": "日常系列 绀色汉服 #78",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "sold_out",
+      "description": "日常系列 绀色汉服 #78，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/78/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/78/1.jpg",
+        "https://img.example.com/br_026/78/2.jpg",
+        "https://img.example.com/br_026/78/3.jpg"
+      ],
+      "publishedAt": "2024-08-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0079",
+      "name": "限定系列 黑色汉服 #79",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "限定系列 黑色汉服 #79，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/79/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/79/1.jpg",
+        "https://img.example.com/br_026/79/2.jpg",
+        "https://img.example.com/br_026/79/3.jpg"
+      ],
+      "publishedAt": "2024-09-16T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0080",
+      "name": "暗黑系列 黑色汉服 #80",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "暗黑系列 黑色汉服 #80，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/80/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/80/1.jpg",
+        "https://img.example.com/br_026/80/2.jpg",
+        "https://img.example.com/br_026/80/3.jpg"
+      ],
+      "publishedAt": "2024-02-07T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0081",
+      "name": "简约系列 蓝色汉服 #81",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "简约系列 蓝色汉服 #81，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/81/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/81/1.jpg",
+        "https://img.example.com/br_026/81/2.jpg",
+        "https://img.example.com/br_026/81/3.jpg"
+      ],
+      "publishedAt": "2024-10-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0082",
+      "name": "学院系列 红色汉服 #82",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "sold_out",
+      "description": "学院系列 红色汉服 #82，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/82/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/82/1.jpg",
+        "https://img.example.com/br_026/82/2.jpg",
+        "https://img.example.com/br_026/82/3.jpg"
+      ],
+      "publishedAt": "2024-03-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0083",
+      "name": "限定系列 红色汉服 #83",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "限定系列 红色汉服 #83，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/83/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/83/1.jpg",
+        "https://img.example.com/br_026/83/2.jpg",
+        "https://img.example.com/br_026/83/3.jpg"
+      ],
+      "publishedAt": "2024-05-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0084",
+      "name": "限定系列 白色汉服 #84",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "限定系列 白色汉服 #84，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/84/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/84/1.jpg",
+        "https://img.example.com/br_026/84/2.jpg",
+        "https://img.example.com/br_026/84/3.jpg"
+      ],
+      "publishedAt": "2024-03-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0085",
+      "name": "限定系列 黑色汉服 #85",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "马面裙",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "pre_order",
+      "description": "限定系列 黑色汉服 #85，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/85/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/85/1.jpg",
+        "https://img.example.com/br_026/85/2.jpg",
+        "https://img.example.com/br_026/85/3.jpg"
+      ],
+      "publishedAt": "2024-10-22T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0086",
+      "name": "经典系列 紫色汉服 #86",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "经典系列 紫色汉服 #86，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/86/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/86/1.jpg",
+        "https://img.example.com/br_026/86/2.jpg",
+        "https://img.example.com/br_026/86/3.jpg"
+      ],
+      "publishedAt": "2024-12-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0087",
+      "name": "学院系列 蓝色汉服 #87",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "sold_out",
+      "description": "学院系列 蓝色汉服 #87，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/87/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/87/1.jpg",
+        "https://img.example.com/br_026/87/2.jpg",
+        "https://img.example.com/br_026/87/3.jpg"
+      ],
+      "publishedAt": "2024-05-11T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0088",
+      "name": "经典系列 粉色汉服 #88",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "on_sale",
+      "description": "经典系列 粉色汉服 #88，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/88/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/88/1.jpg",
+        "https://img.example.com/br_026/88/2.jpg",
+        "https://img.example.com/br_026/88/3.jpg"
+      ],
+      "publishedAt": "2024-07-09T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0089",
+      "name": "日常系列 红色汉服 #89",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "日常系列 红色汉服 #89，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/89/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/89/1.jpg",
+        "https://img.example.com/br_026/89/2.jpg",
+        "https://img.example.com/br_026/89/3.jpg"
+      ],
+      "publishedAt": "2024-03-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0090",
+      "name": "甜美系列 绿色汉服 #90",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "pre_order",
+      "description": "甜美系列 绿色汉服 #90，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/90/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/90/1.jpg",
+        "https://img.example.com/br_026/90/2.jpg",
+        "https://img.example.com/br_026/90/3.jpg"
+      ],
+      "publishedAt": "2024-07-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0091",
+      "name": "简约系列 灰色汉服 #91",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "马面裙",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "简约系列 灰色汉服 #91，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/91/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/91/1.jpg",
+        "https://img.example.com/br_026/91/2.jpg",
+        "https://img.example.com/br_026/91/3.jpg"
+      ],
+      "publishedAt": "2024-06-17T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0092",
+      "name": "华丽系列 黑色汉服 #92",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "pre_order",
+      "description": "华丽系列 黑色汉服 #92，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/92/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/92/1.jpg",
+        "https://img.example.com/br_026/92/2.jpg",
+        "https://img.example.com/br_026/92/3.jpg"
+      ],
+      "publishedAt": "2024-10-20T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0093",
+      "name": "甜美系列 粉色汉服 #93",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 298,
+      "deposit": 59,
+      "balance": 239,
+      "status": "on_sale",
+      "description": "甜美系列 粉色汉服 #93，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/93/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/93/1.jpg",
+        "https://img.example.com/br_026/93/2.jpg",
+        "https://img.example.com/br_026/93/3.jpg"
+      ],
+      "publishedAt": "2024-07-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0094",
+      "name": "甜美系列 粉色汉服 #94",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "OP",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "甜美系列 粉色汉服 #94，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/94/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/94/1.jpg",
+        "https://img.example.com/br_026/94/2.jpg",
+        "https://img.example.com/br_026/94/3.jpg"
+      ],
+      "publishedAt": "2024-11-08T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0095",
+      "name": "日常系列 黑色汉服 #95",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "日常系列 黑色汉服 #95，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/95/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/95/1.jpg",
+        "https://img.example.com/br_026/95/2.jpg",
+        "https://img.example.com/br_026/95/3.jpg"
+      ],
+      "publishedAt": "2024-08-14T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0096",
+      "name": "限定系列 黑色汉服 #96",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "sold_out",
+      "description": "限定系列 黑色汉服 #96，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/96/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/96/1.jpg",
+        "https://img.example.com/br_026/96/2.jpg",
+        "https://img.example.com/br_026/96/3.jpg"
+      ],
+      "publishedAt": "2024-05-27T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0097",
+      "name": "华丽系列 棕色汉服 #97",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "华丽系列 棕色汉服 #97，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/97/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/97/1.jpg",
+        "https://img.example.com/br_026/97/2.jpg",
+        "https://img.example.com/br_026/97/3.jpg"
+      ],
+      "publishedAt": "2024-09-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0098",
+      "name": "经典系列 棕色汉服 #98",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 458,
+      "deposit": 91,
+      "balance": 367,
+      "status": "pre_order",
+      "description": "经典系列 棕色汉服 #98，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/98/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/98/1.jpg",
+        "https://img.example.com/br_026/98/2.jpg",
+        "https://img.example.com/br_026/98/3.jpg"
+      ],
+      "publishedAt": "2024-02-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0099",
+      "name": "学院系列 绿色汉服 #99",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 268,
+      "deposit": 53,
+      "balance": 215,
+      "status": "on_sale",
+      "description": "学院系列 绿色汉服 #99，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/99/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/99/1.jpg",
+        "https://img.example.com/br_026/99/2.jpg",
+        "https://img.example.com/br_026/99/3.jpg"
+      ],
+      "publishedAt": "2024-09-01T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0100",
+      "name": "限定系列 黑色汉服 #100",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "pre_order",
+      "description": "限定系列 黑色汉服 #100，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/100/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/100/1.jpg",
+        "https://img.example.com/br_026/100/2.jpg",
+        "https://img.example.com/br_026/100/3.jpg"
+      ],
+      "publishedAt": "2024-01-03T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0101",
+      "name": "甜美系列 绿色汉服 #101",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "马面裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "pre_order",
+      "description": "甜美系列 绿色汉服 #101，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/101/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/101/1.jpg",
+        "https://img.example.com/br_026/101/2.jpg",
+        "https://img.example.com/br_026/101/3.jpg"
+      ],
+      "publishedAt": "2024-11-15T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0102",
+      "name": "学院系列 绿色汉服 #102",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "学院系列 绿色汉服 #102，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/102/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/102/1.jpg",
+        "https://img.example.com/br_026/102/2.jpg",
+        "https://img.example.com/br_026/102/3.jpg"
+      ],
+      "publishedAt": "2024-02-24T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0103",
+      "name": "学院系列 绿色汉服 #103",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "套装",
+      "price": 358,
+      "deposit": 71,
+      "balance": 287,
+      "status": "on_sale",
+      "description": "学院系列 绿色汉服 #103，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/103/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/103/1.jpg",
+        "https://img.example.com/br_026/103/2.jpg",
+        "https://img.example.com/br_026/103/3.jpg"
+      ],
+      "publishedAt": "2024-01-13T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0104",
+      "name": "限定系列 绀色汉服 #104",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 398,
+      "deposit": 79,
+      "balance": 319,
+      "status": "sold_out",
+      "description": "限定系列 绀色汉服 #104，棉面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/104/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/104/1.jpg",
+        "https://img.example.com/br_026/104/2.jpg",
+        "https://img.example.com/br_026/104/3.jpg"
+      ],
+      "publishedAt": "2024-07-28T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0105",
+      "name": "学院系列 黑色汉服 #105",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 498,
+      "deposit": 99,
+      "balance": 399,
+      "status": "sold_out",
+      "description": "学院系列 黑色汉服 #105，雪纺面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/105/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/105/1.jpg",
+        "https://img.example.com/br_026/105/2.jpg",
+        "https://img.example.com/br_026/105/3.jpg"
+      ],
+      "publishedAt": "2024-06-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0106",
+      "name": "甜美系列 绿色汉服 #106",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 198,
+      "deposit": 39,
+      "balance": 159,
+      "status": "on_sale",
+      "description": "甜美系列 绿色汉服 #106，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/106/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/106/1.jpg",
+        "https://img.example.com/br_026/106/2.jpg",
+        "https://img.example.com/br_026/106/3.jpg"
+      ],
+      "publishedAt": "2024-04-04T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0107",
+      "name": "经典系列 红色汉服 #107",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "SK",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "sold_out",
+      "description": "经典系列 红色汉服 #107，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/107/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/107/1.jpg",
+        "https://img.example.com/br_026/107/2.jpg",
+        "https://img.example.com/br_026/107/3.jpg"
+      ],
+      "publishedAt": "2024-03-21T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0108",
+      "name": "华丽系列 白色汉服 #108",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "格裙",
+      "price": 228,
+      "deposit": 45,
+      "balance": 183,
+      "status": "pre_order",
+      "description": "华丽系列 白色汉服 #108，欧根纱面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/108/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/108/1.jpg",
+        "https://img.example.com/br_026/108/2.jpg",
+        "https://img.example.com/br_026/108/3.jpg"
+      ],
+      "publishedAt": "2024-08-05T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0109",
+      "name": "暗黑系列 白色汉服 #109",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "JSK",
+      "price": 158,
+      "deposit": 31,
+      "balance": 127,
+      "status": "on_sale",
+      "description": "暗黑系列 白色汉服 #109，涤纶面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/109/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/109/1.jpg",
+        "https://img.example.com/br_026/109/2.jpg",
+        "https://img.example.com/br_026/109/3.jpg"
+      ],
+      "publishedAt": "2024-12-23T10:00:00+08:00"
+    },
+    {
+      "id": "br_026_p0110",
+      "name": "暗黑系列 黑色汉服 #110",
+      "brandId": "br_026",
+      "pitType": "HANFU",
+      "category": "襦裙",
+      "price": 128,
+      "deposit": 25,
+      "balance": 103,
+      "status": "pre_order",
+      "description": "暗黑系列 黑色汉服 #110，蕾丝面料，织造司原创",
+      "coverImage": "https://img.example.com/br_026/110/cover.jpg",
+      "images": [
+        "https://img.example.com/br_026/110/1.jpg",
+        "https://img.example.com/br_026/110/2.jpg",
+        "https://img.example.com/br_026/110/3.jpg"
+      ],
+      "publishedAt": "2024-10-08T10:00:00+08:00"
+    }
+  ]
+}
