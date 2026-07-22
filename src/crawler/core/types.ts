@@ -118,6 +118,30 @@ export interface NormalizedItem extends ParsedItem {
   canonicalName: string;
   normalizedBrandName: string;
   confidence: number;
+  /** 发售批次信息（可选，无批次信息时为 null） */
+  release: ReleaseInfo | null;
+}
+
+// ============================================================
+// 5b. 发售批次信息
+// ============================================================
+
+export interface ReleaseInfo {
+  releaseName: string;       // 批次名称（如"一期预约"）
+  releaseNo: number;         // 批次序号（0=未知）
+  releaseType: 'first_release' | 'rerelease' | 'reservation' | 'spot' | 'lottery' | 'unknown';
+  saleStatus: string;        // 沿用 sale_status 枚举
+  depositPrice: number;      // 定金（分）
+  balancePrice: number;      // 尾款（分）
+  fullPrice: number;         // 全价（分）
+  startAt: string | null;    // 开始时间
+  endAt: string | null;      // 结束时间
+  balanceDueAt: string | null; // 尾款截止
+  shipAt: string | null;     // 发货时间
+  isRerelease: boolean;      // 是否再贩
+  isSoldOut: boolean;        // 是否售罄
+  lifecycleStatus: string;   // upcoming/active/ended/sold_out
+  confidence: number;        // 识别置信度 0-100
 }
 
 // ============================================================
@@ -162,12 +186,14 @@ export interface CrawlJobConfig {
   rateLimitMs: number;
   userAgent: string;
   dryRun: boolean;
+  crawlMode?: string;         // incremental/full/backfill/manual
 }
 
 export interface CrawlJobStats {
   jobId: string;
   sourceType: string;
   sourceUrl: string;
+  crawlMode: string;          // incremental/full/backfill/manual
   startedAt: Date;
   finishedAt: Date | null;
   status: 'pending' | 'running' | 'success' | 'failed';

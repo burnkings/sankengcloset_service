@@ -4,13 +4,19 @@ import type { AppRepository, FeedQuery, FeedResult } from './contracts.js';
 import type {
   AiConfirmationInput,
   AiImportTask,
+  ContentFeedItem,
   FeedItem,
   MediaObject,
   Product,
+  SearchQuery,
+  SearchResult,
   SyncOperationInput,
   SyncReceipt,
+  TrendSummary,
   UserProfile,
 } from '../types.js';
+import { generateFeedReason, computeRankingScore, formatPriceSummary, getReleaseTypeName, mergeTags } from '../intelligence/feed-ranker.js';
+import { buildTrendSummary } from '../intelligence/trend-engine.js';
 
 function seedProducts(): Product[] {
   const now = nowIso();
@@ -36,7 +42,17 @@ function seedProducts(): Product[] {
   ];
 }
 
-function toFeed(product: Product): FeedItem {
+function toFeed(product: Product): ContentFeedItem {
+  const feedReason = generateFeedReason({
+    saleStatus: product.status,
+    releaseType: 'unknown',
+    isRerelease: false,
+    isNew: true,
+    brandHeatScore: 50,
+    hasPriceDrop: false,
+    priceTrend: 'stable',
+    feedScore: 1,
+  });
   return {
     id: `feed_${product.id}`,
     feedType: 'product',
@@ -47,16 +63,23 @@ function toFeed(product: Product): FeedItem {
     secondaryCoverUrl: product.images[1] ?? '',
     brandId: product.brandId,
     brandName: product.brandName,
+    category: product.category,
+    pitType: product.category,
     price: product.priceCents,
     originalPrice: product.originalPriceCents,
-    badgeText: product.status === 'PRE_ORDER' ? '预约' : product.status === 'UPCOMING' ? '新品' : '',
+    priceSummary: formatPriceSummary(product.priceCents),
+    saleStatus: product.status,
+    releaseType: 'unknown',
+    releaseTypeName: '未知',
+    tags: [],
+    feedScore: 1,
+    feedReason,
     eventStartAt: '',
     eventEndAt: '',
     liked: false,
     saved: false,
     sourceLabel: '演示数据',
-    rankingScore: 1,
-    category: product.category,
+    publishedAt: product.createdAt,
     createdAt: product.createdAt,
   };
 }
@@ -192,5 +215,45 @@ export class MemoryRepository implements AppRepository {
     task.targetType = input.targetType;
     task.targetId = targetId;
     return task;
+  }
+
+  async searchProducts(query: SearchQuery): Promise<SearchResult> {
+    let rows = this.products.filter(p => {
+      // 关键词搜索
+      if (query.q) {
+        const q = query.q.toLowerCase();
+        const matchTitle = p.title.toLowerCase().includes(q);
+        const matchBrand = p.brandName.toLowerCase().includes(q);
+        if (!matchTitle && !matchBrand) return false;
+      }
+      // 分类过滤
+      if (query.category && p.category !== query.category) return false;
+      // 发售状态过滤
+      if (query.saleStatus && p.status !== query.saleStatus) return false;
+      // 价格范围
+      if (query.minPrice > 0 && p.priceCents < query.minPrice) return false;
+      if (query.maxPrice > 0 && p.priceCents > query.maxPrice) return false;
+      return true;
+    });
+
+    const total = rows.length;
+    const offset = Number.parseInt(query.cursor || '0', 10) || 0;
+    const items = rows.slice(offset, offset + query.limit).map(p => ({
+      ...toFeed(p),
+      sourceLabel: '搜索结果',
+    }));
+    const next = offset + items.length;
+
+    return {
+      items,
+      nextCursor: next < total ? String(next) : '',
+      hasMore: next < total,
+      totalHint: total,
+    };
+  }
+
+  async getTrendSummary(_period?: string): Promise<TrendSummary> {
+    // 内存模式下返回空趋势
+    return buildTrendSummary([], []);
   }
 }

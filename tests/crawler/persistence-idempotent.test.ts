@@ -72,10 +72,11 @@ class MockPersistence {
     });
   }
 
-  async getExistingProducts(): Promise<{ id: string; brandId: string; canonicalName: string; sourceUrl: string }[]> {
+  async getExistingProducts(): Promise<{ id: string; brandId: string; brandName: string; canonicalName: string; sourceUrl: string }[]> {
     return Array.from(this.products.values()).map(p => ({
       id: p.id,
       brandId: p.brand_id,
+      brandName: '兔缝缝',
       canonicalName: p.canonical_name,
       sourceUrl: p.source_url,
     }));
@@ -119,6 +120,7 @@ function makeItem(overrides: Partial<NormalizedItem> = {}): NormalizedItem {
     shopUrl: '',
     tags: [],
     confidence: 100,
+      release: null,
     ...overrides,
   };
 }

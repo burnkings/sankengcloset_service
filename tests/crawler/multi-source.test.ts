@@ -20,6 +20,7 @@ function makeItem(overrides: Partial<NormalizedItem> = {}): NormalizedItem {
     description: '描述', rawDescription: '描述',
     coverUrl: 'https://example.com/img.jpg', images: ['https://example.com/img.jpg'],
     sourcePublishedAt: null, shopUrl: '', tags: [], confidence: 100,
+      release: null,
     ...overrides,
   };
 }

@@ -52,7 +52,7 @@ describeWithDatabase("PostgreSQL repository integration", () => {
     });
     expect(feed.items).toHaveLength(1);
     expect(feed.items[0]?.entityId).toBe("prd_ci_jk");
-    expect(feed.items[0]?.badgeText).toBe("预约");
+    expect(feed.items[0]?.saleStatus).toBe("PRE_ORDER");
     expect(feed.hasMore).toBe(false);
 
     const operation = {

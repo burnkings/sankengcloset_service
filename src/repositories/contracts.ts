@@ -1,11 +1,15 @@
 import type {
   AiConfirmationInput,
   AiImportTask,
+  ContentFeedItem,
   FeedItem,
   MediaObject,
   Product,
+  SearchQuery,
+  SearchResult,
   SyncOperationInput,
   SyncReceipt,
+  TrendSummary,
   UserProfile,
 } from '../types.js';
 
@@ -17,7 +21,7 @@ export interface FeedQuery {
 }
 
 export interface FeedResult {
-  items: FeedItem[];
+  items: ContentFeedItem[];
   nextCursor: string;
   hasMore: boolean;
   totalHint: number;
@@ -31,6 +35,8 @@ export interface AppRepository {
   getUser(userId: string): Promise<UserProfile | null>;
   listFeed(userId: string | null, query: FeedQuery): Promise<FeedResult>;
   getProduct(userId: string | null, productId: string): Promise<Product | null>;
+  searchProducts(query: SearchQuery): Promise<SearchResult>;
+  getTrendSummary(period?: string): Promise<TrendSummary>;
   applySyncBatch(userId: string, operations: SyncOperationInput[]): Promise<SyncReceipt[]>;
   getSyncCheckpoint(userId: string): Promise<string>;
   createMedia(input: Omit<MediaObject, 'id' | 'createdAt' | 'deletedAt' | 'sizeBytes'>): Promise<MediaObject>;

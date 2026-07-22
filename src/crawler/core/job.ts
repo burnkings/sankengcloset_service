@@ -13,6 +13,7 @@ export function createJobStats(config: CrawlJobConfig, jobId: string): CrawlJobS
     jobId,
     sourceType: config.sourceType,
     sourceUrl: config.sourceUrl,
+    crawlMode: config.crawlMode || 'incremental',
     startedAt: new Date(),
     finishedAt: null,
     status: 'running',

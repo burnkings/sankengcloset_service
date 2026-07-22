@@ -224,6 +224,7 @@ describe('ParsedItem / NormalizedItem 兼容性', () => {
       tags: [],
       normalizedBrandName: '兔缝缝',
       confidence: 95,
+      release: null,
     };
     expect(item.normalizedBrandName).toBe('兔缝缝');
     expect(item.confidence).toBe(95);

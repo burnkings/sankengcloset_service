@@ -15,7 +15,21 @@ import type { CrawlJobConfig } from '../src/crawler/core/types.js';
 // ────────────────────────────────────────────────
 
 const DRY_RUN = process.argv.includes('--dry-run');
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgres://sankeng:sankeng@localhost:5432/sankeng';
+const DATABASE_URL = process.env.DATABASE_URL ?? 'postgres://sankeng:***@localhost:5432/sankeng';
+
+// 解析参数
+function getArg(name: string, fallback: string): string {
+  const idx = process.argv.indexOf(`--${name}`);
+  return idx >= 0 && process.argv[idx + 1] ? process.argv[idx + 1]! : fallback;
+}
+
+const CRAWL_MODE = getArg('mode', 'incremental') as 'incremental' | 'full' | 'backfill' | 'manual';
+const BRAND_ID = getArg('brand-id', '');
+const MAX_ITEMS = parseInt(getArg('max-items', '50'), 10);
+
+// Full/Backfill 硬上限
+const HARD_LIMITS: Record<string, number> = { incremental: 500, full: 1000, backfill: 500, manual: 1000 };
+const cappedMax = Math.min(MAX_ITEMS, HARD_LIMITS[CRAWL_MODE] || 200);
 
 // 数据源：fixture 模式（本地测试）或 HTTP 模式（真实采集）
 const SOURCE_URL = process.argv.includes('--http')
@@ -33,6 +47,7 @@ const config: CrawlJobConfig = {
   rateLimitMs: 2000,
   userAgent: 'SankengBot/1.0 (+https://sankengcloset.com)',
   dryRun: DRY_RUN,
+  crawlMode: CRAWL_MODE,
 };
 
 // ────────────────────────────────────────────────
@@ -52,9 +67,10 @@ const pipeline = new CrawlPipeline(sql, adapter, parser, normalizer, validator, 
 // 执行
 // ────────────────────────────────────────────────
 
-console.log(`=== Phase D4: Brand API Crawler ===`);
-console.log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'WRITE'}`);
-console.log(`Source: ${SOURCE_URL}\n`);
+console.log(`=== Phase D5.2: Brand API Crawler ===`);
+console.log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'WRITE'} | CrawlMode: ${CRAWL_MODE}`);
+console.log(`MaxItems: ${cappedMax}${MAX_ITEMS !== cappedMax ? ` (capped from ${MAX_ITEMS})` : ''}`);
+console.log(`Brand: ${BRAND_ID || 'all'} | Source: ${SOURCE_URL}\n`);
 
 try {
   const result = await pipeline.run(config);
@@ -94,11 +110,34 @@ try {
   // 二次运行测试幂等性
   if (!DRY_RUN && result.stats.acceptedCount > 0) {
     console.log(`\n--- 幂等性测试（第二次运行）---`);
+
+    // 记录运行前的数量
+    const countBefore = await sql`SELECT count(*) as cnt FROM products WHERE deleted_at IS NULL`;
+    const productsBefore = Number(countBefore[0]!.cnt);
+    const srcBefore = await sql`SELECT count(*) as cnt FROM source_records`;
+    const psBefore = await sql`SELECT count(*) as cnt FROM price_snapshots`;
+
     const result2 = await pipeline.run(config);
-    console.log(`Accepted: ${result2.stats.acceptedCount} (应为 0)`);
-    console.log(`Duplicates: ${result2.stats.duplicateCount}`);
-    const idempotent = result2.stats.acceptedCount === 0;
-    console.log(`幂等性: ${idempotent ? '✅ 通过' : '❌ 失败'}`);
+
+    // 检查运行后的数量
+    const countAfter = await sql`SELECT count(*) as cnt FROM products WHERE deleted_at IS NULL`;
+    const productsAfter = Number(countAfter[0]!.cnt);
+    const srcAfter = await sql`SELECT count(*) as cnt FROM source_records`;
+    const psAfter = await sql`SELECT count(*) as cnt FROM price_snapshots`;
+
+    console.log(`产品数量: ${productsBefore} → ${productsAfter} (不应新增)`);
+    console.log(`来源记录: ${srcBefore[0]!.cnt} → ${srcAfter[0]!.cnt} (不应新增)`);
+    console.log(`价格快照: ${psBefore[0]!.cnt} → ${psAfter[0]!.cnt} (同价不新增)`);
+    console.log(`第二次 accepted: ${result2.stats.acceptedCount}`);
+
+    const noNewProducts = productsAfter === productsBefore;
+    const noNewSourceRecords = srcAfter[0]!.cnt === srcBefore[0]!.cnt;
+    const noNewPriceSnapshots = psAfter[0]!.cnt === psBefore[0]!.cnt;
+
+    console.log(`\n幂等性: ${noNewProducts && noNewSourceRecords && noNewPriceSnapshots ? '✅ 通过' : '❌ 失败'}`);
+    if (!noNewProducts) console.log(`  ❌ 产品数量增加了 ${productsAfter - productsBefore}`);
+    if (!noNewSourceRecords) console.log(`  ❌ 来源记录增加了 ${Number(srcAfter[0]!.cnt) - Number(srcBefore[0]!.cnt)}`);
+    if (!noNewPriceSnapshots) console.log(`  ❌ 价格快照增加了 ${Number(psAfter[0]!.cnt) - Number(psBefore[0]!.cnt)}`);
   }
 
 } catch (e) {

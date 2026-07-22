@@ -16,3 +16,7 @@ export function notFound(message = '资源不存在'): AppProblem {
 export function conflict(message: string): AppProblem {
   return new AppProblem(409, 'CONFLICT', message, false);
 }
+
+export function badRequest(message: string): AppProblem {
+  return new AppProblem(400, 'BAD_REQUEST', message, false);
+}

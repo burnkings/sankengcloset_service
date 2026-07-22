@@ -72,6 +72,7 @@ export class FieldNormalizer implements Normalizer {
       category,
       normalizedBrandName: brandName,
       confidence: this.calculateConfidence(item, brandName, category),
+      release: null,
     };
   }
 

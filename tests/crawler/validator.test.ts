@@ -29,6 +29,7 @@ function makeItem(overrides: Partial<NormalizedItem> = {}): NormalizedItem {
     shopUrl: '',
     tags: [],
     confidence: 100,
+      release: null,
     ...overrides,
   };
 }

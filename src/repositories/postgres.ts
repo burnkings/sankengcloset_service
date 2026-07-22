@@ -6,12 +6,24 @@ import type {
   AiConfirmationInput,
   AiImportTask,
   AiSuggestion,
+  ContentFeedItem,
   MediaObject,
   Product,
+  SearchQuery,
+  SearchResult,
   SyncOperationInput,
   SyncReceipt,
+  TrendSummary,
   UserProfile,
 } from '../types.js';
+import {
+  generateFeedReason,
+  computeRankingScore,
+  formatPriceSummary,
+  getReleaseTypeName,
+  mergeTags,
+} from '../intelligence/feed-ranker.js';
+import { buildTrendSummary } from '../intelligence/trend-engine.js';
 
 type Row = Record<string, unknown>;
 
@@ -34,13 +46,13 @@ function mapProduct(row: Row): Product {
     id: stringValue(row.id),
     brandId: stringValue(row.brand_id),
     brandName: stringValue(row.brand_name),
-    title: stringValue(row.title),
+    title: stringValue(row.canonical_name || row.title),
     category: stringValue(row.category) as Product['category'],
-    status: stringValue(row.status),
+    status: stringValue(row.sale_status || row.status),
     coverUrl: stringValue(row.cover_url),
     images,
-    priceCents: numberValue(row.price_cents),
-    originalPriceCents: numberValue(row.original_price_cents),
+    priceCents: numberValue(row.current_price || row.price_cents),
+    originalPriceCents: numberValue(row.original_price || row.original_price_cents),
     description: stringValue(row.description),
     shopUrl: stringValue(row.shop_url),
     createdAt: dateValue(row.created_at),
@@ -149,31 +161,98 @@ export class PostgresRepository implements AppRepository {
   }
 
   async listFeed(_userId: string | null, query: FeedQuery): Promise<FeedResult> {
-    const clauses = ['p.deleted_at is null'];
+    const clauses = ['p.deleted_at is null', "p.visibility_status = 'published'"];
     const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
     if (allowedCategories.has(query.category)) clauses.push(`p.category = '${query.category}'`);
-    if (query.channel === 'reservation') clauses.push(`p.status = 'PRE_ORDER'`);
-    if (query.channel === 'new') clauses.push(`p.status = 'UPCOMING'`);
+    if (query.channel === 'reservation') clauses.push(`(COALESCE(p.sale_status, p.status) = 'PRE_ORDER')`);
+    if (query.channel === 'new') clauses.push(`(COALESCE(p.sale_status, p.status) = 'UPCOMING')`);
     const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
     const limit = Math.min(51, Math.max(2, query.limit + 1));
     const rows = await this.sql.unsafe(
-      `select p.*, count(*) over() as total_count,
-        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images
-       from products p where ${clauses.join(' and ')}
-       order by p.created_at desc, p.id desc offset ${offset} limit ${limit}`,
+      `select p.*,
+        b.name as brand_name,
+        b.heat_score as brand_heat_score,
+        count(*) over() as total_count,
+        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+        -- 最新 release
+        (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
+        (select pr.release_name from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_name,
+        (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease,
+        (select pr.end_at from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_end_at,
+        (select pr.lifecycle_status from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_lifecycle,
+        -- 最新价格快照
+        (select ps.price_cents from price_snapshots ps where ps.product_id = p.id order by ps.captured_at desc limit 1) as snapshot_price
+       from products p
+       left join brands b on b.id = p.brand_id
+       where ${clauses.join(' and ')}
+       order by p.feed_score desc, p.created_at desc, p.id desc offset ${offset} limit ${limit}`,
     );
     const hasMore = rows.length > query.limit;
     const visible = hasMore ? rows.slice(0, query.limit) : rows;
     const items = visible.map((row) => {
-      const product = mapProduct(row as Row);
+      const r = row as Row;
+      const product = mapProduct(r);
+      const images = Array.isArray(r.images) ? r.images.map(String) : [];
+      const brandHeatScore = numberValue(r.brand_heat_score);
+      const releaseType = stringValue(r.release_type) || 'unknown';
+      const isRerelease = Boolean(r.is_rerelease);
+      const saleStatus = stringValue(r.sale_status || r.status);
+      const feedScore = numberValue(r.feed_score);
+      const releaseEndAt = dateValue(r.release_end_at);
+
+      // 判断是否新品（7天内）
+      const createdAt = new Date(product.createdAt).getTime();
+      const isNew = (Date.now() - createdAt) / (1000 * 60 * 60 * 24) <= 7;
+
+      // 价格变化检测
+      const snapshotPrice = numberValue(r.snapshot_price);
+      const hasPriceDrop = snapshotPrice > 0 && snapshotPrice < product.priceCents;
+
+      const feedReason = generateFeedReason({
+        saleStatus,
+        releaseType,
+        isRerelease,
+        isNew,
+        brandHeatScore,
+        hasPriceDrop,
+        priceTrend: hasPriceDrop ? 'down' : 'stable',
+        feedScore,
+        eventEndAt: releaseEndAt,
+      });
+
       return {
         id: `feed_${product.id}`,
-        feedType: 'product', entityId: product.id, title: product.title, subtitle: product.brandName,
-        coverUrl: product.coverUrl, secondaryCoverUrl: product.images[1] ?? '', brandId: product.brandId,
-        brandName: product.brandName, price: product.priceCents, originalPrice: product.originalPriceCents,
-        badgeText: product.status === 'PRE_ORDER' ? '预约' : product.status === 'UPCOMING' ? '新品' : '',
-        eventStartAt: '', eventEndAt: '', liked: false, saved: false, sourceLabel: '官方资料', rankingScore: 1,
-        category: product.category, createdAt: product.createdAt,
+        feedType: 'product',
+        entityId: product.id,
+        title: product.title,
+        subtitle: product.brandName,
+        coverUrl: product.coverUrl,
+        secondaryCoverUrl: images[1] ?? '',
+        brandId: product.brandId,
+        brandName: product.brandName,
+        category: product.category,
+        pitType: product.category,
+        price: product.priceCents,
+        originalPrice: product.originalPriceCents,
+        priceSummary: formatPriceSummary(product.priceCents),
+        saleStatus,
+        releaseType,
+        releaseTypeName: getReleaseTypeName(releaseType),
+        tags: mergeTags(
+          Array.isArray(r.season_tags) ? r.season_tags.map(String) : [],
+          Array.isArray(r.scene_tags) ? r.scene_tags.map(String) : [],
+          Array.isArray(r.element_tags) ? r.element_tags.map(String) : [],
+          Array.isArray(r.recommended_tags) ? r.recommended_tags.map(String) : [],
+        ),
+        feedScore,
+        feedReason,
+        eventStartAt: '',
+        eventEndAt: releaseEndAt,
+        liked: false,
+        saved: false,
+        sourceLabel: '官方资料',
+        publishedAt: product.createdAt,
+        createdAt: product.createdAt,
       };
     });
     return {
@@ -184,11 +263,226 @@ export class PostgresRepository implements AppRepository {
     };
   }
 
+  async searchProducts(query: SearchQuery): Promise<SearchResult> {
+    const clauses = ['p.deleted_at is null', "p.visibility_status = 'published'"];
+    const params: unknown[] = [];
+    let paramIdx = 1;
+
+    // 关键词搜索（pg_trgm）
+    if (query.q) {
+      clauses.push(`(p.title % ${query.q} OR b.name % ${query.q} OR p.title ILIKE '%' || ${query.q} || '%' OR b.name ILIKE '%' || ${query.q} || '%')`);
+    }
+
+    // 分类过滤
+    const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
+    if (query.category && allowedCategories.has(query.category)) {
+      clauses.push(`p.category = ${query.category}`);
+    }
+
+    // 发售状态
+    if (query.saleStatus) {
+      clauses.push(`(COALESCE(p.sale_status, p.status) = ${query.saleStatus})`);
+    }
+
+    // 发售类型
+    if (query.releaseStatus) {
+      clauses.push(`exists (select 1 from product_releases pr where pr.product_id = p.id and pr.release_type = ${query.releaseStatus} and pr.deleted_at is null)`);
+    }
+
+    // 品牌ID
+    if (query.brandId) {
+      clauses.push(`p.brand_id = ${query.brandId}`);
+    }
+
+    // 价格范围
+    if (query.minPrice > 0) {
+      clauses.push(`(COALESCE(p.current_price, p.price_cents) >= ${query.minPrice})`);
+    }
+    if (query.maxPrice > 0) {
+      clauses.push(`(COALESCE(p.current_price, p.price_cents) <= ${query.maxPrice})`);
+    }
+
+    const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
+    const limit = Math.min(51, Math.max(2, query.limit + 1));
+
+    const rows = await this.sql.unsafe(
+      `select p.*,
+        b.name as brand_name,
+        b.heat_score as brand_heat_score,
+        count(*) over() as total_count,
+        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+        (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
+        (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease
+       from products p
+       left join brands b on b.id = p.brand_id
+       where ${clauses.join(' and ')}
+       order by p.feed_score desc, p.created_at desc, p.id desc offset ${offset} limit ${limit}`,
+    );
+
+    const hasMore = rows.length > query.limit;
+    const visible = hasMore ? rows.slice(0, query.limit) : rows;
+    const items = visible.map((row) => {
+      const r = row as Row;
+      const product = mapProduct(r);
+      const images = Array.isArray(r.images) ? r.images.map(String) : [];
+      const brandHeatScore = numberValue(r.brand_heat_score);
+      const releaseType = stringValue(r.release_type) || 'unknown';
+      const isRerelease = Boolean(r.is_rerelease);
+      const saleStatus = stringValue(r.sale_status || r.status);
+      const feedScore = numberValue(r.feed_score);
+      const isNew = (Date.now() - new Date(product.createdAt).getTime()) / (1000 * 60 * 60 * 24) <= 7;
+
+      const feedReason = generateFeedReason({
+        saleStatus,
+        releaseType,
+        isRerelease,
+        isNew,
+        brandHeatScore,
+        hasPriceDrop: false,
+        priceTrend: 'stable',
+        feedScore,
+      });
+
+      return {
+        id: `feed_${product.id}`,
+        feedType: 'product',
+        entityId: product.id,
+        title: product.title,
+        subtitle: product.brandName,
+        coverUrl: product.coverUrl,
+        secondaryCoverUrl: images[1] ?? '',
+        brandId: product.brandId,
+        brandName: product.brandName,
+        category: product.category,
+        pitType: product.category,
+        price: product.priceCents,
+        originalPrice: product.originalPriceCents,
+        priceSummary: formatPriceSummary(product.priceCents),
+        saleStatus,
+        releaseType,
+        releaseTypeName: getReleaseTypeName(releaseType),
+        tags: mergeTags(
+          Array.isArray(r.season_tags) ? r.season_tags.map(String) : [],
+          Array.isArray(r.scene_tags) ? r.scene_tags.map(String) : [],
+          Array.isArray(r.element_tags) ? r.element_tags.map(String) : [],
+          Array.isArray(r.recommended_tags) ? r.recommended_tags.map(String) : [],
+        ),
+        feedScore,
+        feedReason,
+        eventStartAt: '',
+        eventEndAt: '',
+        liked: false,
+        saved: false,
+        sourceLabel: '搜索结果',
+        publishedAt: product.createdAt,
+        createdAt: product.createdAt,
+      };
+    });
+
+    return {
+      items,
+      nextCursor: hasMore ? String(offset + query.limit) : '',
+      hasMore,
+      totalHint: rows.length === 0 ? 0 : numberValue((rows[0] as Row).total_count),
+    };
+  }
+
+  async getTrendSummary(period: string = '30d'): Promise<TrendSummary> {
+    const days = period === '7d' ? 7 : period === '90d' ? 90 : 30;
+    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+    // 品牌趋势：聚合品牌的商品数、再贩数、平均价格
+    const brandRows = await this.sql.unsafe(
+      `select
+        b.id as brand_id,
+        b.name as brand_name,
+        b.heat_score,
+        count(distinct p.id) as product_count,
+        count(distinct case when p.created_at >= ${cutoff} then p.id end) as new_product_count,
+        count(distinct case when pr.is_rerelease and pr.created_at >= ${cutoff} then pr.id end) as rerelease_count,
+        coalesce(avg(case when p.created_at >= ${cutoff} then coalesce(p.current_price, p.price_cents) end), 0)::int as avg_price_current,
+        coalesce(avg(case when p.created_at < ${cutoff} then coalesce(p.current_price, p.price_cents) end), 0)::int as avg_price_prev
+       from brands b
+       left join products p on p.brand_id = b.id and p.deleted_at is null
+       left join product_releases pr on pr.product_id = p.id and pr.deleted_at is null
+       where b.deleted_at is null
+       group by b.id, b.name, b.heat_score
+       having count(distinct p.id) > 0
+       order by b.heat_score desc
+       limit 10`,
+    );
+
+    const brandTrends = brandRows.map((row) => {
+      const r = row as Row;
+      const avgCurrent = numberValue(r.avg_price_current);
+      const avgPrev = numberValue(r.avg_price_prev);
+      const priceChange = avgPrev > 0 ? Math.round(((avgCurrent - avgPrev) / avgPrev) * 100) : 0;
+      return {
+        brandId: stringValue(r.brand_id),
+        brandName: stringValue(r.brand_name),
+        period,
+        newProductCount: numberValue(r.new_product_count),
+        rereleaseCount: numberValue(r.rerelease_count),
+        avgPriceCents: avgCurrent,
+        priceChangePercent: priceChange,
+        heatScore: numberValue(r.heat_score),
+        productCount: numberValue(r.product_count),
+      };
+    });
+
+    // 商品趋势：价格变化、热度变化、状态变化
+    const productRows = await this.sql.unsafe(
+      `select
+        p.id as product_id,
+        coalesce(p.canonical_name, p.title) as product_name,
+        b.name as brand_name,
+        p.category,
+        coalesce(p.current_price, p.price_cents) as current_price,
+        p.feed_score as current_feed_score,
+        coalesce(p.sale_status, p.status) as current_sale_status,
+        (select ps.price_cents from price_snapshots ps where ps.product_id = p.id and ps.captured_at < ${cutoff} order by ps.captured_at desc limit 1) as prev_price,
+        coalesce(p.sale_status, p.status) as prev_sale_status
+       from products p
+       left join brands b on b.id = p.brand_id
+       where p.deleted_at is null
+         and p.visibility_status = 'published'
+         and p.updated_at >= ${cutoff}
+       order by p.feed_score desc
+       limit 20`,
+    );
+
+    const productTrends = productRows.map((row) => {
+      const r = row as Row;
+      const currentPrice = numberValue(r.current_price);
+      const prevPrice = numberValue(r.prev_price);
+      const priceChange = currentPrice - prevPrice;
+      const priceChangePercent = prevPrice > 0 ? Math.round(((currentPrice - prevPrice) / prevPrice) * 100) : 0;
+      const currentSaleStatus = stringValue(r.current_sale_status);
+      const prevSaleStatus = stringValue(r.prev_sale_status);
+
+      return {
+        productId: stringValue(r.product_id),
+        productName: stringValue(r.product_name),
+        brandName: stringValue(r.brand_name),
+        category: stringValue(r.category),
+        period,
+        priceChange,
+        priceChangePercent,
+        feedScoreChange: 0, // 需要历史数据，简化为0
+        saleStatusChanged: currentSaleStatus !== prevSaleStatus,
+        currentSaleStatus,
+        previousSaleStatus: prevSaleStatus,
+      };
+    });
+
+    return buildTrendSummary(brandTrends, productTrends);
+  }
+
   async getProduct(_userId: string | null, productId: string): Promise<Product | null> {
     const rows = await this.sql`
       select p.*,
         coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images
-      from products p where p.id = ${productId} and p.deleted_at is null
+      from products p where p.id = ${productId} and p.deleted_at is null and p.visibility_status = 'published'
     `;
     return rows.length === 0 ? null : mapProduct(rows[0] as Row);
   }

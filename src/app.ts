@@ -16,6 +16,8 @@ import { registerContentRoutes } from './routes/content.js';
 import { registerSyncRoutes } from './routes/sync.js';
 import { registerUploadRoutes } from './routes/uploads.js';
 import { registerAiImportRoutes } from './routes/ai-import.js';
+import { registerReviewRoutes } from './routes/review.js';
+import postgres from 'postgres';
 import { readFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -85,6 +87,14 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await registerSyncRoutes(app, repository);
   await registerUploadRoutes(app, config, repository, storage);
   await registerAiImportRoutes(app, config, repository);
+
+  // 审核路由（仅 postgres 模式）
+  if (config.DATA_DRIVER === 'postgres') {
+    const reviewSql = postgres(config.DATABASE_URL, { max: 5 });
+    await registerReviewRoutes(app, reviewSql);
+    app.addHook('onClose', async () => { await reviewSql.end(); });
+  }
+
   app.addHook('onClose', async () => repository.close());
   return app;
 }
