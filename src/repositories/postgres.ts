@@ -6,15 +6,22 @@ import type {
   AiConfirmationInput,
   AiImportTask,
   AiSuggestion,
+  BrandFollower,
   ContentFeedItem,
+  CreateUserEventInput,
+  CreateWishlistInput,
   MediaObject,
+  PersonalScoreInput,
+  PersonalScoreResult,
   Product,
   SearchQuery,
   SearchResult,
   SyncOperationInput,
   SyncReceipt,
   TrendSummary,
+  UserEvent,
   UserProfile,
+  WishlistItem,
 } from '../types.js';
 import {
   generateFeedReason,
@@ -24,6 +31,7 @@ import {
   mergeTags,
 } from '../intelligence/feed-ranker.js';
 import { buildTrendSummary } from '../intelligence/trend-engine.js';
+import { computePersonalScore, type UserPreference } from '../intelligence/personal-score.js';
 
 type Row = Record<string, unknown>;
 
@@ -617,5 +625,164 @@ export class PostgresRepository implements AppRepository {
       `;
       return mapAiTask(updated[0] as Row);
     });
+  }
+
+  // ─── D8: 用户行为事件 ──────────────────────────────────────
+
+  async recordEvent(userId: string | null, input: CreateUserEventInput): Promise<UserEvent> {
+    const id = newId('evt');
+    const metadataJson = JSON.stringify(input.metadata ?? {});
+    if (userId) {
+      await this.sql`INSERT INTO user_events (id, user_id, event_type, target_type, target_id, metadata)
+        VALUES (${id}, ${userId}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${metadataJson}::jsonb)`;
+    } else {
+      await this.sql`INSERT INTO user_events (id, event_type, target_type, target_id, metadata)
+        VALUES (${id}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${metadataJson}::jsonb)`;
+    }
+    return {
+      id, userId, eventType: input.eventType,
+      targetType: input.targetType, targetId: input.targetId,
+      metadata: input.metadata ?? {}, createdAt: new Date().toISOString(),
+    };
+  }
+
+  async getUserEvents(userId: string, eventType?: string, limit: number = 50): Promise<UserEvent[]> {
+    let rows;
+    if (eventType) {
+      rows = await this.sql`SELECT * FROM user_events WHERE user_id = ${userId} AND event_type = ${eventType}
+        ORDER BY created_at DESC LIMIT ${limit}`;
+    } else {
+      rows = await this.sql`SELECT * FROM user_events WHERE user_id = ${userId}
+        ORDER BY created_at DESC LIMIT ${limit}`;
+    }
+    return rows.map((r: Row) => ({
+      id: stringValue(r.id),
+      userId: r.user_id == null ? null : stringValue(r.user_id),
+      eventType: stringValue(r.event_type) as UserEvent['eventType'],
+      targetType: stringValue(r.target_type),
+      targetId: stringValue(r.target_id),
+      metadata: (r.metadata ?? {}) as Record<string, unknown>,
+      createdAt: dateValue(r.created_at),
+    }));
+  }
+
+  // ─── D8: 收藏体系 ─────────────────────────────────────────
+
+  async addWishlist(userId: string, input: CreateWishlistInput): Promise<WishlistItem> {
+    const id = newId('wli');
+    const now = new Date();
+    const rows = await this.sql`
+      INSERT INTO wishlist_items (id, user_id, title, status, product_id, release_id, note, created_at, updated_at)
+      VALUES (${id}, ${userId}, ${input.title}, ${input.status},
+        ${input.productId ?? null}, ${input.releaseId ?? null}, ${input.note ?? ''}, ${now}, ${now})
+      RETURNING *`;
+    return this.mapWishlist(rows[0] as Row);
+  }
+
+  async updateWishlistStatus(wishlistId: string, userId: string, status: string): Promise<WishlistItem> {
+    const rows = await this.sql`UPDATE wishlist_items SET status = ${status}, updated_at = now()
+      WHERE id = ${wishlistId} AND user_id = ${userId} RETURNING *`;
+    if (rows.length === 0) throw notFound('收藏项不存在');
+    return this.mapWishlist(rows[0] as Row);
+  }
+
+  async removeWishlist(wishlistId: string, userId: string): Promise<boolean> {
+    const rows = await this.sql`DELETE FROM wishlist_items WHERE id = ${wishlistId} AND user_id = ${userId} RETURNING id`;
+    return rows.length > 0;
+  }
+
+  async listWishlist(userId: string, status?: string): Promise<WishlistItem[]> {
+    let rows;
+    if (status) {
+      rows = await this.sql`SELECT * FROM wishlist_items WHERE user_id = ${userId} AND status = ${status} ORDER BY created_at DESC`;
+    } else {
+      rows = await this.sql`SELECT * FROM wishlist_items WHERE user_id = ${userId} ORDER BY created_at DESC`;
+    }
+    return rows.map((r: Row) => this.mapWishlist(r));
+  }
+
+  async isProductWishlisted(userId: string, productId: string): Promise<boolean> {
+    const rows = await this.sql`SELECT 1 FROM wishlist_items WHERE user_id = ${userId} AND product_id = ${productId} LIMIT 1`;
+    return rows.length > 0;
+  }
+
+  private mapWishlist(row: Row): WishlistItem {
+    return {
+      id: stringValue(row.id),
+      userId: stringValue(row.user_id),
+      title: stringValue(row.title),
+      status: stringValue(row.status) as WishlistItem['status'],
+      productId: row.product_id == null ? null : stringValue(row.product_id),
+      releaseId: row.release_id == null ? null : stringValue(row.release_id),
+      note: stringValue(row.note),
+      payloadJson: (row.payload_json ?? {}) as Record<string, unknown>,
+      createdAt: dateValue(row.created_at),
+      updatedAt: dateValue(row.updated_at),
+    };
+  }
+
+  // ─── D8: 品牌关注 ─────────────────────────────────────────
+
+  async followBrand(userId: string, brandId: string): Promise<BrandFollower> {
+    await this.sql`INSERT INTO brand_followers (user_id, brand_id) VALUES (${userId}, ${brandId})
+      ON CONFLICT (user_id, brand_id) DO NOTHING`;
+    const rows = await this.sql`SELECT * FROM brand_followers WHERE user_id = ${userId} AND brand_id = ${brandId}`;
+    const row = rows[0];
+    if (!row) throw notFound('品牌关注不存在');
+    return { userId: stringValue(row.user_id), brandId: stringValue(row.brand_id), createdAt: dateValue(row.created_at) };
+  }
+
+  async unfollowBrand(userId: string, brandId: string): Promise<boolean> {
+    const rows = await this.sql`DELETE FROM brand_followers WHERE user_id = ${userId} AND brand_id = ${brandId} RETURNING user_id`;
+    return rows.length > 0;
+  }
+
+  async isFollowingBrand(userId: string, brandId: string): Promise<boolean> {
+    const rows = await this.sql`SELECT 1 FROM brand_followers WHERE user_id = ${userId} AND brand_id = ${brandId} LIMIT 1`;
+    return rows.length > 0;
+  }
+
+  async getFollowedBrandIds(userId: string): Promise<string[]> {
+    const rows = await this.sql`SELECT brand_id FROM brand_followers WHERE user_id = ${userId}`;
+    return rows.map((r: Row) => stringValue(r.brand_id));
+  }
+
+  // ─── D8: 个性化评分 ───────────────────────────────────────
+
+  async getUserPreference(userId: string): Promise<UserPreference> {
+    const followedBrandIds = await this.getFollowedBrandIds(userId);
+
+    // 收藏的品类
+    const catRows = await this.sql`SELECT DISTINCT p.category
+      FROM wishlist_items w JOIN products p ON p.id = w.product_id
+      WHERE w.user_id = ${userId} AND w.product_id IS NOT NULL`;
+    const wishlistCategories = catRows.map((r: Row) => stringValue(r.category));
+
+    // 收藏的标签
+    const tagRows = await this.sql`SELECT DISTINCT unnest(
+      COALESCE(p.season_tags, '{}') || COALESCE(p.scene_tags, '{}') || COALESCE(p.element_tags, '{}')
+    ) AS tag
+      FROM wishlist_items w JOIN products p ON p.id = w.product_id
+      WHERE w.user_id = ${userId} AND w.product_id IS NOT NULL`;
+    const wishlistTags = tagRows.map((r: Row) => stringValue(r.tag));
+
+    // 浏览的品类
+    const viewRows = await this.sql`SELECT DISTINCT p.category
+      FROM user_events e JOIN products p ON p.id = e.target_id
+      WHERE e.user_id = ${userId} AND e.event_type = 'VIEW_PRODUCT'`;
+    const viewedCategories = viewRows.map((r: Row) => stringValue(r.category));
+
+    // 搜索关键词
+    const searchRows = await this.sql`SELECT metadata->>'q' AS q
+      FROM user_events WHERE user_id = ${userId} AND event_type = 'SEARCH'
+      AND metadata->>'q' IS NOT NULL ORDER BY created_at DESC LIMIT 20`;
+    const searchedKeywords = searchRows.map((r: Row) => stringValue(r.q));
+
+    return { followedBrandIds, wishlistCategories, wishlistTags, viewedCategories, searchedKeywords };
+  }
+
+  async computePersonalScore(input: PersonalScoreInput): Promise<PersonalScoreResult> {
+    const preference = await this.getUserPreference(input.userId);
+    return computePersonalScore(input, preference);
   }
 }

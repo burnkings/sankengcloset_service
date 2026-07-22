@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { success } from '../http.js';
+import { success, requireUser } from '../http.js';
 import { notFound } from '../lib/problem.js';
 import type { AppRepository } from '../repositories/contracts.js';
 
@@ -29,12 +29,42 @@ const trendQuerySchema = z.object({
 
 const productParamsSchema = z.object({ id: z.string().min(1).max(128) });
 
+/**
+ * 为 Feed 项附加个性化评分
+ */
+async function enrichWithPersonalScore(
+  items: Awaited<ReturnType<AppRepository['listFeed']>>['items'],
+  userId: string | null,
+  repository: AppRepository,
+) {
+  if (!userId) {
+    return items.map(item => ({ ...item, personalScore: 0, matchReason: '', finalScore: item.feedScore }));
+  }
+
+  return Promise.all(items.map(async (item) => {
+    const result = await repository.computePersonalScore({
+      userId,
+      productId: item.entityId,
+      brandId: item.brandId,
+      category: item.category,
+      tags: item.tags,
+    });
+    const finalScore = Math.round(item.feedScore * 0.7 + result.personalScore * 0.3);
+    return { ...item, personalScore: result.personalScore, matchReason: result.matchReason, finalScore };
+  }));
+}
+
 export async function registerContentRoutes(app: FastifyInstance, repository: AppRepository) {
-  // 智能 Feed
+  // 智能 Feed（支持个性化）
   app.get('/api/v1/feed', async (request) => {
     const query = feedQuerySchema.parse(request.query);
-    const result = await repository.listFeed(null, query);
-    return success(request, result.items, {
+    let userId: string | null = null;
+    try { userId = await requireUser(request); } catch { /* 匿名 */ }
+    const result = await repository.listFeed(userId, query);
+    const enriched = await enrichWithPersonalScore(result.items, userId, repository);
+    // 按 finalScore 重新排序
+    enriched.sort((a, b) => b.finalScore - a.finalScore);
+    return success(request, enriched, {
       nextCursor: result.nextCursor, hasMore: result.hasMore, totalHint: result.totalHint,
     });
   });

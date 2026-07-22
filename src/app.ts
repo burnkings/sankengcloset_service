@@ -17,6 +17,7 @@ import { registerSyncRoutes } from './routes/sync.js';
 import { registerUploadRoutes } from './routes/uploads.js';
 import { registerAiImportRoutes } from './routes/ai-import.js';
 import { registerReviewRoutes } from './routes/review.js';
+import { registerInteractionRoutes } from './routes/interaction.js';
 import postgres from 'postgres';
 import { readFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
@@ -87,6 +88,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await registerSyncRoutes(app, repository);
   await registerUploadRoutes(app, config, repository, storage);
   await registerAiImportRoutes(app, config, repository);
+  await registerInteractionRoutes(app, repository);
 
   // 审核路由（仅 postgres 模式）
   if (config.DATA_DRIVER === 'postgres') {

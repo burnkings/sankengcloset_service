@@ -4,19 +4,26 @@ import type { AppRepository, FeedQuery, FeedResult } from './contracts.js';
 import type {
   AiConfirmationInput,
   AiImportTask,
+  BrandFollower,
   ContentFeedItem,
-  FeedItem,
+  CreateUserEventInput,
+  CreateWishlistInput,
   MediaObject,
+  PersonalScoreInput,
+  PersonalScoreResult,
   Product,
   SearchQuery,
   SearchResult,
   SyncOperationInput,
   SyncReceipt,
   TrendSummary,
+  UserEvent,
   UserProfile,
+  WishlistItem,
 } from '../types.js';
 import { generateFeedReason, computeRankingScore, formatPriceSummary, getReleaseTypeName, mergeTags } from '../intelligence/feed-ranker.js';
 import { buildTrendSummary } from '../intelligence/trend-engine.js';
+import { computePersonalScore, type UserPreference } from '../intelligence/personal-score.js';
 
 function seedProducts(): Product[] {
   const now = nowIso();
@@ -253,7 +260,135 @@ export class MemoryRepository implements AppRepository {
   }
 
   async getTrendSummary(_period?: string): Promise<TrendSummary> {
-    // 内存模式下返回空趋势
     return buildTrendSummary([], []);
+  }
+
+  // ─── D8: 用户行为事件 ──────────────────────────────────────
+
+  private readonly events: UserEvent[] = [];
+
+  async recordEvent(userId: string | null, input: CreateUserEventInput): Promise<UserEvent> {
+    const event: UserEvent = {
+      id: newId('evt'),
+      userId,
+      eventType: input.eventType,
+      targetType: input.targetType,
+      targetId: input.targetId,
+      metadata: input.metadata ?? {},
+      createdAt: nowIso(),
+    };
+    this.events.push(event);
+    return event;
+  }
+
+  async getUserEvents(userId: string, eventType?: string, limit: number = 50): Promise<UserEvent[]> {
+    let filtered = this.events.filter(e => e.userId === userId);
+    if (eventType) filtered = filtered.filter(e => e.eventType === eventType);
+    return filtered.slice(-limit).reverse();
+  }
+
+  // ─── D8: 收藏体系 ─────────────────────────────────────────
+
+  private readonly wishlists: WishlistItem[] = [];
+
+  async addWishlist(userId: string, input: CreateWishlistInput): Promise<WishlistItem> {
+    const item: WishlistItem = {
+      id: newId('wli'),
+      userId,
+      title: input.title,
+      status: input.status,
+      productId: input.productId ?? null,
+      releaseId: input.releaseId ?? null,
+      note: input.note ?? '',
+      payloadJson: {},
+      createdAt: nowIso(),
+      updatedAt: nowIso(),
+    };
+    this.wishlists.push(item);
+    return item;
+  }
+
+  async updateWishlistStatus(wishlistId: string, userId: string, status: string): Promise<WishlistItem> {
+    const item = this.wishlists.find(w => w.id === wishlistId && w.userId === userId);
+    if (!item) throw notFound('收藏项不存在');
+    item.status = status as WishlistItem['status'];
+    item.updatedAt = nowIso();
+    return item;
+  }
+
+  async removeWishlist(wishlistId: string, userId: string): Promise<boolean> {
+    const idx = this.wishlists.findIndex(w => w.id === wishlistId && w.userId === userId);
+    if (idx === -1) return false;
+    this.wishlists.splice(idx, 1);
+    return true;
+  }
+
+  async listWishlist(userId: string, status?: string): Promise<WishlistItem[]> {
+    let items = this.wishlists.filter(w => w.userId === userId);
+    if (status) items = items.filter(w => w.status === status);
+    return items;
+  }
+
+  async isProductWishlisted(userId: string, productId: string): Promise<boolean> {
+    return this.wishlists.some(w => w.userId === userId && w.productId === productId);
+  }
+
+  // ─── D8: 品牌关注 ─────────────────────────────────────────
+
+  private readonly brandFollowers: BrandFollower[] = [];
+
+  async followBrand(userId: string, brandId: string): Promise<BrandFollower> {
+    const existing = this.brandFollowers.find(f => f.userId === userId && f.brandId === brandId);
+    if (existing) return existing;
+    const follower: BrandFollower = { userId, brandId, createdAt: nowIso() };
+    this.brandFollowers.push(follower);
+    return follower;
+  }
+
+  async unfollowBrand(userId: string, brandId: string): Promise<boolean> {
+    const idx = this.brandFollowers.findIndex(f => f.userId === userId && f.brandId === brandId);
+    if (idx === -1) return false;
+    this.brandFollowers.splice(idx, 1);
+    return true;
+  }
+
+  async isFollowingBrand(userId: string, brandId: string): Promise<boolean> {
+    return this.brandFollowers.some(f => f.userId === userId && f.brandId === brandId);
+  }
+
+  async getFollowedBrandIds(userId: string): Promise<string[]> {
+    return this.brandFollowers.filter(f => f.userId === userId).map(f => f.brandId);
+  }
+
+  // ─── D8: 个性化评分 ───────────────────────────────────────
+
+  async getUserPreference(userId: string): Promise<UserPreference> {
+    const followedBrandIds = await this.getFollowedBrandIds(userId);
+    const wishlists = await this.listWishlist(userId);
+    const wishlistCategories = [...new Set(
+      wishlists
+        .map(w => this.products.find(p => p.id === w.productId)?.category)
+        .filter(Boolean) as string[],
+    )];
+    const wishlistTags = wishlists
+      .flatMap(w => {
+        const p = this.products.find(pr => pr.id === w.productId);
+        return p ? [...(p as any).season_tags ?? [], ...(p as any).scene_tags ?? [], ...(p as any).element_tags ?? []] : [];
+      });
+    const viewEvents = this.events.filter(e => e.userId === userId && e.eventType === 'VIEW_PRODUCT');
+    const viewedCategories = [...new Set(
+      viewEvents
+        .map(e => this.products.find(p => p.id === e.targetId)?.category)
+        .filter(Boolean) as string[],
+    )];
+    const searchEvents = this.events.filter(e => e.userId === userId && e.eventType === 'SEARCH');
+    const searchedKeywords = searchEvents.map(e => (e.metadata.q as string) ?? '').filter(Boolean);
+
+    return { followedBrandIds, wishlistCategories, wishlistTags, viewedCategories, searchedKeywords };
+  }
+
+  async computePersonalScore(input: PersonalScoreInput): Promise<PersonalScoreResult> {
+    const preference = await this.getUserPreference(input.userId);
+    return computePersonalScore(input, preference);
   }
 }

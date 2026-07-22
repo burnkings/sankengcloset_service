@@ -1,16 +1,23 @@
 import type {
   AiConfirmationInput,
   AiImportTask,
+  BrandFollower,
   ContentFeedItem,
+  CreateUserEventInput,
+  CreateWishlistInput,
   FeedItem,
   MediaObject,
+  PersonalScoreInput,
+  PersonalScoreResult,
   Product,
   SearchQuery,
   SearchResult,
   SyncOperationInput,
   SyncReceipt,
   TrendSummary,
+  UserEvent,
   UserProfile,
+  WishlistItem,
 } from '../types.js';
 
 export interface FeedQuery {
@@ -37,6 +44,34 @@ export interface AppRepository {
   getProduct(userId: string | null, productId: string): Promise<Product | null>;
   searchProducts(query: SearchQuery): Promise<SearchResult>;
   getTrendSummary(period?: string): Promise<TrendSummary>;
+
+  // D8: 用户行为事件
+  recordEvent(userId: string | null, input: CreateUserEventInput): Promise<UserEvent>;
+  getUserEvents(userId: string, eventType?: string, limit?: number): Promise<UserEvent[]>;
+
+  // D8: 收藏体系
+  addWishlist(userId: string, input: CreateWishlistInput): Promise<WishlistItem>;
+  updateWishlistStatus(wishlistId: string, userId: string, status: string): Promise<WishlistItem>;
+  removeWishlist(wishlistId: string, userId: string): Promise<boolean>;
+  listWishlist(userId: string, status?: string): Promise<WishlistItem[]>;
+  isProductWishlisted(userId: string, productId: string): Promise<boolean>;
+
+  // D8: 品牌关注
+  followBrand(userId: string, brandId: string): Promise<BrandFollower>;
+  unfollowBrand(userId: string, brandId: string): Promise<boolean>;
+  isFollowingBrand(userId: string, brandId: string): Promise<boolean>;
+  getFollowedBrandIds(userId: string): Promise<string[]>;
+
+  // D8: 个性化评分
+  computePersonalScore(input: PersonalScoreInput): Promise<PersonalScoreResult>;
+  getUserPreference(userId: string): Promise<{
+    followedBrandIds: string[];
+    wishlistCategories: string[];
+    wishlistTags: string[];
+    viewedCategories: string[];
+    searchedKeywords: string[];
+  }>;
+
   applySyncBatch(userId: string, operations: SyncOperationInput[]): Promise<SyncReceipt[]>;
   getSyncCheckpoint(userId: string): Promise<string>;
   createMedia(input: Omit<MediaObject, 'id' | 'createdAt' | 'deletedAt' | 'sizeBytes'>): Promise<MediaObject>;

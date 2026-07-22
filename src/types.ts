@@ -202,3 +202,96 @@ export interface TrendSummary {
   productTrends: ProductTrend[];
   generatedAt: string;
 }
+
+// ─── Phase D8: User Interaction & Personalization ──────────
+
+/**
+ * 用户行为事件
+ */
+export type UserEventType =
+  | 'VIEW_PRODUCT' | 'VIEW_RELEASE' | 'LIKE_PRODUCT' | 'SAVE_PRODUCT'
+  | 'FOLLOW_BRAND' | 'SEARCH' | 'SHARE' | 'CLICK_PRICE_ALERT' | 'CLICK_BUY';
+
+export interface UserEvent {
+  id: string;
+  userId: string | null;     // null = 匿名
+  eventType: UserEventType;
+  targetType: string;        // product / release / brand / search
+  targetId: string;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface CreateUserEventInput {
+  eventType: UserEventType;
+  targetType: string;
+  targetId: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * 收藏项（升级版）
+ */
+export type WishlistStatus = 'WISH' | 'WANT' | 'WATCHING' | 'WAIT_RELEASE' | 'WAIT_PRICE' | 'PURCHASED';
+
+export interface WishlistItem {
+  id: string;
+  userId: string;
+  title: string;
+  status: WishlistStatus;
+  productId: string | null;
+  releaseId: string | null;
+  note: string;
+  payloadJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateWishlistInput {
+  title: string;
+  status: WishlistStatus;
+  productId?: string | null;
+  releaseId?: string | null;
+  note?: string;
+}
+
+/**
+ * 品牌关注
+ */
+export interface BrandFollower {
+  userId: string;
+  brandId: string;
+  createdAt: string;
+}
+
+/**
+ * 个性化评分
+ */
+export interface PersonalScoreInput {
+  userId: string;
+  productId: string;
+  brandId: string;
+  category: string;          // JK / LOLITA / HANFU / OTHER
+  tags: string[];
+}
+
+export interface PersonalScoreResult {
+  personalScore: number;     // 0-100
+  matchReason: string;       // e.g. "因为你收藏过甜系Lolita"
+  breakdown: {
+    tagMatch: number;        // 标签匹配 0-40
+    brandMatch: number;      // 品牌匹配 0-30
+    categoryMatch: number;   // 品类匹配 0-30
+  };
+}
+
+/**
+ * 个性化 Feed 查询（扩展 FeedQuery）
+ */
+export interface PersonalizedFeedQuery {
+  channel: string;
+  category: string;
+  cursor: string;
+  limit: number;
+  userId: string | null;     // null = 公共 Feed
+}
