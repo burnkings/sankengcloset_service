@@ -136,7 +136,9 @@ export interface ContentFeedItem {
   releaseTypeName: string;    // 首发 / 再贩 / 预约 / 现货 / 抽选 / 未知
   tags: string[];             // season + scene + element + recommended
   feedScore: number;          // 0-100
+  rankingScore: number;       // 排序分数，等同 feedScore（前端 FeedItem 协议）
   feedReason: string;         // 推荐理由 e.g. "热门品牌新品"
+  badgeText: string;          // 角标文字 '新品' / '预约' / '降价' / ''（前端 FeedItem 协议）
   eventStartAt: string;
   eventEndAt: string;
   liked: boolean;

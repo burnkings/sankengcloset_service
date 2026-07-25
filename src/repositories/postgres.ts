@@ -228,6 +228,13 @@ export class PostgresRepository implements AppRepository {
         eventEndAt: releaseEndAt,
       });
 
+      // 前端期望的 badgeText 字段
+      const badgeText: string =
+        hasPriceDrop ? '降价'
+        : saleStatus === 'PRE_ORDER' ? '预约'
+        : isNew ? '新品'
+        : '';
+
       return {
         id: `feed_${product.id}`,
         feedType: 'product',
@@ -253,7 +260,9 @@ export class PostgresRepository implements AppRepository {
           Array.isArray(r.recommended_tags) ? r.recommended_tags.map(String) : [],
         ),
         feedScore,
+        rankingScore: feedScore,
         feedReason,
+        badgeText,
         eventStartAt: '',
         eventEndAt: releaseEndAt,
         liked: false,
@@ -376,7 +385,9 @@ export class PostgresRepository implements AppRepository {
           Array.isArray(r.recommended_tags) ? r.recommended_tags.map(String) : [],
         ),
         feedScore,
+        rankingScore: feedScore,
         feedReason,
+        badgeText: '',
         eventStartAt: '',
         eventEndAt: '',
         liked: false,
