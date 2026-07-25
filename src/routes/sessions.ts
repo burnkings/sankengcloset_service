@@ -19,12 +19,14 @@ function createTokens(app: FastifyInstance, userId: string) {
 }
 
 export async function registerSessionRoutes(app: FastifyInstance, config: AppConfig, repository: AppRepository) {
-  app.post('/api/v1/sessions/dev', async (request) => {
-    if (config.NODE_ENV === 'production') throw notFound();
-    const body = devLoginSchema.parse(request.body ?? {});
-    const user = await repository.ensureDevUser(body.nickname);
-    return success(request, { user, ...createTokens(app, user.id), mode: 'development' });
-  });
+  // Dev login route — only available in test environment
+  if (config.NODE_ENV === 'test') {
+    app.post('/api/v1/sessions/dev', async (request) => {
+      const body = devLoginSchema.parse(request.body ?? {});
+      const user = await repository.ensureDevUser(body.nickname);
+      return success(request, { user, ...createTokens(app, user.id), mode: 'development' });
+    });
+  }
 
   app.post('/api/v1/sessions/wechat', async (request) => {
     const body = wechatSchema.parse(request.body);
