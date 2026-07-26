@@ -181,7 +181,7 @@ export class PostgresRepository implements AppRepository {
         b.name as brand_name,
         b.heat_score as brand_heat_score,
         count(*) over() as total_count,
-        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
         -- 最新 release
         (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
         (select pr.release_name from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_name,
@@ -327,7 +327,7 @@ export class PostgresRepository implements AppRepository {
         b.name as brand_name,
         b.heat_score as brand_heat_score,
         count(*) over() as total_count,
-        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
         (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
         (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease
        from products p
@@ -499,9 +499,11 @@ export class PostgresRepository implements AppRepository {
 
   async getProduct(_userId: string | null, productId: string): Promise<Product | null> {
     const rows = await this.sql`
-      select p.*,
-        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images
-      from products p where p.id = ${productId} and p.deleted_at is null and p.visibility_status = 'published'
+      select p.*, b.name as brand_name,
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images
+      from products p
+      left join brands b on b.id = p.brand_id
+      where p.id = ${productId} and p.deleted_at is null and p.visibility_status = 'published'
     `;
     return rows.length === 0 ? null : mapProduct(rows[0] as Row);
   }
