@@ -23,6 +23,7 @@ import type {
 export interface FeedQuery {
   channel: string;
   category: string;
+  categories?: string;
   cursor: string;
   limit: number;
 }

@@ -7,6 +7,7 @@ import type { AppRepository } from '../repositories/contracts.js';
 const feedQuerySchema = z.object({
   channel: z.enum(['', 'recommend', 'new', 'reservation', 'price_drop', 'outfit']).default(''),
   category: z.enum(['', 'JK', 'LOLITA', 'HANFU', 'OTHER']).default(''),
+  categories: z.string().max(200).default(''),
   cursor: z.string().max(64).default(''),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });

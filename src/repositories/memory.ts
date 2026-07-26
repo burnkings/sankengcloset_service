@@ -129,7 +129,14 @@ export class MemoryRepository implements AppRepository {
 
   async listFeed(_userId: string | null, query: FeedQuery): Promise<FeedResult> {
     let rows = this.products;
-    if (query.category !== '') rows = rows.filter((item) => item.category === query.category);
+    const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
+    let categoryFilter: string[] = [];
+    if (query.categories) {
+      categoryFilter = query.categories.split(',').map(c => c.trim().toUpperCase()).filter(c => allowedCategories.has(c));
+    } else if (allowedCategories.has(query.category)) {
+      categoryFilter = [query.category];
+    }
+    if (categoryFilter.length > 0) rows = rows.filter((item) => categoryFilter.includes(item.category));
     if (query.channel === 'reservation') rows = rows.filter((item) => item.status === 'PRE_ORDER');
     if (query.channel === 'new') rows = rows.filter((item) => item.status === 'UPCOMING');
     const offset = Number.parseInt(query.cursor || '0', 10) || 0;

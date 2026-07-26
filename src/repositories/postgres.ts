@@ -54,15 +54,15 @@ function mapProduct(row: Row): Product {
     id: stringValue(row.id),
     brandId: stringValue(row.brand_id),
     brandName: stringValue(row.brand_name),
-    title: stringValue(row.canonical_name || row.title),
-    category: stringValue(row.category) as Product['category'],
+    title: stringValue(row.display_name || row.canonical_name),
+    category: (stringValue(row.category) || '') as Product['category'],
     status: stringValue(row.sale_status || row.status),
     coverUrl: stringValue(row.cover_url),
     images,
     priceCents: numberValue(row.current_price || row.price_cents),
     originalPriceCents: numberValue(row.original_price || row.original_price_cents),
     description: stringValue(row.description),
-    shopUrl: stringValue(row.shop_url),
+    shopUrl: stringValue(row.source_url),
     createdAt: dateValue(row.created_at),
     updatedAt: dateValue(row.updated_at),
   };
@@ -169,32 +169,61 @@ export class PostgresRepository implements AppRepository {
   }
 
   async listFeed(_userId: string | null, query: FeedQuery): Promise<FeedResult> {
-    const clauses = ['p.deleted_at is null', "p.visibility_status = 'published'"];
     const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
-    if (allowedCategories.has(query.category)) clauses.push(`p.category = '${query.category}'`);
-    if (query.channel === 'reservation') clauses.push(`(COALESCE(p.sale_status, p.status) = 'PRE_ORDER')`);
-    if (query.channel === 'new') clauses.push(`(COALESCE(p.sale_status, p.status) = 'UPCOMING')`);
+
+    // Resolve category filter: categories (comma-separated) takes precedence over single category
+    let categoryFilter: string[] = [];
+    if (query.categories) {
+      categoryFilter = query.categories
+        .split(',')
+        .map(c => c.trim().toUpperCase())
+        .filter(c => allowedCategories.has(c));
+    } else if (allowedCategories.has(query.category)) {
+      categoryFilter = [query.category];
+    }
+
+    const channelReservation = query.channel === 'reservation';
+    const channelNew = query.channel === 'new';
     const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
     const limit = Math.min(51, Math.max(2, query.limit + 1));
-    const rows = await this.sql.unsafe(
-      `select p.*,
+
+    // Build WHERE clauses with postgres.js tagged-template parameterization
+    const staticClauses = [
+      this.sql`p.deleted_at is null`,
+      this.sql`p.visibility_status = 'published'`,
+    ];
+    if (categoryFilter.length > 0) {
+      staticClauses.push(this.sql`p.category IN ${this.sql(categoryFilter)}`);
+    }
+    if (channelReservation) {
+      staticClauses.push(this.sql`p.sale_status = 'PRE_ORDER'`);
+    }
+    if (channelNew) {
+      staticClauses.push(this.sql`p.sale_status = 'UPCOMING'`);
+    }
+
+    // Combine all WHERE clauses with AND
+    const whereClause = staticClauses.reduce((acc, clause, i) =>
+      i === 0 ? clause : this.sql`${acc} AND ${clause}`
+    );
+
+    const rows = await this.sql`
+      select p.*,
         b.name as brand_name,
         b.heat_score as brand_heat_score,
         count(*) over() as total_count,
-        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
-        -- 最新 release
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
         (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
         (select pr.release_name from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_name,
         (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease,
         (select pr.end_at from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_end_at,
         (select pr.lifecycle_status from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_lifecycle,
-        -- 最新价格快照
-        (select ps.price_cents from price_snapshots ps where ps.product_id = p.id order by ps.captured_at desc limit 1) as snapshot_price
+        (select ps.price_cents from price_snapshots ps where ps.product_id = p.id order by ps.fetched_at desc limit 1) as snapshot_price
        from products p
        left join brands b on b.id = p.brand_id
-       where ${clauses.join(' and ')}
-       order by p.feed_score desc, p.created_at desc, p.id desc offset ${offset} limit ${limit}`,
-    );
+       where ${whereClause}
+       order by p.feed_score desc, p.created_at desc, p.id desc offset ${offset} limit ${limit}
+    `;
     const hasMore = rows.length > query.limit;
     const visible = hasMore ? rows.slice(0, query.limit) : rows;
     const items = visible.map((row) => {
@@ -287,7 +316,7 @@ export class PostgresRepository implements AppRepository {
 
     // 关键词搜索（pg_trgm）
     if (query.q) {
-      clauses.push(`(p.title % ${query.q} OR b.name % ${query.q} OR p.title ILIKE '%' || ${query.q} || '%' OR b.name ILIKE '%' || ${query.q} || '%')`);
+      clauses.push(`(p.display_name % ${query.q} OR b.name % ${query.q} OR p.display_name ILIKE '%' || ${query.q} || '%' OR b.name ILIKE '%' || ${query.q} || '%')`);
     }
 
     // 分类过滤
@@ -298,7 +327,7 @@ export class PostgresRepository implements AppRepository {
 
     // 发售状态
     if (query.saleStatus) {
-      clauses.push(`(COALESCE(p.sale_status, p.status) = ${query.saleStatus})`);
+      clauses.push(`(p.sale_status = ${query.saleStatus})`);
     }
 
     // 发售类型
@@ -313,10 +342,10 @@ export class PostgresRepository implements AppRepository {
 
     // 价格范围
     if (query.minPrice > 0) {
-      clauses.push(`(COALESCE(p.current_price, p.price_cents) >= ${query.minPrice})`);
+      clauses.push(`(p.current_price >= ${query.minPrice})`);
     }
     if (query.maxPrice > 0) {
-      clauses.push(`(COALESCE(p.current_price, p.price_cents) <= ${query.maxPrice})`);
+      clauses.push(`(p.current_price <= ${query.maxPrice})`);
     }
 
     const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
@@ -327,7 +356,7 @@ export class PostgresRepository implements AppRepository {
         b.name as brand_name,
         b.heat_score as brand_heat_score,
         count(*) over() as total_count,
-        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
         (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
         (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease
        from products p
@@ -409,6 +438,7 @@ export class PostgresRepository implements AppRepository {
   async getTrendSummary(period: string = '30d'): Promise<TrendSummary> {
     const days = period === '7d' ? 7 : period === '90d' ? 90 : 30;
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+    const cutoffSql = `'${cutoff}'::timestamptz`;
 
     // 品牌趋势：聚合品牌的商品数、再贩数、平均价格
     const brandRows = await this.sql.unsafe(
@@ -417,10 +447,10 @@ export class PostgresRepository implements AppRepository {
         b.name as brand_name,
         b.heat_score,
         count(distinct p.id) as product_count,
-        count(distinct case when p.created_at >= ${cutoff} then p.id end) as new_product_count,
-        count(distinct case when pr.is_rerelease and pr.created_at >= ${cutoff} then pr.id end) as rerelease_count,
-        coalesce(avg(case when p.created_at >= ${cutoff} then coalesce(p.current_price, p.price_cents) end), 0)::int as avg_price_current,
-        coalesce(avg(case when p.created_at < ${cutoff} then coalesce(p.current_price, p.price_cents) end), 0)::int as avg_price_prev
+        count(distinct case when p.created_at >= ${cutoffSql} then p.id end) as new_product_count,
+        count(distinct case when pr.is_rerelease and pr.created_at >= ${cutoffSql} then pr.id end) as rerelease_count,
+        coalesce(avg(case when p.created_at >= ${cutoffSql} then p.current_price end), 0)::int as avg_price_current,
+        coalesce(avg(case when p.created_at < ${cutoffSql} then p.current_price end), 0)::int as avg_price_prev
        from brands b
        left join products p on p.brand_id = b.id and p.deleted_at is null
        left join product_releases pr on pr.product_id = p.id and pr.deleted_at is null
@@ -453,19 +483,19 @@ export class PostgresRepository implements AppRepository {
     const productRows = await this.sql.unsafe(
       `select
         p.id as product_id,
-        coalesce(p.canonical_name, p.title) as product_name,
+        p.display_name as product_name,
         b.name as brand_name,
         p.category,
-        coalesce(p.current_price, p.price_cents) as current_price,
+        p.current_price as current_price,
         p.feed_score as current_feed_score,
-        coalesce(p.sale_status, p.status) as current_sale_status,
-        (select ps.price_cents from price_snapshots ps where ps.product_id = p.id and ps.captured_at < ${cutoff} order by ps.captured_at desc limit 1) as prev_price,
-        coalesce(p.sale_status, p.status) as prev_sale_status
+        p.sale_status as current_sale_status,
+        (select ps.price_cents from price_snapshots ps where ps.product_id = p.id and ps.fetched_at < ${cutoffSql} order by ps.fetched_at desc limit 1) as prev_price,
+        p.sale_status as prev_sale_status
        from products p
        left join brands b on b.id = p.brand_id
        where p.deleted_at is null
          and p.visibility_status = 'published'
-         and p.updated_at >= ${cutoff}
+         and p.updated_at >= ${cutoffSql}
        order by p.feed_score desc
        limit 20`,
     );
@@ -500,8 +530,11 @@ export class PostgresRepository implements AppRepository {
   async getProduct(_userId: string | null, productId: string): Promise<Product | null> {
     const rows = await this.sql`
       select p.*,
-        coalesce((select array_agg(pi.object_key order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images
-      from products p where p.id = ${productId} and p.deleted_at is null and p.visibility_status = 'published'
+        b.name as brand_name,
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images
+      from products p
+      left join brands b on b.id = p.brand_id
+      where p.id = ${productId} and p.deleted_at is null and p.visibility_status = 'published'
     `;
     return rows.length === 0 ? null : mapProduct(rows[0] as Row);
   }
