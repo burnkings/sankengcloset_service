@@ -213,6 +213,7 @@ export class PostgresRepository implements AppRepository {
         b.heat_score as brand_heat_score,
         count(*) over() as total_count,
         coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+        -- 最新 release
         (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
         (select pr.release_name from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_name,
         (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease,
@@ -529,8 +530,7 @@ export class PostgresRepository implements AppRepository {
 
   async getProduct(_userId: string | null, productId: string): Promise<Product | null> {
     const rows = await this.sql`
-      select p.*,
-        b.name as brand_name,
+      select p.*, b.name as brand_name,
         coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images
       from products p
       left join brands b on b.id = p.brand_id
