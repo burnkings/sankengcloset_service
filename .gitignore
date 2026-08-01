@@ -7,3 +7,5 @@ coverage/
 .env.infra
 docs/DIRECTUS-CREDENTIALS.md
 spike-d7.6/
+.env.production
+ecosystem.config.cjs
