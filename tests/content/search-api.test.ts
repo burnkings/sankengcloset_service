@@ -123,4 +123,50 @@ describe('Search API', () => {
       expect(item.title.toLowerCase()).toContain('月光');
     }
   });
+
+  it('supports pit aliases: 洛丽塔 / Lolita / LOLITA hit LOLITA category', async () => {
+    const instance = await createApp();
+    for (const q of ['洛丽塔', 'Lolita', 'LOLITA']) {
+      const response = await instance.inject({ method: 'GET', url: `/api/v1/search?q=${encodeURIComponent(q)}` });
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      const hasLolita = body.data.some((item: { category: string }) => item.category === 'LOLITA');
+      expect(hasLolita).toBe(true);
+    }
+  });
+
+  it('supports pit aliases: 汉服 / HANFU hit HANFU category', async () => {
+    const instance = await createApp();
+    for (const q of ['汉服', 'HANFU']) {
+      const response = await instance.inject({ method: 'GET', url: `/api/v1/search?q=${encodeURIComponent(q)}` });
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      const hasHanfu = body.data.some((item: { category: string }) => item.category === 'HANFU');
+      expect(hasHanfu).toBe(true);
+    }
+  });
+
+  it('supports pit aliases: JK / 制服 / JK制服 hit JK category', async () => {
+    const instance = await createApp();
+    for (const q of ['JK', '制服', 'JK制服']) {
+      const response = await instance.inject({ method: 'GET', url: `/api/v1/search?q=${encodeURIComponent(q)}` });
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      const hasJk = body.data.some((item: { category: string }) => item.category === 'JK');
+      expect(hasJk).toBe(true);
+    }
+  });
+
+  it('handles malicious quote input safely (parameterized, no injection)', async () => {
+    const instance = await createApp();
+    const malicious = ["foo' OR '1'='1", '" OR 1=1 --', "' OR '1'='1' --", "'; DROP TABLE products;--"];
+    for (const q of malicious) {
+      const response = await instance.inject({ method: 'GET', url: `/api/v1/search?q=${encodeURIComponent(q)}` });
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(Array.isArray(body.data)).toBe(true);
+      // 恶意输入不应命中任何商品，也不应抛错/返回非 200
+      expect(body.data.length).toBe(0);
+    }
+  });
 });

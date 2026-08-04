@@ -310,61 +310,102 @@ export class PostgresRepository implements AppRepository {
     };
   }
 
+  /**
+   * 搜索关键词 → 坑向分类别名映射：
+   * 洛丽塔/Lolita/LOLITA → LOLITA；汉服/HANFU → HANFU；JK/制服 → JK。
+   * 命中别名时额外按 p.category 匹配，确保「搜洛丽塔出 Lolita 分类」。
+   */
+  resolveAliasCategory(q: string): string {
+    const lower = q.trim().toLowerCase();
+    if (lower.includes('洛丽塔') || lower === 'lolita') return 'LOLITA';
+    if (lower.includes('汉服') || lower === 'hanfu') return 'HANFU';
+    if (lower === 'jk' || lower.includes('jk') || lower.includes('制服')) return 'JK';
+    return '';
+  }
+
   async searchProducts(query: SearchQuery): Promise<SearchResult> {
-    const clauses = ['p.deleted_at is null', "p.visibility_status = 'published'"];
-    const params: unknown[] = [];
-    let paramIdx = 1;
+  const clauses: string[] = ['p.deleted_at is null', "p.visibility_status = 'published'"];
+  const params: any[] = [];
+  let paramIdx = 1;
 
-    // 关键词搜索（pg_trgm）
-    if (query.q) {
-      clauses.push(`(p.display_name % ${query.q} OR b.name % ${query.q} OR p.display_name ILIKE '%' || ${query.q} || '%' OR b.name ILIKE '%' || ${query.q} || '%')`);
+  // 关键词搜索（title/brand ILIKE + pg_trgm 相似度 + 别名命中 category）
+  if (query.q) {
+    const q = query.q;
+    const aliasCategory = this.resolveAliasCategory(q);
+    const likeParam = `%${q}%`;
+    params.push(likeParam);
+    // 搜索范围：display_name / canonical_name / brand name（ILIKE + pg_trgm 相似度）
+    let kwClause = `(p.display_name ILIKE $${paramIdx} OR p.canonical_name ILIKE $${paramIdx} OR b.name ILIKE $${paramIdx})`;
+    paramIdx += 1;
+    params.push(q);
+    kwClause += ` OR p.display_name % $${paramIdx} OR p.canonical_name % $${paramIdx} OR b.name % $${paramIdx}`;
+    paramIdx += 1;
+    if (aliasCategory !== '') {
+      params.push(aliasCategory);
+      kwClause += ` OR p.category = $${paramIdx}`;
+      paramIdx += 1;
     }
+    clauses.push(kwClause);
+  }
 
-    // 分类过滤
-    const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
-    if (query.category && allowedCategories.has(query.category)) {
-      clauses.push(`p.category = ${query.category}`);
-    }
+  // 分类过滤
+  const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
+  if (query.category && allowedCategories.has(query.category)) {
+    params.push(query.category);
+    clauses.push(`p.category = $${paramIdx}`);
+    paramIdx += 1;
+  }
 
-    // 发售状态
-    if (query.saleStatus) {
-      clauses.push(`(p.sale_status = ${query.saleStatus})`);
-    }
+  // 发售状态
+  if (query.saleStatus) {
+    params.push(query.saleStatus);
+    clauses.push(`p.sale_status = $${paramIdx}`);
+    paramIdx += 1;
+  }
 
-    // 发售类型
-    if (query.releaseStatus) {
-      clauses.push(`exists (select 1 from product_releases pr where pr.product_id = p.id and pr.release_type = ${query.releaseStatus} and pr.deleted_at is null)`);
-    }
+  // 发售类型
+  if (query.releaseStatus) {
+    params.push(query.releaseStatus);
+    clauses.push(`exists (select 1 from product_releases pr where pr.product_id = p.id and pr.release_type = $${paramIdx} and pr.deleted_at is null)`);
+    paramIdx += 1;
+  }
 
-    // 品牌ID
-    if (query.brandId) {
-      clauses.push(`p.brand_id = ${query.brandId}`);
-    }
+  // 品牌ID
+  if (query.brandId) {
+    params.push(query.brandId);
+    clauses.push(`p.brand_id = $${paramIdx}`);
+    paramIdx += 1;
+  }
 
-    // 价格范围
-    if (query.minPrice > 0) {
-      clauses.push(`(p.current_price >= ${query.minPrice})`);
-    }
-    if (query.maxPrice > 0) {
-      clauses.push(`(p.current_price <= ${query.maxPrice})`);
-    }
+  // 价格范围
+  if (query.minPrice > 0) {
+    params.push(query.minPrice);
+    clauses.push(`p.current_price >= $${paramIdx}`);
+    paramIdx += 1;
+  }
+  if (query.maxPrice > 0) {
+    params.push(query.maxPrice);
+    clauses.push(`p.current_price <= $${paramIdx}`);
+    paramIdx += 1;
+  }
 
-    const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
-    const limit = Math.min(51, Math.max(2, query.limit + 1));
+  const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
+  const limit = Math.min(51, Math.max(2, query.limit + 1));
 
-    const rows = await this.sql.unsafe(
-      `select p.*,
-        b.name as brand_name,
-        b.heat_score as brand_heat_score,
-        count(*) over() as total_count,
-        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
-        (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
-        (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease
-       from products p
-       left join brands b on b.id = p.brand_id
-       where ${clauses.join(' and ')}
-       order by p.feed_score desc, p.created_at desc, p.id desc offset ${offset} limit ${limit}`,
-    );
+  const rows = await this.sql.unsafe(
+    `select p.*,
+      b.name as brand_name,
+      b.heat_score as brand_heat_score,
+      count(*) over() as total_count,
+      coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+      (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
+      (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease
+     from products p
+     left join brands b on b.id = p.brand_id
+     where ${clauses.join(' and ')}
+     order by p.feed_score desc, p.created_at desc, p.id desc offset ${offset} limit ${limit}`,
+    params,
+  );
 
     const hasMore = rows.length > query.limit;
     const visible = hasMore ? rows.slice(0, query.limit) : rows;

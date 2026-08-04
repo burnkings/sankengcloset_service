@@ -25,6 +25,15 @@ import { generateFeedReason, computeRankingScore, formatPriceSummary, getRelease
 import { buildTrendSummary } from '../intelligence/trend-engine.js';
 import { computePersonalScore, type UserPreference } from '../intelligence/personal-score.js';
 
+/** 搜索关键词 → 坑向分类别名（与 postgres.ts 保持一致） */
+function resolveAliasCategory(q: string): string {
+  const lower = q.trim().toLowerCase();
+  if (lower.includes('洛丽塔') || lower === 'lolita') return 'LOLITA';
+  if (lower.includes('汉服') || lower === 'hanfu') return 'HANFU';
+  if (lower === 'jk' || lower.includes('jk') || lower.includes('制服')) return 'JK';
+  return '';
+}
+
 function seedProducts(): Product[] {
   const now = nowIso();
   return [
@@ -235,12 +244,14 @@ export class MemoryRepository implements AppRepository {
 
   async searchProducts(query: SearchQuery): Promise<SearchResult> {
     let rows = this.products.filter(p => {
-      // 关键词搜索
+      // 关键词搜索（title/brand + 坑向别名命中 category）
       if (query.q) {
         const q = query.q.toLowerCase();
+        const aliasCategory = resolveAliasCategory(query.q);
         const matchTitle = p.title.toLowerCase().includes(q);
         const matchBrand = p.brandName.toLowerCase().includes(q);
-        if (!matchTitle && !matchBrand) return false;
+        const matchCategory = aliasCategory !== '' && p.category === aliasCategory;
+        if (!matchTitle && !matchBrand && !matchCategory) return false;
       }
       // 分类过滤
       if (query.category && p.category !== query.category) return false;
