@@ -21,6 +21,7 @@ import type {
   UserProfile,
   WishlistItem,
 } from '../types.js';
+import type { CommunityPost, CommunityPostPage, CommunityPostQuery, CreateCommunityPostInput, UserAsset, UserAssetKind, UserSettingKey } from './contracts.js';
 import { generateFeedReason, computeRankingScore, formatPriceSummary, getReleaseTypeName, mergeTags } from '../intelligence/feed-ranker.js';
 import { buildTrendSummary } from '../intelligence/trend-engine.js';
 import { computePersonalScore, type UserPreference } from '../intelligence/personal-score.js';
@@ -111,6 +112,10 @@ export class MemoryRepository implements AppRepository {
   private readonly media = new Map<string, MediaObject>();
   private readonly aiTasks = new Map<string, AiImportTask>();
   private readonly assets = new Map<string, unknown>();
+  private readonly userAssets = new Map<string, UserAsset>();
+  private readonly userSettings = new Map<string, Record<string, unknown>>();
+  private readonly communityPosts = new Map<string, Omit<CommunityPost, 'authorNickname' | 'likeCount' | 'liked'>>();
+  private readonly postLikes = new Set<string>();
 
   async close(): Promise<void> {}
   async ready(): Promise<boolean> { return true; }
@@ -411,4 +416,122 @@ export class MemoryRepository implements AppRepository {
     const preference = await this.getUserPreference(input.userId);
     return computePersonalScore(input, preference);
   }
+  // ─── V2.5: 页面级用户资产 ──────────────────────────────────
+
+  private userAssetKey(userId: string, kind: UserAssetKind, assetId: string): string {
+    return `${userId}:${kind}:${assetId}`;
+  }
+
+  async listUserAssets(userId: string, kind: UserAssetKind): Promise<UserAsset[]> {
+    return [...this.userAssets.values()]
+      .filter((asset) => this.userAssetKey(userId, kind, asset.id) === this.userAssetKey(userId, asset.type, asset.id))
+      .filter((asset) => asset.type === kind && asset.payload.__ownerUserId === userId)
+      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+      .map((asset) => ({ ...asset, payload: { ...asset.payload } }));
+  }
+
+  async getUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<UserAsset | null> {
+    const asset = this.userAssets.get(this.userAssetKey(userId, kind, assetId));
+    return asset ? { ...asset, payload: { ...asset.payload } } : null;
+  }
+
+  async createUserAsset(userId: string, kind: UserAssetKind, assetId: string, payload: Record<string, unknown>): Promise<UserAsset> {
+    const now = nowIso();
+    const asset: UserAsset = {
+      id: assetId, type: kind, payload: { ...payload, __ownerUserId: userId }, version: 1, createdAt: now, updatedAt: now,
+    };
+    this.userAssets.set(this.userAssetKey(userId, kind, assetId), asset);
+    return { ...asset, payload: { ...payload } };
+  }
+
+  async updateUserAsset(userId: string, kind: UserAssetKind, assetId: string, patch: Record<string, unknown>): Promise<UserAsset | null> {
+    const key = this.userAssetKey(userId, kind, assetId);
+    const existing = this.userAssets.get(key);
+    if (!existing) return null;
+    existing.payload = { ...existing.payload, ...patch, __ownerUserId: userId };
+    existing.version += 1;
+    existing.updatedAt = nowIso();
+    const { __ownerUserId: _owner, ...payload } = existing.payload;
+    return { ...existing, payload };
+  }
+
+  async deleteUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<boolean> {
+    return this.userAssets.delete(this.userAssetKey(userId, kind, assetId));
+  }
+
+  async getUserSetting(userId: string, key: UserSettingKey): Promise<Record<string, unknown>> {
+    return { ...(this.userSettings.get(`${userId}:${key}`) ?? {}) };
+  }
+
+  async putUserSetting(userId: string, key: UserSettingKey, payload: Record<string, unknown>): Promise<Record<string, unknown>> {
+    this.userSettings.set(`${userId}:${key}`, { ...payload });
+    return { ...payload };
+  }
+
+  private communityPostView(post: Omit<CommunityPost, 'authorNickname' | 'likeCount' | 'liked'>, viewerUserId: string | null): CommunityPost {
+    const author = this.users.get(post.authorUserId);
+    const likeCount = [...this.postLikes].filter((key) => key.startsWith(`${post.id}:`)).length;
+    return {
+      ...post,
+      authorNickname: author?.nickname ?? '三坑同好',
+      likeCount,
+      liked: viewerUserId !== null && this.postLikes.has(`${post.id}:${viewerUserId}`),
+    };
+  }
+
+  private communityPage(viewerUserId: string | null, query: CommunityPostQuery, authorUserId?: string): CommunityPostPage {
+    const filtered = [...this.communityPosts.values()]
+      .filter((post) => authorUserId === undefined || post.authorUserId === authorUserId)
+      .filter((post) => !query.category || post.category === query.category)
+      .filter((post) => !query.topic || post.topic === query.topic)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const offset = Number.parseInt(query.cursor || '0', 10) || 0;
+    const items = filtered.slice(offset, offset + query.limit).map((post) => this.communityPostView(post, viewerUserId));
+    const next = offset + items.length;
+    return { items, nextCursor: next < filtered.length ? String(next) : '', hasMore: next < filtered.length, totalHint: filtered.length };
+  }
+
+  async listCommunityPosts(viewerUserId: string | null, query: CommunityPostQuery): Promise<CommunityPostPage> {
+    return this.communityPage(viewerUserId, query);
+  }
+
+  async listMyCommunityPosts(userId: string, query: Pick<CommunityPostQuery, 'cursor' | 'limit'>): Promise<CommunityPostPage> {
+    return this.communityPage(userId, query, userId);
+  }
+
+  async createCommunityPost(userId: string, input: CreateCommunityPostInput): Promise<CommunityPost> {
+    const now = nowIso();
+    const post: Omit<CommunityPost, 'authorNickname' | 'likeCount' | 'liked'> = {
+      ...input, authorUserId: userId, createdAt: now, updatedAt: now,
+    };
+    this.communityPosts.set(post.id, post);
+    return this.communityPostView(post, userId);
+  }
+
+  async getCommunityPost(viewerUserId: string | null, postId: string): Promise<CommunityPost | null> {
+    const post = this.communityPosts.get(postId);
+    return post ? this.communityPostView(post, viewerUserId) : null;
+  }
+
+  async setCommunityPostLike(userId: string, postId: string, liked: boolean): Promise<{ liked: boolean; likeCount: number } | null> {
+    if (!this.communityPosts.has(postId)) return null;
+    const key = `${postId}:${userId}`;
+    if (liked) this.postLikes.add(key); else this.postLikes.delete(key);
+    const likeCount = [...this.postLikes].filter((value) => value.startsWith(`${postId}:`)).length;
+    return { liked: this.postLikes.has(key), likeCount };
+  }
+
+  async deleteCommunityPost(userId: string, postId: string): Promise<boolean> {
+    const post = this.communityPosts.get(postId);
+    if (!post || post.authorUserId !== userId) return false;
+    this.communityPosts.delete(postId);
+    for (const key of [...this.postLikes]) if (key.startsWith(`${postId}:`)) this.postLikes.delete(key);
+    return true;
+  }
+
+  async getMediaById(mediaId: string): Promise<MediaObject | null> {
+    for (const media of this.media.values()) if (media.id === mediaId) return media;
+    return null;
+  }
+
 }
