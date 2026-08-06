@@ -353,88 +353,52 @@ export class PostgresRepository implements AppRepository {
   }
 
   async searchProducts(query: SearchQuery): Promise<SearchResult> {
-  const clauses: string[] = ['p.deleted_at is null', "p.visibility_status = 'published'"];
-  const params: any[] = [];
-  let paramIdx = 1;
-
-  // 关键词搜索（title/brand ILIKE + pg_trgm 相似度 + 别名命中 category）
-  if (query.q) {
-    const q = query.q;
-    const aliasCategory = this.resolveAliasCategory(q);
-    const likeParam = `%${q}%`;
-    params.push(likeParam);
-    // 搜索范围：display_name / canonical_name / brand name（ILIKE + pg_trgm 相似度）
-    let kwClause = `(p.display_name ILIKE $${paramIdx} OR p.canonical_name ILIKE $${paramIdx} OR b.name ILIKE $${paramIdx})`;
-    paramIdx += 1;
-    params.push(q);
-    kwClause += ` OR p.display_name % $${paramIdx} OR p.canonical_name % $${paramIdx} OR b.name % $${paramIdx}`;
-    paramIdx += 1;
-    if (aliasCategory !== '') {
-      params.push(aliasCategory);
-      kwClause += ` OR p.category = $${paramIdx}`;
-      paramIdx += 1;
+    // 每个条件均使用 postgres.js 的 SQL fragment；用户输入绝不拼入 SQL 文本。
+    const clauses = [
+      this.sql`p.deleted_at is null`,
+      this.sql`p.visibility_status = 'published'`,
+    ];
+    if (query.q) {
+      const pattern = `%${query.q}%`;
+      const aliasCategory = this.resolveAliasCategory(query.q);
+      let keywordClause = this.sql`(
+        p.display_name ilike ${pattern}
+        or p.canonical_name ilike ${pattern}
+        or b.name ilike ${pattern}
+      )`;
+      if (aliasCategory !== '') keywordClause = this.sql`(${keywordClause} or p.category = ${aliasCategory})`;
+      clauses.push(keywordClause);
     }
-    clauses.push(kwClause);
-  }
+    const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
+    if (query.category && allowedCategories.has(query.category)) clauses.push(this.sql`p.category = ${query.category}`);
+    if (query.saleStatus) clauses.push(this.sql`p.sale_status = ${query.saleStatus}`);
+    if (query.releaseStatus) {
+      clauses.push(this.sql`exists (
+        select 1 from product_releases pr
+        where pr.product_id = p.id and pr.release_type = ${query.releaseStatus} and pr.deleted_at is null
+      )`);
+    }
+    if (query.brandId) clauses.push(this.sql`p.brand_id = ${query.brandId}`);
+    if (query.minPrice > 0) clauses.push(this.sql`p.current_price >= ${query.minPrice}`);
+    if (query.maxPrice > 0) clauses.push(this.sql`p.current_price <= ${query.maxPrice}`);
 
-  // 分类过滤
-  const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
-  if (query.category && allowedCategories.has(query.category)) {
-    params.push(query.category);
-    clauses.push(`p.category = $${paramIdx}`);
-    paramIdx += 1;
-  }
-
-  // 发售状态
-  if (query.saleStatus) {
-    params.push(query.saleStatus);
-    clauses.push(`p.sale_status = $${paramIdx}`);
-    paramIdx += 1;
-  }
-
-  // 发售类型
-  if (query.releaseStatus) {
-    params.push(query.releaseStatus);
-    clauses.push(`exists (select 1 from product_releases pr where pr.product_id = p.id and pr.release_type = $${paramIdx} and pr.deleted_at is null)`);
-    paramIdx += 1;
-  }
-
-  // 品牌ID
-  if (query.brandId) {
-    params.push(query.brandId);
-    clauses.push(`p.brand_id = $${paramIdx}`);
-    paramIdx += 1;
-  }
-
-  // 价格范围
-  if (query.minPrice > 0) {
-    params.push(query.minPrice);
-    clauses.push(`p.current_price >= $${paramIdx}`);
-    paramIdx += 1;
-  }
-  if (query.maxPrice > 0) {
-    params.push(query.maxPrice);
-    clauses.push(`p.current_price <= $${paramIdx}`);
-    paramIdx += 1;
-  }
-
-  const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
-  const limit = Math.min(51, Math.max(2, query.limit + 1));
-
-  const rows = await this.sql.unsafe(
-    `select p.*,
-      b.name as brand_name,
-      b.heat_score as brand_heat_score,
-      count(*) over() as total_count,
-      coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
-      (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
-      (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease
-     from products p
-     left join brands b on b.id = p.brand_id
-     where ${clauses.join(' and ')}
-     order by p.feed_score desc, p.created_at desc, p.id desc offset ${offset} limit ${limit}`,
-    params,
-  );
+    const whereClause = clauses.reduce((all, clause, index) => index === 0 ? clause : this.sql`${all} and ${clause}`);
+    const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
+    const limit = Math.min(51, Math.max(2, query.limit + 1));
+    const rows = await this.sql`
+      select p.*,
+        b.name as brand_name,
+        b.heat_score as brand_heat_score,
+        count(*) over() as total_count,
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+        (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
+        (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease
+      from products p
+      left join brands b on b.id = p.brand_id
+      where ${whereClause}
+      order by p.feed_score desc, p.created_at desc, p.id desc
+      offset ${offset} limit ${limit}
+    `;
 
     const hasMore = rows.length > query.limit;
     const visible = hasMore ? rows.slice(0, query.limit) : rows;
@@ -448,18 +412,10 @@ export class PostgresRepository implements AppRepository {
       const saleStatus = stringValue(r.sale_status || r.status);
       const feedScore = numberValue(r.feed_score);
       const isNew = (Date.now() - new Date(product.createdAt).getTime()) / (1000 * 60 * 60 * 24) <= 7;
-
       const feedReason = generateFeedReason({
-        saleStatus,
-        releaseType,
-        isRerelease,
-        isNew,
-        brandHeatScore,
-        hasPriceDrop: false,
-        priceTrend: 'stable',
-        feedScore,
+        saleStatus, releaseType, isRerelease, isNew, brandHeatScore,
+        hasPriceDrop: false, priceTrend: 'stable', feedScore,
       });
-
       return {
         id: `feed_${product.id}`,
         feedType: 'product',
@@ -497,7 +453,6 @@ export class PostgresRepository implements AppRepository {
         createdAt: product.createdAt,
       };
     });
-
     return {
       items,
       nextCursor: hasMore ? String(offset + query.limit) : '',
