@@ -1,4 +1,4 @@
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, resolve, sep } from 'node:path';
 
 export class LocalObjectStorage {
@@ -18,6 +18,10 @@ export class LocalObjectStorage {
     const target = this.pathFor(objectKey);
     await mkdir(dirname(target), { recursive: true });
     await writeFile(target, data, { flag: 'wx' });
+  }
+
+  async get(objectKey: string): Promise<Buffer> {
+    return readFile(this.pathFor(objectKey));
   }
 
   async delete(objectKey: string): Promise<void> {
