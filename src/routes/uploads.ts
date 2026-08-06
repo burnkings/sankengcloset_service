@@ -12,6 +12,7 @@ const prepareSchema = z.object({
   contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
 });
 const uploadParamsSchema = z.object({ uploadId: z.string().min(1).max(128) });
+const mediaParamsSchema = z.object({ mediaId: z.string().min(1).max(128) });
 const sourceSchema = z.object({ objectKey: z.string().min(1).max(512) });
 
 export async function registerUploadRoutes(
@@ -20,6 +21,16 @@ export async function registerUploadRoutes(
   repository: AppRepository,
   storage: LocalObjectStorage,
 ) {
+
+  // 圈子动态图片需要无鉴权加载；仅已上传的 outfit 媒体可以公开读取。
+  app.get('/api/v1/media/:mediaId', async (request, reply) => {
+    const { mediaId } = mediaParamsSchema.parse(request.params);
+    const media = await repository.getMediaById(mediaId);
+    if (!media || media.deletedAt !== null || media.sizeBytes <= 0 || media.purpose !== 'outfit') throw notFound('图片不存在');
+    const content = await storage.get(media.objectKey);
+    return reply.type(media.contentType).header('cache-control', 'public, max-age=86400').send(content);
+  });
+
   app.post('/api/v1/uploads:prepare', async (request) => {
     const userId = await requireUser(request);
     const body = prepareSchema.parse(request.body);
