@@ -35,6 +35,57 @@ export interface FeedResult {
   totalHint: number;
 }
 
+export type UserAssetKind = 'wardrobe' | 'purchase' | 'reminder' | 'wish' | 'notification';
+
+export interface UserAsset {
+  id: string;
+  type: UserAssetKind;
+  payload: Record<string, unknown>;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type UserSettingKey = 'budget' | 'preferences';
+
+export interface CommunityPostQuery {
+  cursor: string;
+  limit: number;
+  category?: string;
+  topic?: string;
+}
+
+export interface CommunityPost {
+  id: string;
+  authorUserId: string;
+  authorNickname: string;
+  mediaId: string;
+  imageUrl: string;
+  caption: string;
+  category: string;
+  topic: string;
+  likeCount: number;
+  liked: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommunityPostPage {
+  items: CommunityPost[];
+  nextCursor: string;
+  hasMore: boolean;
+  totalHint: number;
+}
+
+export interface CreateCommunityPostInput {
+  id: string;
+  mediaId: string;
+  imageUrl: string;
+  caption: string;
+  category: string;
+  topic: string;
+}
+
 export interface AppRepository {
   close(): Promise<void>;
   ready(): Promise<boolean>;
@@ -83,4 +134,22 @@ export interface AppRepository {
   createAiTask(task: AiImportTask): Promise<AiImportTask>;
   getAiTask(userId: string, taskId: string): Promise<AiImportTask | null>;
   confirmAiTask(userId: string, taskId: string, input: AiConfirmationInput): Promise<AiImportTask>;
+
+  // V2.5: 个人管理页的数据资源（衣橱/购买/提醒/愿望/通知）
+  listUserAssets(userId: string, kind: UserAssetKind): Promise<UserAsset[]>;
+  getUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<UserAsset | null>;
+  createUserAsset(userId: string, kind: UserAssetKind, assetId: string, payload: Record<string, unknown>): Promise<UserAsset>;
+  updateUserAsset(userId: string, kind: UserAssetKind, assetId: string, patch: Record<string, unknown>): Promise<UserAsset | null>;
+  deleteUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<boolean>;
+  getUserSetting(userId: string, key: UserSettingKey): Promise<Record<string, unknown>>;
+  putUserSetting(userId: string, key: UserSettingKey, payload: Record<string, unknown>): Promise<Record<string, unknown>>;
+
+  // V2.5: 圈子动态及点赞
+  listCommunityPosts(viewerUserId: string | null, query: CommunityPostQuery): Promise<CommunityPostPage>;
+  listMyCommunityPosts(userId: string, query: Pick<CommunityPostQuery, 'cursor' | 'limit'>): Promise<CommunityPostPage>;
+  createCommunityPost(userId: string, input: CreateCommunityPostInput): Promise<CommunityPost>;
+  getCommunityPost(viewerUserId: string | null, postId: string): Promise<CommunityPost | null>;
+  setCommunityPostLike(userId: string, postId: string, liked: boolean): Promise<{ liked: boolean; likeCount: number } | null>;
+  deleteCommunityPost(userId: string, postId: string): Promise<boolean>;
+  getMediaById(mediaId: string): Promise<MediaObject | null>;
 }
