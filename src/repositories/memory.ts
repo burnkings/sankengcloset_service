@@ -423,9 +423,10 @@ export class MemoryRepository implements AppRepository {
   }
 
   async listUserAssets(userId: string, kind: UserAssetKind): Promise<UserAsset[]> {
-    return [...this.userAssets.values()]
-      .filter((asset) => this.userAssetKey(userId, kind, asset.id) === this.userAssetKey(userId, asset.type, asset.id))
-      .filter((asset) => asset.type === kind && asset.payload.__ownerUserId === userId)
+    const prefix = `${userId}:${kind}:`;
+    return [...this.userAssets.entries()]
+      .filter(([key]) => key.startsWith(prefix))
+      .map(([, asset]) => asset)
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .map((asset) => ({ ...asset, payload: { ...asset.payload } }));
   }
@@ -438,21 +439,20 @@ export class MemoryRepository implements AppRepository {
   async createUserAsset(userId: string, kind: UserAssetKind, assetId: string, payload: Record<string, unknown>): Promise<UserAsset> {
     const now = nowIso();
     const asset: UserAsset = {
-      id: assetId, type: kind, payload: { ...payload, __ownerUserId: userId }, version: 1, createdAt: now, updatedAt: now,
+      id: assetId, type: kind, payload: { ...payload }, version: 1, createdAt: now, updatedAt: now,
     };
     this.userAssets.set(this.userAssetKey(userId, kind, assetId), asset);
-    return { ...asset, payload: { ...payload } };
+    return { ...asset, payload: { ...asset.payload } };
   }
 
   async updateUserAsset(userId: string, kind: UserAssetKind, assetId: string, patch: Record<string, unknown>): Promise<UserAsset | null> {
     const key = this.userAssetKey(userId, kind, assetId);
     const existing = this.userAssets.get(key);
     if (!existing) return null;
-    existing.payload = { ...existing.payload, ...patch, __ownerUserId: userId };
+    existing.payload = { ...existing.payload, ...patch };
     existing.version += 1;
     existing.updatedAt = nowIso();
-    const { __ownerUserId: _owner, ...payload } = existing.payload;
-    return { ...existing, payload };
+    return { ...existing, payload: { ...existing.payload } };
   }
 
   async deleteUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<boolean> {
