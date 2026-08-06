@@ -1,7 +1,7 @@
 import postgres, { type Sql } from 'postgres';
 import { conflict, notFound } from '../lib/problem.js';
 import { newId, nowIso } from '../lib/id.js';
-import type { AppRepository, FeedQuery, FeedResult } from './contracts.js';
+import type { AppRepository, CommunityPost, CommunityPostPage, CommunityPostQuery, CreateCommunityPostInput, FeedQuery, FeedResult, UserAsset, UserAssetKind, UserSettingKey } from './contracts.js';
 import type {
   AiConfirmationInput,
   AiImportTask,
@@ -63,6 +63,35 @@ function mapProduct(row: Row): Product {
     originalPriceCents: numberValue(row.original_price || row.original_price_cents),
     description: stringValue(row.description),
     shopUrl: stringValue(row.source_url),
+    createdAt: dateValue(row.created_at),
+    updatedAt: dateValue(row.updated_at),
+  };
+}
+
+
+function mapUserAsset(row: Row): UserAsset {
+  return {
+    id: stringValue(row.id),
+    type: stringValue(row.asset_type) as UserAssetKind,
+    payload: (row.payload_json ?? {}) as Record<string, unknown>,
+    version: numberValue(row.version),
+    createdAt: dateValue(row.created_at),
+    updatedAt: dateValue(row.updated_at),
+  };
+}
+
+function mapCommunityPost(row: Row): CommunityPost {
+  return {
+    id: stringValue(row.id),
+    authorUserId: stringValue(row.author_user_id),
+    authorNickname: stringValue(row.author_nickname) || '三坑同好',
+    mediaId: stringValue(row.media_id),
+    imageUrl: stringValue(row.image_url),
+    caption: stringValue(row.caption),
+    category: stringValue(row.category),
+    topic: stringValue(row.topic),
+    likeCount: numberValue(row.like_count),
+    liked: row.liked === true,
     createdAt: dateValue(row.created_at),
     updatedAt: dateValue(row.updated_at),
   };
@@ -870,4 +899,174 @@ export class PostgresRepository implements AppRepository {
     const preference = await this.getUserPreference(input.userId);
     return computePersonalScore(input, preference);
   }
+  // ─── V2.5: 页面级用户资产 ──────────────────────────────────
+
+  async listUserAssets(userId: string, kind: UserAssetKind): Promise<UserAsset[]> {
+    const rows = await this.sql`
+      select id, asset_type, payload_json, version, created_at, updated_at
+      from user_assets
+      where user_id = ${userId} and asset_type = ${kind} and deleted_at is null
+      order by updated_at desc, id desc
+    `;
+    return rows.map((row) => mapUserAsset(row as Row));
+  }
+
+  async getUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<UserAsset | null> {
+    const rows = await this.sql`
+      select id, asset_type, payload_json, version, created_at, updated_at
+      from user_assets
+      where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
+    `;
+    return rows.length === 0 ? null : mapUserAsset(rows[0] as Row);
+  }
+
+  async createUserAsset(userId: string, kind: UserAssetKind, assetId: string, payload: Record<string, unknown>): Promise<UserAsset> {
+    const payloadJson = JSON.stringify(payload);
+    const rows = await this.sql`
+      insert into user_assets (user_id, asset_type, id, payload_json)
+      values (${userId}, ${kind}, ${assetId}, ${payloadJson}::jsonb)
+      returning id, asset_type, payload_json, version, created_at, updated_at
+    `;
+    return mapUserAsset(rows[0] as Row);
+  }
+
+  async updateUserAsset(userId: string, kind: UserAssetKind, assetId: string, patch: Record<string, unknown>): Promise<UserAsset | null> {
+    const patchJson = JSON.stringify(patch);
+    const rows = await this.sql`
+      update user_assets
+      set payload_json = payload_json || ${patchJson}::jsonb,
+          version = version + 1,
+          updated_at = now()
+      where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
+      returning id, asset_type, payload_json, version, created_at, updated_at
+    `;
+    return rows.length === 0 ? null : mapUserAsset(rows[0] as Row);
+  }
+
+  async deleteUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<boolean> {
+    const rows = await this.sql`
+      update user_assets set deleted_at = now(), version = version + 1, updated_at = now()
+      where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
+      returning id
+    `;
+    return rows.length > 0;
+  }
+
+  async getUserSetting(userId: string, key: UserSettingKey): Promise<Record<string, unknown>> {
+    const rows = await this.sql`select payload_json from user_settings where user_id = ${userId} and setting_key = ${key}`;
+    return rows.length === 0 ? {} : (rows[0] as Row).payload_json as Record<string, unknown>;
+  }
+
+  async putUserSetting(userId: string, key: UserSettingKey, payload: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const payloadJson = JSON.stringify(payload);
+    const rows = await this.sql`
+      insert into user_settings (user_id, setting_key, payload_json)
+      values (${userId}, ${key}, ${payloadJson}::jsonb)
+      on conflict (user_id, setting_key) do update
+        set payload_json = excluded.payload_json, updated_at = now()
+      returning payload_json
+    `;
+    return (rows[0] as Row).payload_json as Record<string, unknown>;
+  }
+
+  private async communityPage(viewerUserId: string | null, query: CommunityPostQuery, authorUserId = ''): Promise<CommunityPostPage> {
+    const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
+    const limit = Math.min(51, Math.max(2, query.limit + 1));
+    const viewerId = viewerUserId ?? '';
+    const category = query.category ?? '';
+    const topic = query.topic ?? '';
+    const rows = await this.sql`
+      select p.id, p.author_user_id, u.nickname as author_nickname, p.media_id, p.image_url, p.caption, p.category, p.topic, p.created_at, p.updated_at,
+        (select count(*)::int from community_post_likes l where l.post_id = p.id) as like_count,
+        exists(select 1 from community_post_likes l where l.post_id = p.id and l.user_id = ${viewerId}) as liked,
+        count(*) over() as total_count
+      from community_posts p
+      join users u on u.id = p.author_user_id
+      where p.deleted_at is null
+        and (${authorUserId} = '' or p.author_user_id = ${authorUserId})
+        and (${authorUserId} <> '' or p.visibility = 'public')
+        and (${category} = '' or p.category = ${category})
+        and (${topic} = '' or p.topic = ${topic})
+      order by p.created_at desc, p.id desc
+      offset ${offset} limit ${limit}
+    `;
+    const hasMore = rows.length > query.limit;
+    const visible = hasMore ? rows.slice(0, query.limit) : rows;
+    return {
+      items: visible.map((row) => mapCommunityPost(row as Row)),
+      nextCursor: hasMore ? String(offset + query.limit) : '',
+      hasMore,
+      totalHint: rows.length === 0 ? 0 : numberValue((rows[0] as Row).total_count),
+    };
+  }
+
+  async listCommunityPosts(viewerUserId: string | null, query: CommunityPostQuery): Promise<CommunityPostPage> {
+    return this.communityPage(viewerUserId, query);
+  }
+
+  async listMyCommunityPosts(userId: string, query: Pick<CommunityPostQuery, 'cursor' | 'limit'>): Promise<CommunityPostPage> {
+    return this.communityPage(userId, query, userId);
+  }
+
+  async createCommunityPost(userId: string, input: CreateCommunityPostInput): Promise<CommunityPost> {
+    const rows = await this.sql`
+      insert into community_posts (id, author_user_id, media_id, image_url, caption, category, topic)
+      values (${input.id}, ${userId}, ${input.mediaId}, ${input.imageUrl}, ${input.caption}, ${input.category}, ${input.topic})
+      returning id, author_user_id, media_id, image_url, caption, category, topic, created_at, updated_at
+    `;
+    const row = rows[0] as Row;
+    return {
+      id: stringValue(row.id), authorUserId: stringValue(row.author_user_id),
+      authorNickname: (await this.getUser(userId))?.nickname ?? '三坑同好',
+      mediaId: stringValue(row.media_id), imageUrl: stringValue(row.image_url),
+      caption: stringValue(row.caption), category: stringValue(row.category), topic: stringValue(row.topic),
+      likeCount: 0, liked: false, createdAt: dateValue(row.created_at), updatedAt: dateValue(row.updated_at),
+    };
+  }
+
+  async getCommunityPost(viewerUserId: string | null, postId: string): Promise<CommunityPost | null> {
+    const viewerId = viewerUserId ?? '';
+    const rows = await this.sql`
+      select p.id, p.author_user_id, u.nickname as author_nickname, p.media_id, p.image_url, p.caption, p.category, p.topic, p.created_at, p.updated_at,
+        (select count(*)::int from community_post_likes l where l.post_id = p.id) as like_count,
+        exists(select 1 from community_post_likes l where l.post_id = p.id and l.user_id = ${viewerId}) as liked
+      from community_posts p join users u on u.id = p.author_user_id
+      where p.id = ${postId} and p.deleted_at is null and (p.visibility = 'public' or p.author_user_id = ${viewerId})
+    `;
+    return rows.length === 0 ? null : mapCommunityPost(rows[0] as Row);
+  }
+
+  async setCommunityPostLike(userId: string, postId: string, liked: boolean): Promise<{ liked: boolean; likeCount: number } | null> {
+    const post = await this.sql`select id from community_posts where id = ${postId} and deleted_at is null and visibility = 'public'`;
+    if (post.length === 0) return null;
+    if (liked) {
+      await this.sql`insert into community_post_likes (post_id, user_id) values (${postId}, ${userId}) on conflict do nothing`;
+    } else {
+      await this.sql`delete from community_post_likes where post_id = ${postId} and user_id = ${userId}`;
+    }
+    const rows = await this.sql`
+      select count(*)::int as like_count,
+        exists(select 1 from community_post_likes where post_id = ${postId} and user_id = ${userId}) as liked
+      from community_post_likes where post_id = ${postId}
+    `;
+    return { liked: (rows[0] as Row).liked === true, likeCount: numberValue((rows[0] as Row).like_count) };
+  }
+
+  async deleteCommunityPost(userId: string, postId: string): Promise<boolean> {
+    const rows = await this.sql`
+      update community_posts set deleted_at = now(), updated_at = now()
+      where id = ${postId} and author_user_id = ${userId} and deleted_at is null
+      returning id
+    `;
+    return rows.length > 0;
+  }
+
+  async getMediaById(mediaId: string): Promise<MediaObject | null> {
+    const rows = await this.sql`
+      select id, owner_user_id, object_key, upload_id, purpose, content_type, size_bytes, created_at, deleted_at
+      from media_objects where id = ${mediaId}
+    `;
+    return rows.length === 0 ? null : mapMedia(rows[0] as Row);
+  }
+
 }
