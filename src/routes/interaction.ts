@@ -24,7 +24,7 @@ export const createEventSchema = z.object({
 
 export const getEventsSchema = z.object({
   eventType: z.string().max(32).default(''),
-  limit: z.coerce.number().int().min(1).max(100).default(50),
+  limit: z.preprocess((v) => (v === '' || v == null ? undefined : v), z.coerce.number().int().min(1).max(100).default(50)),
 });
 
 // ─── 收藏 API ──────────────────────────────────────────────

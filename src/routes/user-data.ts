@@ -10,7 +10,7 @@ export const idSchema = z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9_-]+
 export const assetParamsSchema = z.object({ id: idSchema });
 export const pageSchema = z.object({
   cursor: z.string().max(64).default(''),
-  limit: z.coerce.number().int().min(1).max(50).default(20),
+  limit: z.preprocess((v) => (v === '' || v == null ? undefined : v), z.coerce.number().int().min(1).max(50).default(20)),
 });
 
 export const wardrobeSchema = z.object({

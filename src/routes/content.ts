@@ -9,7 +9,7 @@ export const feedQuerySchema = z.object({
   category: z.enum(['', 'JK', 'LOLITA', 'HANFU', 'OTHER']).default(''),
   categories: z.string().max(200).default(''),
   cursor: z.string().max(64).default(''),
-  limit: z.coerce.number().int().min(1).max(50).default(20),
+  limit: z.preprocess((v) => (v === '' || v == null ? undefined : v), z.coerce.number().int().min(1).max(50).default(20)),
 });
 
 export const searchQuerySchema = z.object({
@@ -21,7 +21,7 @@ export const searchQuerySchema = z.object({
   minPrice: z.coerce.number().int().min(0).default(0),
   maxPrice: z.coerce.number().int().min(0).default(0),
   cursor: z.string().max(64).default(''),
-  limit: z.coerce.number().int().min(1).max(50).default(20),
+  limit: z.preprocess((v) => (v === '' || v == null ? undefined : v), z.coerce.number().int().min(1).max(50).default(20)),
 });
 
 export const trendQuerySchema = z.object({
