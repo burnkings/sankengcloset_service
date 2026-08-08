@@ -4,7 +4,7 @@ import { success, requireUser } from '../http.js';
 import { notFound } from '../lib/problem.js';
 import type { AppRepository } from '../repositories/contracts.js';
 
-const feedQuerySchema = z.object({
+export const feedQuerySchema = z.object({
   channel: z.enum(['', 'recommend', 'new', 'reservation', 'price_drop', 'outfit']).default(''),
   category: z.enum(['', 'JK', 'LOLITA', 'HANFU', 'OTHER']).default(''),
   categories: z.string().max(200).default(''),
@@ -12,7 +12,7 @@ const feedQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
-const searchQuerySchema = z.object({
+export const searchQuerySchema = z.object({
   q: z.string().max(100).default(''),
   category: z.enum(['', 'JK', 'LOLITA', 'HANFU', 'OTHER']).default(''),
   saleStatus: z.enum(['', 'UPCOMING', 'ON_SALE', 'PRE_ORDER', 'SOLD_OUT', 'ENDED']).default(''),
@@ -24,11 +24,11 @@ const searchQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
-const trendQuerySchema = z.object({
+export const trendQuerySchema = z.object({
   period: z.enum(['7d', '30d', '90d']).default('30d'),
 });
 
-const productParamsSchema = z.object({ id: z.string().min(1).max(128) });
+export const productParamsSchema = z.object({ id: z.string().min(1).max(128) });
 
 /**
  * 为 Feed 项附加个性化评分

@@ -12,7 +12,7 @@ const VALID_EVENT_TYPES = new Set<UserEventType>([
   'FOLLOW_BRAND', 'SEARCH', 'SHARE', 'CLICK_PRICE_ALERT', 'CLICK_BUY',
 ]);
 
-const createEventSchema = z.object({
+export const createEventSchema = z.object({
   eventType: z.string().refine(t => VALID_EVENT_TYPES.has(t as UserEventType), { message: '无效的事件类型' }),
   targetType: z.string().min(1).max(32),
   targetId: z.string().max(128).default(''),
@@ -22,7 +22,7 @@ const createEventSchema = z.object({
   { message: 'metadata 不能超过 2KB' },
 );
 
-const getEventsSchema = z.object({
+export const getEventsSchema = z.object({
   eventType: z.string().max(32).default(''),
   limit: z.coerce.number().int().min(1).max(100).default(50),
 });
@@ -33,7 +33,7 @@ const VALID_WISH_STATUSES = new Set<WishlistStatus>([
   'WISH', 'WANT', 'WATCHING', 'WAIT_RELEASE', 'WAIT_PRICE', 'PURCHASED',
 ]);
 
-const addWishlistSchema = z.object({
+export const addWishlistSchema = z.object({
   title: z.string().min(1).max(200),
   status: z.enum(['WISH', 'WANT', 'WATCHING', 'WAIT_RELEASE', 'WAIT_PRICE', 'PURCHASED']),
   productId: z.string().max(128).nullable().default(null),
@@ -41,17 +41,17 @@ const addWishlistSchema = z.object({
   note: z.string().max(500).default(''),
 });
 
-const updateWishlistSchema = z.object({
+export const updateWishlistSchema = z.object({
   status: z.string().refine(s => VALID_WISH_STATUSES.has(s as WishlistStatus), '无效的收藏状态'),
 });
 
-const wishlistQuerySchema = z.object({
+export const wishlistQuerySchema = z.object({
   status: z.string().max(32).default(''),
 });
 
 // ─── 品牌关注 API ──────────────────────────────────────────
 
-const followBrandSchema = z.object({
+export const followBrandSchema = z.object({
   brandId: z.string().min(1).max(128),
 });
 

@@ -17,7 +17,7 @@ const operationSchema = z.object({
   }, 'payload 必须是 JSON 字符串'),
   createdAt: z.string().min(1),
 });
-const batchSchema = z.object({ operations: z.array(operationSchema).min(1).max(100) });
+export const batchSchema = z.object({ operations: z.array(operationSchema).min(1).max(100) });
 
 export async function registerSyncRoutes(app: FastifyInstance, repository: AppRepository) {
   app.post('/api/v1/sync/operations:batch', async (request) => {

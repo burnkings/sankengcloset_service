@@ -6,9 +6,9 @@ import type { AppRepository } from '../repositories/contracts.js';
 import { AppProblem, notFound } from '../lib/problem.js';
 import { exchangeWechatCode } from '../services/wechat-auth.js';
 
-const devLoginSchema = z.object({ nickname: z.string().trim().min(1).max(32).default('本地测试用户') });
-const refreshSchema = z.object({ refreshToken: z.string().min(1) });
-const wechatSchema = z.object({ code: z.string().min(1), deviceId: z.string().min(1).max(128) });
+export const devLoginSchema = z.object({ nickname: z.string().trim().min(1).max(32).default('本地测试用户') });
+export const refreshSchema = z.object({ refreshToken: z.string().min(1) });
+export const wechatSchema = z.object({ code: z.string().min(1), deviceId: z.string().min(1).max(128) });
 
 function createTokens(app: FastifyInstance, userId: string) {
   return {

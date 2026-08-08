@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import { API_TAGS, swaggerTransform } from './swagger-docs.js';
 import { ZodError } from 'zod';
 import { loadConfig, type AppConfig } from './config.js';
 import { AppProblem } from './lib/problem.js';
@@ -48,11 +49,27 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(jwt, { secret: config.JWT_SECRET });
   await app.register(swagger, {
     openapi: {
-      info: { title: '三坑绮橱 API', version: '0.1.0' },
+      info: {
+        title: '三坑绮橱 API',
+        version: '0.1.0',
+        description: '三坑绮橱（JK / Lolita / 汉服）——商品发现、个人衣橱管理、圈子穿搭分享后端 API。登录接口返回 Bearer 令牌后，可在 Swagger UI 右上角 Authorize 填入（仅填 accessToken 即可）。',
+      },
       servers: [{ url: config.PUBLIC_BASE_URL }],
+      tags: [...API_TAGS],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+            description: '登录/刷新接口返回的 accessToken',
+          },
+        },
+      },
     },
+    transform: swaggerTransform,
   });
-  await app.register(swaggerUi, { routePrefix: '/docs' });
+  await app.register(swaggerUi, { routePrefix: '/docs', uiConfig: { docExpansion: 'list', deepLinking: true } });
   app.addContentTypeParser('application/octet-stream', { parseAs: 'buffer' }, (_request, body, done) => done(null, body));
 
   app.setErrorHandler((error, request, reply) => {

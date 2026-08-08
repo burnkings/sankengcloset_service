@@ -7,13 +7,13 @@ import { AppProblem, notFound } from '../lib/problem.js';
 import type { AppRepository } from '../repositories/contracts.js';
 import type { LocalObjectStorage } from '../storage/local-storage.js';
 
-const prepareSchema = z.object({
+export const prepareSchema = z.object({
   purpose: z.enum(['ai_import', 'outfit', 'wardrobe']),
   contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
 });
-const uploadParamsSchema = z.object({ uploadId: z.string().min(1).max(128) });
-const mediaParamsSchema = z.object({ mediaId: z.string().min(1).max(128) });
-const sourceSchema = z.object({ objectKey: z.string().min(1).max(512) });
+export const uploadParamsSchema = z.object({ uploadId: z.string().min(1).max(128) });
+export const mediaParamsSchema = z.object({ mediaId: z.string().min(1).max(128) });
+export const sourceSchema = z.object({ objectKey: z.string().min(1).max(512) });
 
 export async function registerUploadRoutes(
   app: FastifyInstance,

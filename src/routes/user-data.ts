@@ -6,14 +6,14 @@ import { newId } from '../lib/id.js';
 import { AppProblem, conflict, notFound } from '../lib/problem.js';
 import type { AppRepository, CommunityPostQuery, UserAssetKind } from '../repositories/contracts.js';
 
-const idSchema = z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9_-]+$/, 'id 格式不正确');
-const assetParamsSchema = z.object({ id: idSchema });
-const pageSchema = z.object({
+export const idSchema = z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9_-]+$/, 'id 格式不正确');
+export const assetParamsSchema = z.object({ id: idSchema });
+export const pageSchema = z.object({
   cursor: z.string().max(64).default(''),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
-const wardrobeSchema = z.object({
+export const wardrobeSchema = z.object({
   id: idSchema.optional(),
   name: z.string().trim().min(1).max(160),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'OTHER']),
@@ -32,7 +32,7 @@ const wardrobeSchema = z.object({
   isFavorite: z.boolean().default(false),
 });
 
-const purchaseSchema = z.object({
+export const purchaseSchema = z.object({
   id: idSchema.optional(),
   name: z.string().trim().min(1).max(160),
   brand: z.string().max(120).default(''),
@@ -49,7 +49,7 @@ const purchaseSchema = z.object({
   isFavorite: z.boolean().default(false),
 });
 
-const reminderSchema = z.object({
+export const reminderSchema = z.object({
   id: idSchema.optional(),
   title: z.string().trim().min(1).max(160),
   type: z.enum(['ARRIVAL', 'BALANCE', 'RELEASE', 'CUSTOM']).default('CUSTOM'),
@@ -61,7 +61,7 @@ const reminderSchema = z.object({
   status: z.enum(['PENDING', 'DONE', 'MISSED']).default('PENDING'),
 });
 
-const wishSchema = z.object({
+export const wishSchema = z.object({
   id: idSchema.optional(),
   name: z.string().trim().min(1).max(160),
   coverImage: z.string().max(512).default(''),
@@ -78,7 +78,7 @@ const wishSchema = z.object({
   isFavorite: z.boolean().default(false),
 });
 
-const notificationSchema = z.object({
+export const notificationSchema = z.object({
   id: idSchema.optional(),
   type: z.string().min(1).max(40),
   title: z.string().min(1).max(160),
@@ -87,27 +87,27 @@ const notificationSchema = z.object({
   read: z.boolean().default(false),
 });
 
-const preferenceSchema = z.object({
+export const preferenceSchema = z.object({
   pitTypes: z.array(z.enum(['JK', 'LOLITA', 'HANFU'])).max(3).default([]),
   followedBrands: z.array(z.string().max(128)).max(200).default([]),
   priceRange: z.string().max(40).default('all'),
   themeMode: z.enum(['system', 'light', 'dark']).default('system'),
 });
 
-const budgetSchema = z.object({
+export const budgetSchema = z.object({
   monthlyLimit: z.number().int().min(0).max(100_000_000),
   alertPercent: z.number().int().min(1).max(100),
 });
 
-const postCreateSchema = z.object({
+export const postCreateSchema = z.object({
   mediaId: idSchema,
   caption: z.string().trim().max(600).default(''),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'MIXED']),
   topic: z.string().trim().min(1).max(80),
 });
-const postParamsSchema = z.object({ id: idSchema });
-const postLikeSchema = z.object({ liked: z.boolean() });
-const postQuerySchema = pageSchema.extend({
+export const postParamsSchema = z.object({ id: idSchema });
+export const postLikeSchema = z.object({ liked: z.boolean() });
+export const postQuerySchema = pageSchema.extend({
   category: z.enum(['', 'JK', 'LOLITA', 'HANFU', 'MIXED']).default(''),
   topic: z.string().trim().max(80).default(''),
 });

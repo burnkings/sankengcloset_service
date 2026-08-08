@@ -9,11 +9,11 @@ import type postgres from 'postgres';
 
 const visibilityStatuses = ['draft', 'reviewing', 'published', 'hidden'] as const;
 
-const updateVisibilitySchema = z.object({
+export const updateVisibilitySchema = z.object({
   visibility_status: z.enum(visibilityStatuses),
 });
 
-const batchUpdateSchema = z.object({
+export const batchUpdateSchema = z.object({
   product_ids: z.array(z.string().min(1).max(128)).min(1).max(100),
   visibility_status: z.enum(visibilityStatuses),
 });

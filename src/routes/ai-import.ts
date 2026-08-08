@@ -7,9 +7,9 @@ import { AppProblem, notFound } from '../lib/problem.js';
 import type { AppRepository } from '../repositories/contracts.js';
 import { createSafeMockTask } from '../services/ai-import.js';
 
-const createSchema = z.object({ objectKey: z.string().min(1).max(512) });
-const taskParamsSchema = z.object({ taskId: z.string().min(1).max(128) });
-const suggestionSchema = z.object({
+export const createSchema = z.object({ objectKey: z.string().min(1).max(512) });
+export const taskParamsSchema = z.object({ taskId: z.string().min(1).max(128) });
+export const suggestionSchema = z.object({
   name: z.string().trim().min(1).max(120),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'OTHER']),
   brand: z.string().trim().max(120),
@@ -18,7 +18,7 @@ const suggestionSchema = z.object({
   size: z.string().trim().max(80),
   note: z.string().trim().max(1000),
 });
-const confirmSchema = z.object({
+export const confirmSchema = z.object({
   opId: z.string().min(1).max(128),
   targetType: z.enum(['wardrobe', 'wishlist']),
   confirmed: suggestionSchema,
