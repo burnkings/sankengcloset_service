@@ -8,13 +8,14 @@
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- 商品名 + 品牌名 的 GIN 索引，用于模糊搜索
+-- (0002 重建的 products 无 title/brand_name 列，按实际查询列对齐)
 CREATE INDEX IF NOT EXISTS idx_products_title_trgm
-  ON products USING gin (title gin_trgm_ops)
+  ON products USING gin (canonical_name gin_trgm_ops)
   WHERE deleted_at IS NULL AND visibility_status = 'published';
 
-CREATE INDEX IF NOT EXISTS idx_products_brand_name_trgm
-  ON products USING gin (brand_name gin_trgm_ops)
-  WHERE deleted_at IS NULL AND visibility_status = 'published';
+CREATE INDEX IF NOT EXISTS idx_brands_name_trgm
+  ON brands USING gin (name gin_trgm_ops)
+  WHERE deleted_at IS NULL;
 
 -- ============================================================
 -- 2. 内容聚合视图（product + brand + release + price + score）
@@ -24,14 +25,14 @@ CREATE OR REPLACE VIEW v_content_feed AS
 SELECT
   p.id AS product_id,
   p.brand_id,
-  COALESCE(b.name, p.brand_name) AS brand_name,
-  COALESCE(p.canonical_name, p.title) AS title,
+  COALESCE(b.name, p.canonical_name) AS brand_name,
+  p.canonical_name AS title,
   p.category,
   p.cover_url,
-  p.shop_url,
-  COALESCE(p.current_price, p.price_cents) AS price_cents,
-  COALESCE(p.original_price, p.original_price_cents) AS original_price_cents,
-  COALESCE(p.sale_status, p.status) AS sale_status,
+  p.shop_id,
+  p.current_price AS price_cents,
+  p.original_price AS original_price_cents,
+  p.sale_status,
   p.feed_score,
   p.season_tags,
   p.scene_tags,
@@ -55,7 +56,7 @@ SELECT
   r.lifecycle_status AS release_lifecycle,
   -- 最新价格快照
   ps.price_cents AS snapshot_price,
-  ps.captured_at AS price_captured_at
+  ps.fetched_at AS price_captured_at
 FROM products p
 LEFT JOIN brands b ON b.id = p.brand_id
 LEFT JOIN LATERAL (
@@ -69,7 +70,7 @@ LEFT JOIN LATERAL (
   SELECT *
   FROM price_snapshots
   WHERE product_id = p.id
-  ORDER BY captured_at DESC
+  ORDER BY fetched_at DESC
   LIMIT 1
 ) ps ON true
 WHERE p.deleted_at IS NULL

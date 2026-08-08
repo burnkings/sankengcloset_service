@@ -1,6 +1,11 @@
 -- Phase D7.5: 批量导入三坑品牌数据
 -- 250+ 品牌，覆盖 Lolita/JK/汉服
 
+-- 品牌可跨品类同名（如婴梵塔同时有 Lolita/JK/汉服线），
+-- 原唯一索引仅约束 name 会误杀跨品类同名品牌，改为 (name, category) 复合唯一
+DROP INDEX IF EXISTS brands_name_unique;
+CREATE UNIQUE INDEX brands_name_unique ON brands (name, category) WHERE deleted_at IS NULL;
+
 -- ============================================================
 -- Lolita（日本品牌）
 -- ============================================================
@@ -76,8 +81,7 @@ INSERT INTO brands (id, name, name_en, category, description, source_platform, r
 ('br_yyls', '月影森林', 'Moon Forest', 'LOLITA', '古典 Lolita', 'ADMIN', 'APPROVED', 100),
 ('br_ayzh', '暗夜之花', 'Night Flower', 'LOLITA', '哥特 Lolita', 'ADMIN', 'APPROVED', 100),
 ('br_xcyc', '星尘传说', 'Stardust Legend', 'LOLITA', '甜美 Lolita', 'ADMIN', 'APPROVED', 100),
-('br_ayzg', '暗夜之歌', 'Night Song', 'LOLITA', '哥特 Lolita', 'ADMIN', 'APPROVED', 100),
-('br_txxw2', '甜心物语', 'Sweet Heart Story', 'LOLITA', '甜美 Lolita', 'ADMIN', 'APPROVED', 100)
+('br_ayzg', '暗夜之歌', 'Night Song', 'LOLITA', '哥特 Lolita', 'ADMIN', 'APPROVED', 100)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
