@@ -55,7 +55,7 @@ function mapProduct(row: Row): Product {
     brandId: stringValue(row.brand_id),
     brandName: stringValue(row.brand_name),
     title: stringValue(row.display_name || row.canonical_name),
-    category: (stringValue(row.category) || '') as Product['category'],
+    category: (stringValue(row.pit_type) || '') as Product['category'],
     status: stringValue(row.sale_status || row.status),
     coverUrl: stringValue(row.cover_url),
     images,
@@ -222,7 +222,7 @@ export class PostgresRepository implements AppRepository {
       this.sql`p.visibility_status = 'published'`,
     ];
     if (categoryFilter.length > 0) {
-      staticClauses.push(this.sql`p.category IN ${this.sql(categoryFilter)}`);
+      staticClauses.push(this.sql`p.pit_type IN ${this.sql(categoryFilter)}`);
     }
     if (channelReservation) {
       staticClauses.push(this.sql`p.sale_status = 'PRE_ORDER'`);
@@ -252,7 +252,7 @@ export class PostgresRepository implements AppRepository {
        from products p
        left join brands b on b.id = p.brand_id
        where ${whereClause}
-       order by p.feed_score desc, p.created_at desc, p.id desc offset ${offset} limit ${limit}
+       order by p.feed_score desc, md5(p.id), p.id desc offset ${offset} limit ${limit}
     `;
     const hasMore = rows.length > query.limit;
     const visible = hasMore ? rows.slice(0, query.limit) : rows;
@@ -342,7 +342,7 @@ export class PostgresRepository implements AppRepository {
   /**
    * 搜索关键词 → 坑向分类别名映射：
    * 洛丽塔/Lolita/LOLITA → LOLITA；汉服/HANFU → HANFU；JK/制服 → JK。
-   * 命中别名时额外按 p.category 匹配，确保「搜洛丽塔出 Lolita 分类」。
+   * 命中别名时额外按 p.pit_type 匹配，确保「搜洛丽塔出 Lolita 分类」。
    */
   resolveAliasCategory(q: string): string {
     const lower = q.trim().toLowerCase();
@@ -366,11 +366,11 @@ export class PostgresRepository implements AppRepository {
         or p.canonical_name ilike ${pattern}
         or b.name ilike ${pattern}
       )`;
-      if (aliasCategory !== '') keywordClause = this.sql`(${keywordClause} or p.category = ${aliasCategory})`;
+      if (aliasCategory !== '') keywordClause = this.sql`(${keywordClause} or p.pit_type = ${aliasCategory})`;
       clauses.push(keywordClause);
     }
     const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
-    if (query.category && allowedCategories.has(query.category)) clauses.push(this.sql`p.category = ${query.category}`);
+    if (query.category && allowedCategories.has(query.category)) clauses.push(this.sql`p.pit_type = ${query.category}`);
     if (query.saleStatus) clauses.push(this.sql`p.sale_status = ${query.saleStatus}`);
     if (query.releaseStatus) {
       clauses.push(this.sql`exists (
@@ -396,7 +396,7 @@ export class PostgresRepository implements AppRepository {
       from products p
       left join brands b on b.id = p.brand_id
       where ${whereClause}
-      order by p.feed_score desc, p.created_at desc, p.id desc
+      order by p.feed_score desc, md5(p.id), p.id desc
       offset ${offset} limit ${limit}
     `;
 
@@ -511,7 +511,7 @@ export class PostgresRepository implements AppRepository {
         p.id as product_id,
         p.display_name as product_name,
         b.name as brand_name,
-        p.category,
+        p.pit_type as category,
         p.current_price as current_price,
         p.feed_score as current_feed_score,
         p.sale_status as current_sale_status,
@@ -822,7 +822,7 @@ export class PostgresRepository implements AppRepository {
     const followedBrandIds = await this.getFollowedBrandIds(userId);
 
     // 收藏的品类
-    const catRows = await this.sql`SELECT DISTINCT p.category
+    const catRows = await this.sql`SELECT DISTINCT p.pit_type as category
       FROM wishlist_items w JOIN products p ON p.id = w.product_id
       WHERE w.user_id = ${userId} AND w.product_id IS NOT NULL`;
     const wishlistCategories = catRows.map((r: Row) => stringValue(r.category));
@@ -836,7 +836,7 @@ export class PostgresRepository implements AppRepository {
     const wishlistTags = tagRows.map((r: Row) => stringValue(r.tag));
 
     // 浏览的品类
-    const viewRows = await this.sql`SELECT DISTINCT p.category
+    const viewRows = await this.sql`SELECT DISTINCT p.pit_type as category
       FROM user_events e JOIN products p ON p.id = e.target_id
       WHERE e.user_id = ${userId} AND e.event_type = 'VIEW_PRODUCT'`;
     const viewedCategories = viewRows.map((r: Row) => stringValue(r.category));
