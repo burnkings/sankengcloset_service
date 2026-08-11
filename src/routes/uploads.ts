@@ -8,7 +8,7 @@ import type { AppRepository } from '../repositories/contracts.js';
 import type { LocalObjectStorage } from '../storage/local-storage.js';
 
 export const prepareSchema = z.object({
-  purpose: z.enum(['ai_import', 'outfit', 'wardrobe']),
+  purpose: z.enum(['purchase_import', 'outfit', 'ai_import', 'wardrobe']),
   contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
 });
 export const uploadParamsSchema = z.object({ uploadId: z.string().min(1).max(128) });

@@ -52,37 +52,45 @@ describe('runtime foundation', () => {
     expect(second.json().data.receipts[0]).toEqual(first.json().data.receipts[0]);
   });
 
-  it('requires upload completion and explicit confirmation before creating an AI target', async () => {
+  it('fails OCR honestly without a vision provider and rejects confirming a non-ready task', async () => {
     const instance = await createApp();
     const token = await login(instance);
     const auth = { authorization: `Bearer ${token}` };
     const prepared = await instance.inject({
       method: 'POST', url: '/api/v1/uploads:prepare', headers: auth,
-      payload: { purpose: 'ai_import', contentType: 'image/jpeg' },
+      payload: { purpose: 'purchase_import', contentType: 'image/jpeg' },
     });
-    const { uploadId, objectKey } = prepared.json().data;
+    const { uploadId, mediaId } = prepared.json().data;
     const uploaded = await instance.inject({
       method: 'PUT', url: `/api/v1/uploads/${uploadId}/content`,
       headers: { ...auth, 'content-type': 'application/octet-stream' }, payload: Buffer.from('fake-image'),
     });
     expect(uploaded.statusCode).toBe(201);
     const created = await instance.inject({
-      method: 'POST', url: '/api/v1/ai/import-tasks', headers: auth, payload: { objectKey },
+      method: 'POST', url: '/api/v1/ai/import-tasks', headers: auth,
+      payload: { mediaId, taskType: 'purchase_order', sourcePlatform: 'taobao' },
     });
     expect(created.statusCode).toBe(202);
-    expect(created.json().data.state).toBe('ready');
-    expect(created.json().data.suggestion.brand).toBe('');
+    expect(created.json().data.state).toBe('pending');
+    // 轮询直到终态：未配置视觉模型 → 真实 failed，绝不伪造成 ready
     const taskId = created.json().data.taskId as string;
-    const confirmed = await instance.inject({
+    let state = '';
+    for (let i = 0; i < 20; i++) {
+      const polled = await instance.inject({ method: 'GET', url: `/api/v1/ai/import-tasks/${taskId}`, headers: auth });
+      state = polled.json().data.state;
+      if (state === 'failed' || state === 'ready') break;
+      await new Promise((resolve) => { setTimeout(resolve, 10); });
+    }
+    expect(state).toBe('failed');
+    const failed = await instance.inject({ method: 'GET', url: `/api/v1/ai/import-tasks/${taskId}`, headers: auth });
+    expect(failed.json().data.warnings.join('')).toContain('当前识别服务不可用');
+    expect(failed.json().data.suggestion.totalCents).toBe(0); // 不编造识别字段
+    // failed 任务不可确认
+    const confirm = await instance.inject({
       method: 'POST', url: `/api/v1/ai/import-tasks/${taskId}/confirm`, headers: auth,
-      payload: {
-        opId: 'op_ai_confirm_1', targetType: 'wardrobe',
-        confirmed: { name: '人工确认格裙', category: 'JK', brand: '人工填写', priceCents: 12800, color: '深蓝', size: 'M', note: '' },
-      },
+      payload: { targetType: 'purchase', targetId: 'pur_test_1', confirmed: { name: '手动补全' } },
     });
-    expect(confirmed.statusCode).toBe(200);
-    expect(confirmed.json().data.task.state).toBe('confirmed');
-    expect(confirmed.json().data.task.targetId).toMatch(/^wdi_/);
+    expect(confirm.statusCode).toBe(409);
   });
 
   it('exchanges a WeChat code without exposing the session key', async () => {

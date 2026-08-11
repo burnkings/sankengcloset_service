@@ -73,7 +73,9 @@ export async function registerContentRoutes(app: FastifyInstance, repository: Ap
   // 商品搜索
   app.get('/api/v1/search', async (request) => {
     const query = searchQuerySchema.parse(request.query);
-    const result = await repository.searchProducts(query);
+    let userId: string | null = null;
+    try { userId = await requireUser(request); } catch { /* 匿名 */ }
+    const result = await repository.searchProducts(query, userId);
     return success(request, result.items, {
       nextCursor: result.nextCursor, hasMore: result.hasMore, totalHint: result.totalHint,
     });

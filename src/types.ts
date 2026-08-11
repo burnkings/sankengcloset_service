@@ -3,6 +3,7 @@ export type Category = 'JK' | 'LOLITA' | 'HANFU' | 'OTHER';
 export interface UserProfile {
   id: string;
   nickname: string;
+  avatarUrl: string;
   status: 'active';
   createdAt: string;
 }
@@ -76,21 +77,45 @@ export interface MediaObject {
   deletedAt: string | null;
 }
 
+/**
+ * 订单截图识别草稿（尾款一键入库）。
+ * 仅作为可编辑草稿；低置信字段保持空，由用户确认页手动补全。
+ * 金额一律整数分（xxxCents）。
+ */
 export interface AiSuggestion {
   name: string;
-  category: Category;
   brand: string;
-  priceCents: number;
-  color: string;
-  size: string;
+  shopName: string;
+  category: Category;
+  orderNumber: string;
+  orderDate: string;        // YYYY-MM-DD
+  totalCents: number;
+  depositCents: number;
+  paidCents: number;
+  balanceDueDate: string;   // YYYY-MM-DD
+  arrivalDate: string;      // YYYY-MM-DD
   note: string;
 }
+
+export function emptyAiSuggestion(): AiSuggestion {
+  return {
+    name: '', brand: '', shopName: '', category: 'OTHER', orderNumber: '',
+    orderDate: '', totalCents: 0, depositCents: 0, paidCents: 0,
+    balanceDueDate: '', arrivalDate: '', note: '',
+  };
+}
+
+export type AiTaskState = 'pending' | 'processing' | 'ready' | 'failed' | 'confirmed';
 
 export interface AiImportTask {
   taskId: string;
   userId: string;
   objectKey: string;
-  state: 'ready' | 'confirmed' | 'failed';
+  mediaId: string;
+  taskType: string;          // purchase_order
+  sourcePlatform: string;    // taobao | weidian | tuanzhang | other | ''
+  sourceLink: string;
+  state: AiTaskState;
   requestId: string;
   model: { provider: string; name: string; version: string };
   suggestion: AiSuggestion;
@@ -101,14 +126,15 @@ export interface AiImportTask {
   createdAt: string;
   expiresAt: string;
   confirmedAt: string | null;
-  targetType: 'wardrobe' | 'wishlist' | null;
+  targetType: 'purchase' | 'wardrobe' | 'wishlist' | null;
   targetId: string | null;
 }
 
 export interface AiConfirmationInput {
-  opId: string;
-  targetType: 'wardrobe' | 'wishlist';
-  confirmed: AiSuggestion;
+  opId?: string;
+  targetType: 'purchase';
+  targetId: string;          // 前端已创建的 purchase id（仅审计关联，不建单）
+  confirmed: AiSuggestion;   // 用户最终确认后的订单字段
 }
 
 // ─── Phase D7: Content Data Platform ────────────────────────

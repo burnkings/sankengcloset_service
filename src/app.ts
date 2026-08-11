@@ -7,6 +7,7 @@ import { API_TAGS, swaggerTransform } from './swagger-docs.js';
 import { ZodError } from 'zod';
 import { loadConfig, type AppConfig } from './config.js';
 import { AppProblem } from './lib/problem.js';
+import { requireUser } from './http.js';
 import type { AppRepository } from './repositories/contracts.js';
 import { MemoryRepository } from './repositories/memory.js';
 import { PostgresRepository } from './repositories/postgres.js';
@@ -20,6 +21,8 @@ import { registerAiImportRoutes } from './routes/ai-import.js';
 import { registerReviewRoutes } from './routes/review.js';
 import { registerInteractionRoutes } from './routes/interaction.js';
 import { registerUserDataRoutes } from './routes/user-data.js';
+import type { OrderRecognizer } from './services/vision-ocr.js';
+import { createHttpOrderRecognizer } from './services/vision-ocr.js';
 import postgres from 'postgres';
 import { readFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
@@ -29,6 +32,7 @@ export interface BuildAppOptions {
   config?: AppConfig;
   repository?: AppRepository;
   logger?: boolean;
+  visionRecognizer?: OrderRecognizer;
 }
 
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
@@ -36,6 +40,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   const repository = options.repository ?? (
     config.DATA_DRIVER === 'postgres' ? new PostgresRepository(config.DATABASE_URL) : new MemoryRepository()
   );
+  // 测试可注入 stub 识别器；未提供时用默认（未配置视觉模型 → 任务真实 failed）
+  const visionRecognizer = options.visionRecognizer ?? createHttpOrderRecognizer(config);
   const app = Fastify({
     logger: options.logger ?? config.NODE_ENV !== 'test',
     bodyLimit: config.UPLOAD_MAX_BYTES,
@@ -92,6 +98,39 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     return reply.code(500).send({ requestId: request.id, error: { code: 'SERVER_ERROR', message: '服务暂时不可用', retryable: true } });
   });
 
+  // ─── Idempotency-Key 支持（关键写操作防网络重试重复建单） ─────────────
+  // 缓存按 userId+key 隔离；成功/确定性错误(2xx-4xx)缓存 10 分钟，重放原响应。
+  const idempotencyStore = new Map<string, { statusCode: number; body: unknown; expiresAt: number }>();
+  const IDEMPOTENCY_TTL_MS = 10 * 60 * 1000;
+  const IDEMPOTENCY_MAX = 2000;
+
+  app.addHook('preHandler', async (request, reply) => {
+    const key = request.headers['idempotency-key'];
+    if (!key || !['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) return;
+    let userId = '';
+    try { userId = await requireUser(request); } catch { return; }
+    const cacheKey = `${userId}:${String(key)}`;
+    const cached = idempotencyStore.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return reply.code(cached.statusCode).type('application/json').send(cached.body);
+    }
+    if (cached) idempotencyStore.delete(cacheKey);
+    (reply as { idempotencyCacheKey?: string }).idempotencyCacheKey = cacheKey;
+  });
+
+  app.addHook('onSend', async (request, reply, payload) => {
+    const cacheKey = (reply as { idempotencyCacheKey?: string }).idempotencyCacheKey;
+    if (!cacheKey) return payload;
+    if (reply.statusCode >= 200 && reply.statusCode < 500) {
+      if (idempotencyStore.size >= IDEMPOTENCY_MAX) {
+        const oldest = idempotencyStore.keys().next().value;
+        if (oldest !== undefined) idempotencyStore.delete(oldest);
+      }
+      idempotencyStore.set(cacheKey, { statusCode: reply.statusCode, body: payload, expiresAt: Date.now() + IDEMPOTENCY_TTL_MS });
+    }
+    return payload;
+  });
+
   const storage = new LocalObjectStorage(config.UPLOAD_DIR);
   await registerHealthRoutes(app, repository);
 
@@ -105,7 +144,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await registerContentRoutes(app, repository);
   await registerSyncRoutes(app, repository);
   await registerUploadRoutes(app, config, repository, storage);
-  await registerAiImportRoutes(app, config, repository);
+  await registerAiImportRoutes(app, config, repository, storage, visionRecognizer);
   await registerInteractionRoutes(app, repository);
   await registerUserDataRoutes(app, config, repository);
 

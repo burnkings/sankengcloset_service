@@ -38,6 +38,18 @@ export const purchaseSchema = z.object({
   brand: z.string().max(120).default(''),
   shopName: z.string().max(120).default(''),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'OTHER']).default('OTHER'),
+  // 规格字段（金额一律整数分）：orderNumber/totalCents/depositCents/paidCents/balanceDueDate/arrivalDate/status
+  orderNumber: z.string().max(64).default(''),
+  totalCents: z.number().int().min(0).max(100_000_000).default(0),
+  depositCents: z.number().int().min(0).max(100_000_000).default(0),
+  paidCents: z.number().int().min(0).max(100_000_000).default(0),
+  balanceDueDate: z.string().max(32).default(''),
+  arrivalDate: z.string().max(32).default(''),
+  status: z.string().max(32).default(''),
+  // 图片/媒体关联（订单截图 mediaId 或公开 imageUrl）
+  mediaId: idSchema.optional(),
+  image: z.string().max(512).default(''),
+  // 兼容旧前端字段
   totalAmount: z.number().int().min(0).max(100_000_000).default(0),
   depositAmount: z.number().int().min(0).max(100_000_000).default(0),
   paidAmount: z.number().int().min(0).max(100_000_000).default(0),
@@ -103,7 +115,7 @@ export const postCreateSchema = z.object({
   mediaId: idSchema,
   caption: z.string().trim().max(600).default(''),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'MIXED']),
-  topic: z.string().trim().min(1).max(80),
+  topic: z.string().trim().max(80).default(''),
 });
 export const postParamsSchema = z.object({ id: idSchema });
 export const postLikeSchema = z.object({ liked: z.boolean() });

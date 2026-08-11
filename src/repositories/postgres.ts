@@ -43,6 +43,7 @@ function mapUser(row: Row): UserProfile {
   return {
     id: stringValue(row.id),
     nickname: stringValue(row.nickname),
+    avatarUrl: stringValue(row.avatar_url),
     status: 'active',
     createdAt: dateValue(row.created_at),
   };
@@ -117,6 +118,10 @@ function mapAiTask(row: Row): AiImportTask {
     taskId: stringValue(row.id),
     userId: stringValue(row.user_id),
     objectKey: stringValue(row.object_key),
+    mediaId: stringValue(row.media_id),
+    taskType: stringValue(row.task_type) || 'purchase_order',
+    sourcePlatform: stringValue(row.source_platform),
+    sourceLink: stringValue(row.source_link),
     state: stringValue(row.state) as AiImportTask['state'],
     requestId: stringValue(row.request_id),
     model: {
@@ -155,7 +160,7 @@ export class PostgresRepository implements AppRepository {
       insert into users (id, nickname, status)
       values ('usr_dev', ${nickname}, 'active')
       on conflict (id) do update set nickname = excluded.nickname
-      returning id, nickname, status, created_at
+      returning id, nickname, avatar_url, status, created_at
     `;
     return mapUser(rows[0] as Row);
   }
@@ -163,7 +168,7 @@ export class PostgresRepository implements AppRepository {
   async ensureWechatUser(openId: string, nickname: string): Promise<UserProfile> {
     return this.sql.begin(async (tx) => {
       const existing = await tx`
-        select u.id, u.nickname, u.status, u.created_at
+        select u.id, u.nickname, u.avatar_url, u.status, u.created_at
         from user_identities i join users u on u.id = i.user_id
         where i.provider = 'wechat' and i.provider_subject = ${openId} and u.status = 'active'
       `;
@@ -178,13 +183,13 @@ export class PostgresRepository implements AppRepository {
         returning user_id
       `;
       if (identity.length > 0) {
-        const created = await tx`select id, nickname, status, created_at from users where id = ${userId}`;
+        const created = await tx`select id, nickname, avatar_url, status, created_at from users where id = ${userId}`;
         return mapUser(created[0] as Row);
       }
 
       await tx`delete from users where id = ${userId}`;
       const raced = await tx`
-        select u.id, u.nickname, u.status, u.created_at
+        select u.id, u.nickname, u.avatar_url, u.status, u.created_at
         from user_identities i join users u on u.id = i.user_id
         where i.provider = 'wechat' and i.provider_subject = ${openId} and u.status = 'active'
       `;
@@ -193,11 +198,47 @@ export class PostgresRepository implements AppRepository {
   }
 
   async getUser(userId: string): Promise<UserProfile | null> {
-    const rows = await this.sql`select id, nickname, status, created_at from users where id = ${userId} and status = 'active'`;
+    const rows = await this.sql`select id, nickname, avatar_url, status, created_at from users where id = ${userId} and status = 'active'`;
     return rows.length === 0 ? null : mapUser(rows[0] as Row);
   }
 
-  async listFeed(_userId: string | null, query: FeedQuery): Promise<FeedResult> {
+  // ─── P0-A: 用户会话（refresh token 轮换） ────────────────────────────
+
+  async createUserSession(userId: string, deviceId: string, refreshTokenHash: string, expiresAt: string): Promise<void> {
+    await this.sql`
+      insert into user_sessions (id, user_id, refresh_token_hash, device_id, expires_at)
+      values (${newId('ses')}, ${userId}, ${refreshTokenHash}, ${deviceId}, ${expiresAt})
+    `;
+  }
+
+  async rotateUserSession(oldHash: string, newHash: string, newExpiresAt: string): Promise<boolean> {
+    return this.sql.begin(async (tx) => {
+      const rows = await tx`
+        update user_sessions
+        set revoked_at = now(), last_used_at = now()
+        where refresh_token_hash = ${oldHash} and revoked_at is null and expires_at > now()
+        returning id, user_id
+      `;
+      if (rows.length === 0) return false;
+      const rotated = rows[0] as Row;
+      await tx`
+        insert into user_sessions (id, user_id, refresh_token_hash, device_id, expires_at)
+        values (${newId('ses')}, ${stringValue(rotated.user_id)}, ${newHash}, '', ${newExpiresAt})
+      `;
+      return true;
+    });
+  }
+
+  async revokeUserSession(refreshTokenHash: string): Promise<boolean> {
+    const rows = await this.sql`
+      update user_sessions set revoked_at = now()
+      where refresh_token_hash = ${refreshTokenHash} and revoked_at is null
+      returning id
+    `;
+    return rows.length > 0;
+  }
+
+  async listFeed(userId: string | null, query: FeedQuery): Promise<FeedResult> {
     const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
 
     // Resolve category filter: categories (comma-separated) takes precedence over single category
@@ -256,6 +297,18 @@ export class PostgresRepository implements AppRepository {
     `;
     const hasMore = rows.length > query.limit;
     const visible = hasMore ? rows.slice(0, query.limit) : rows;
+    // 实时计算当前登录用户的收藏状态（saved）；游客固定 false
+    let savedSet = new Set<string>();
+    if (userId) {
+      const productIds = visible.map((r) => stringValue((r as Row).id));
+      if (productIds.length > 0) {
+        const savedRows = await this.sql`
+          select product_id from wishlist_items
+          where user_id = ${userId} and product_id in ${this.sql(productIds)}
+        `;
+        savedSet = new Set(savedRows.map((r) => stringValue((r as Row).product_id)));
+      }
+    }
     const items = visible.map((row) => {
       const r = row as Row;
       const product = mapProduct(r);
@@ -325,8 +378,8 @@ export class PostgresRepository implements AppRepository {
         eventStartAt: '',
         eventEndAt: releaseEndAt,
         liked: false,
-        saved: false,
-        sourceLabel: '官方资料',
+        saved: savedSet.has(product.id),
+        sourceLabel: '品牌官方',
         publishedAt: product.createdAt,
         createdAt: product.createdAt,
       };
@@ -352,7 +405,7 @@ export class PostgresRepository implements AppRepository {
     return '';
   }
 
-  async searchProducts(query: SearchQuery): Promise<SearchResult> {
+  async searchProducts(query: SearchQuery, userId: string | null = null): Promise<SearchResult> {
     // 每个条件均使用 postgres.js 的 SQL fragment；用户输入绝不拼入 SQL 文本。
     const clauses = [
       this.sql`p.deleted_at is null`,
@@ -402,6 +455,18 @@ export class PostgresRepository implements AppRepository {
 
     const hasMore = rows.length > query.limit;
     const visible = hasMore ? rows.slice(0, query.limit) : rows;
+    // 实时计算当前登录用户的收藏状态（saved）；游客固定 false
+    let savedSet = new Set<string>();
+    if (userId) {
+      const productIds = visible.map((r) => stringValue((r as Row).id));
+      if (productIds.length > 0) {
+        const savedRows = await this.sql`
+          select product_id from wishlist_items
+          where user_id = ${userId} and product_id in ${this.sql(productIds)}
+        `;
+        savedSet = new Set(savedRows.map((r) => stringValue((r as Row).product_id)));
+      }
+    }
     const items = visible.map((row) => {
       const r = row as Row;
       const product = mapProduct(r);
@@ -447,7 +512,7 @@ export class PostgresRepository implements AppRepository {
         eventStartAt: '',
         eventEndAt: '',
         liked: false,
-        saved: false,
+        saved: savedSet.has(product.id),
         sourceLabel: '搜索结果',
         publishedAt: product.createdAt,
         createdAt: product.createdAt,
@@ -633,9 +698,11 @@ export class PostgresRepository implements AppRepository {
     await this.sql.begin(async (tx) => {
       await tx`
         insert into ai_import_tasks
-          (id, user_id, object_key, state, request_id, model_provider, model_name, model_version, created_at, expires_at)
+          (id, user_id, object_key, media_id, task_type, source_platform, source_link, state, request_id,
+           model_provider, model_name, model_version, created_at, expires_at)
         values
-          (${task.taskId}, ${task.userId}, ${task.objectKey}, ${task.state}, ${task.requestId}, ${task.model.provider},
+          (${task.taskId}, ${task.userId}, ${task.objectKey}, ${task.mediaId}, ${task.taskType}, ${task.sourcePlatform}, ${task.sourceLink},
+           ${task.state}, ${task.requestId}, ${task.model.provider},
            ${task.model.name}, ${task.model.version}, ${task.createdAt}, ${task.expiresAt})
       `;
       await tx`
@@ -659,6 +726,46 @@ export class PostgresRepository implements AppRepository {
     return rows.length === 0 ? null : mapAiTask(rows[0] as Row);
   }
 
+  async updateAiTask(
+    taskId: string,
+    userId: string,
+    patch: Partial<Pick<AiImportTask, 'state' | 'suggestion' | 'confidence' | 'fieldConfidence' | 'evidence' | 'warnings' | 'model'>>,
+  ): Promise<AiImportTask | null> {
+    return this.sql.begin(async (tx) => {
+      const tasks = await tx`
+        update ai_import_tasks
+        set state = ${patch.state ?? ''},
+            model_provider = ${patch.model?.provider ?? 'vision'},
+            model_name = ${patch.model?.name ?? ''},
+            model_version = ${patch.model?.version ?? ''}
+        where id = ${taskId} and user_id = ${userId}
+        returning *
+      `;
+      if (tasks.length === 0) return null;
+      const suggestion = patch.suggestion ?? { name: '', brand: '', shopName: '', category: 'OTHER', orderNumber: '', orderDate: '', totalCents: 0, depositCents: 0, paidCents: 0, balanceDueDate: '', arrivalDate: '', note: '' };
+      await tx`
+        insert into ai_import_suggestions
+          (task_id, suggestion_json, confidence, field_confidence_json, evidence_json, warnings_json)
+        values
+          (${taskId}, ${JSON.stringify(suggestion)}::jsonb, ${patch.confidence ?? 0},
+           ${JSON.stringify(patch.fieldConfidence ?? {})}::jsonb, ${JSON.stringify(patch.evidence ?? [])}::jsonb,
+           ${JSON.stringify(patch.warnings ?? [])}::jsonb)
+        on conflict (task_id) do update
+          set suggestion_json = excluded.suggestion_json,
+              confidence = excluded.confidence,
+              field_confidence_json = excluded.field_confidence_json,
+              evidence_json = excluded.evidence_json,
+              warnings_json = excluded.warnings_json
+      `;
+      const row = await tx`
+        select t.*, s.suggestion_json, s.confidence, s.field_confidence_json, s.evidence_json, s.warnings_json
+        from ai_import_tasks t join ai_import_suggestions s on s.task_id = t.id
+        where t.id = ${taskId}
+      `;
+      return mapAiTask(row[0] as Row);
+    });
+  }
+
   async confirmAiTask(userId: string, taskId: string, input: AiConfirmationInput): Promise<AiImportTask> {
     return this.sql.begin(async (tx) => {
       const taskRows = await tx`
@@ -668,27 +775,35 @@ export class PostgresRepository implements AppRepository {
       `;
       if (taskRows.length === 0) throw notFound('AI 导入任务不存在');
       const task = mapAiTask(taskRows[0] as Row);
-      if (task.state === 'confirmed') {
-        if (task.targetType !== input.targetType) throw conflict('该任务已经确认到其他目标');
-        return task;
+      if (task.state === 'confirmed') return task; // 幂等：已确认直接返回
+      if (task.state !== 'ready') throw conflict('任务尚未识别完成，无法确认');
+
+      // 校验 target purchase 存在且属于当前用户；仅记录审计关联，不建单、不覆盖
+      const purchase = await tx`
+        select id from user_assets
+        where user_id = ${userId} and asset_type = 'purchase' and id = ${input.targetId} and deleted_at is null
+      `;
+      if (purchase.length === 0) throw notFound('目标订单不存在或不属于当前用户');
+
+      if (input.opId) {
+        const existingOp = await tx`select id from ai_import_confirmations where user_id = ${userId} and op_id = ${input.opId}`;
+        if (existingOp.length > 0) return task; // 同 opId 网络重试：不重复记录
       }
-      const existing = await tx`select id from ai_import_confirmations where user_id = ${userId} and op_id = ${input.opId}`;
-      if (existing.length > 0) return task;
-      const targetId = newId(input.targetType === 'wardrobe' ? 'wdi' : 'wli');
-      if (input.targetType === 'wardrobe') {
-        await tx`insert into wardrobe_items (id, user_id, category, title, payload_json) values (${targetId}, ${userId}, ${input.confirmed.category}, ${input.confirmed.name}, ${JSON.stringify(input.confirmed)}::jsonb)`;
-      } else {
-        await tx`insert into wishlist_items (id, user_id, title, status, payload_json) values (${targetId}, ${userId}, ${input.confirmed.name}, 'WISH', ${JSON.stringify(input.confirmed)}::jsonb)`;
-      }
+
       await tx`
-        insert into ai_import_confirmations (id, task_id, user_id, target_type, target_id, confirmed_json, correction_json, op_id)
-        values (${newId('aic')}, ${taskId}, ${userId}, ${input.targetType}, ${targetId}, ${JSON.stringify(input.confirmed)}::jsonb,
-          ${JSON.stringify({ before: task.suggestion, after: input.confirmed })}::jsonb, ${input.opId})
+        insert into ai_import_confirmations
+          (id, task_id, user_id, target_type, target_id, confirmed_json, correction_json, op_id)
+        values
+          (${newId('aic')}, ${taskId}, ${userId}, 'purchase', ${input.targetId},
+           ${JSON.stringify(input.confirmed)}::jsonb,
+           ${JSON.stringify({ before: task.suggestion, after: input.confirmed })}::jsonb,
+           ${input.opId ?? ''})
+        on conflict (task_id) do nothing
       `;
       const updated = await tx`
-        update ai_import_tasks set state = 'confirmed', confirmed_at = now(), target_type = ${input.targetType}, target_id = ${targetId}
+        update ai_import_tasks set state = 'confirmed', confirmed_at = now(), target_type = 'purchase', target_id = ${input.targetId}
         where id = ${taskId}
-        returning *, ${JSON.stringify(input.confirmed)}::jsonb as suggestion_json, ${task.confidence}::double precision as confidence,
+        returning *, ${JSON.stringify(task.suggestion)}::jsonb as suggestion_json, ${task.confidence}::double precision as confidence,
           ${JSON.stringify(task.fieldConfidence)}::jsonb as field_confidence_json, ${JSON.stringify(task.evidence)}::jsonb as evidence_json,
           ${JSON.stringify(task.warnings)}::jsonb as warnings_json
       `;
@@ -738,13 +853,28 @@ export class PostgresRepository implements AppRepository {
   // ─── D8: 收藏体系 ─────────────────────────────────────────
 
   async addWishlist(userId: string, input: CreateWishlistInput): Promise<WishlistItem> {
+    // 幂等：同一用户 + 同一 productId 重复 POST 返回既有条目，绝不创建重复收藏
+    if (input.productId) {
+      const existing = await this.sql`
+        select * from wishlist_items where user_id = ${userId} and product_id = ${input.productId} limit 1
+      `;
+      if (existing.length > 0) return this.mapWishlist(existing[0] as Row);
+    }
     const id = newId('wli');
     const now = new Date();
     const rows = await this.sql`
       INSERT INTO wishlist_items (id, user_id, title, status, product_id, release_id, note, created_at, updated_at)
       VALUES (${id}, ${userId}, ${input.title}, ${input.status},
         ${input.productId ?? null}, ${input.releaseId ?? null}, ${input.note ?? ''}, ${now}, ${now})
+      ON CONFLICT (user_id, product_id) WHERE product_id IS NOT NULL DO NOTHING
       RETURNING *`;
+    if (rows.length === 0 && input.productId) {
+      // 并发竞争：返回既有条目
+      const raced = await this.sql`
+        select * from wishlist_items where user_id = ${userId} and product_id = ${input.productId} limit 1
+      `;
+      return this.mapWishlist(raced[0] as Row);
+    }
     return this.mapWishlist(rows[0] as Row);
   }
 
@@ -792,17 +922,29 @@ export class PostgresRepository implements AppRepository {
 
   // ─── D8: 品牌关注 ─────────────────────────────────────────
 
+  /** 品牌 id 或品牌名 → 品牌 id（兼容按名关注） */
+  private async resolveBrandId(brandId: string): Promise<string | null> {
+    const byId = await this.sql`select id from brands where id = ${brandId} and deleted_at is null`;
+    if (byId.length > 0) return stringValue((byId[0] as Row).id);
+    const byName = await this.sql`select id from brands where name = ${brandId} and deleted_at is null limit 1`;
+    return byName.length > 0 ? stringValue((byName[0] as Row).id) : null;
+  }
+
   async followBrand(userId: string, brandId: string): Promise<BrandFollower> {
-    await this.sql`INSERT INTO brand_followers (user_id, brand_id) VALUES (${userId}, ${brandId})
+    const resolved = await this.resolveBrandId(brandId);
+    if (!resolved) throw notFound('品牌不存在');
+    await this.sql`INSERT INTO brand_followers (user_id, brand_id) VALUES (${userId}, ${resolved})
       ON CONFLICT (user_id, brand_id) DO NOTHING`;
-    const rows = await this.sql`SELECT * FROM brand_followers WHERE user_id = ${userId} AND brand_id = ${brandId}`;
+    const rows = await this.sql`SELECT * FROM brand_followers WHERE user_id = ${userId} AND brand_id = ${resolved}`;
     const row = rows[0];
     if (!row) throw notFound('品牌关注不存在');
     return { userId: stringValue(row.user_id), brandId: stringValue(row.brand_id), createdAt: dateValue(row.created_at) };
   }
 
   async unfollowBrand(userId: string, brandId: string): Promise<boolean> {
-    const rows = await this.sql`DELETE FROM brand_followers WHERE user_id = ${userId} AND brand_id = ${brandId} RETURNING user_id`;
+    const resolved = await this.resolveBrandId(brandId);
+    if (!resolved) return false;
+    const rows = await this.sql`DELETE FROM brand_followers WHERE user_id = ${userId} AND brand_id = ${resolved} RETURNING user_id`;
     return rows.length > 0;
   }
 
@@ -886,25 +1028,55 @@ export class PostgresRepository implements AppRepository {
   }
 
   async updateUserAsset(userId: string, kind: UserAssetKind, assetId: string, patch: Record<string, unknown>): Promise<UserAsset | null> {
-    const patchJson = JSON.stringify(patch);
-    const rows = await this.sql`
-      update user_assets
-      set payload_json = payload_json || ${patchJson}::jsonb,
-          version = version + 1,
-          updated_at = now()
-      where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
-      returning id, asset_type, payload_json, version, created_at, updated_at
-    `;
-    return rows.length === 0 ? null : mapUserAsset(rows[0] as Row);
+    return this.sql.begin(async (tx) => {
+      const patchJson = JSON.stringify(patch);
+      const rows = await tx`
+        update user_assets
+        set payload_json = payload_json || ${patchJson}::jsonb,
+            version = version + 1,
+            updated_at = now()
+        where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
+        returning id, asset_type, payload_json, version, created_at, updated_at
+      `;
+      if (rows.length === 0) return null;
+      // 尾款日期联动：更新订单尾款日 → 同步更新关联 BALANCE 提醒（remindDate），避免提醒与订单脱节
+      if (kind === 'purchase') {
+        const newDeadline = (patch.balanceDueDate ?? patch.deadline) as unknown;
+        if (typeof newDeadline === 'string' && newDeadline !== '') {
+          await tx`
+            update user_assets
+            set payload_json = jsonb_set(payload_json, '{remindDate}', to_jsonb(${newDeadline}), true),
+                payload_json = jsonb_set(payload_json, '{resyncedFrom}', to_jsonb(${assetId}), true),
+                version = version + 1,
+                updated_at = now()
+            where user_id = ${userId} and asset_type = 'reminder' and deleted_at is null
+              and payload_json->>'relatedPurchaseId' = ${assetId}
+              and payload_json->>'type' = 'BALANCE'
+          `;
+        }
+      }
+      return mapUserAsset(rows[0] as Row);
+    });
   }
 
   async deleteUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<boolean> {
-    const rows = await this.sql`
-      update user_assets set deleted_at = now(), version = version + 1, updated_at = now()
-      where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
-      returning id
-    `;
-    return rows.length > 0;
+    return this.sql.begin(async (tx) => {
+      const rows = await tx`
+        update user_assets set deleted_at = now(), version = version + 1, updated_at = now()
+        where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
+        returning id
+      `;
+      if (rows.length === 0) return false;
+      if (kind === 'purchase') {
+        // 删除订单 → 同步软删关联提醒，杜绝孤儿提醒
+        await tx`
+          update user_assets set deleted_at = now(), version = version + 1, updated_at = now()
+          where user_id = ${userId} and asset_type = 'reminder' and deleted_at is null
+            and payload_json->>'relatedPurchaseId' = ${assetId}
+        `;
+      }
+      return true;
+    });
   }
 
   async getUserSetting(userId: string, key: UserSettingKey): Promise<Record<string, unknown>> {

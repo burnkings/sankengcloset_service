@@ -121,9 +121,10 @@ export class MemoryRepository implements AppRepository {
   async ready(): Promise<boolean> { return true; }
 
   async ensureDevUser(nickname: string): Promise<UserProfile> {
-    const existing = this.users.get('usr_dev');
+    // dev 用户按昵称隔离：同昵称幂等复用；不同昵称生成不同用户（用户隔离测试依赖）
+    const existing = [...this.users.values()].find((u) => u.nickname === nickname);
     if (existing) return existing;
-    const user: UserProfile = { id: 'usr_dev', nickname, status: 'active', createdAt: nowIso() };
+    const user: UserProfile = { id: newId('usr'), nickname, avatarUrl: '', status: 'active', createdAt: nowIso() };
     this.users.set(user.id, user);
     return user;
   }
@@ -131,7 +132,7 @@ export class MemoryRepository implements AppRepository {
   async ensureWechatUser(openId: string, nickname: string): Promise<UserProfile> {
     const existingId = this.wechatUsers.get(openId);
     if (existingId) return this.users.get(existingId)!;
-    const user: UserProfile = { id: newId('usr'), nickname, status: 'active', createdAt: nowIso() };
+    const user: UserProfile = { id: newId('usr'), nickname, avatarUrl: '', status: 'active', createdAt: nowIso() };
     this.users.set(user.id, user);
     this.wechatUsers.set(openId, user.id);
     return user;
@@ -141,7 +142,27 @@ export class MemoryRepository implements AppRepository {
     return this.users.get(userId) ?? null;
   }
 
-  async listFeed(_userId: string | null, query: FeedQuery): Promise<FeedResult> {
+  // ─── P0-A: 用户会话（refresh token 轮换） ────────────────────────────
+
+  private readonly sessions = new Map<string, { userId: string; expiresAt: string }>();
+
+  async createUserSession(userId: string, _deviceId: string, refreshTokenHash: string, expiresAt: string): Promise<void> {
+    this.sessions.set(refreshTokenHash, { userId, expiresAt });
+  }
+
+  async rotateUserSession(oldHash: string, newHash: string, newExpiresAt: string): Promise<boolean> {
+    const existing = this.sessions.get(oldHash);
+    if (!existing || new Date(existing.expiresAt).getTime() < Date.now()) return false;
+    this.sessions.delete(oldHash);
+    this.sessions.set(newHash, { userId: existing.userId, expiresAt: newExpiresAt });
+    return true;
+  }
+
+  async revokeUserSession(refreshTokenHash: string): Promise<boolean> {
+    return this.sessions.delete(refreshTokenHash);
+  }
+
+  async listFeed(userId: string | null, query: FeedQuery): Promise<FeedResult> {
     let rows = this.products;
     const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
     let categoryFilter: string[] = [];
@@ -155,6 +176,10 @@ export class MemoryRepository implements AppRepository {
     if (query.channel === 'new') rows = rows.filter((item) => item.status === 'UPCOMING');
     const offset = Number.parseInt(query.cursor || '0', 10) || 0;
     const items = rows.slice(offset, offset + query.limit).map(toFeed);
+    if (userId) {
+      const savedIds = new Set(this.wishlists.filter(w => w.userId === userId && w.productId !== null).map(w => w.productId as string));
+      for (const item of items) item.saved = savedIds.has(item.entityId);
+    }
     const next = offset + items.length;
     return { items, nextCursor: next < rows.length ? String(next) : '', hasMore: next < rows.length, totalHint: rows.length };
   }
@@ -229,25 +254,44 @@ export class MemoryRepository implements AppRepository {
     return task?.userId === userId ? task : null;
   }
 
-  async confirmAiTask(userId: string, taskId: string, input: AiConfirmationInput): Promise<AiImportTask> {
-    const task = await this.getAiTask(userId, taskId);
-    if (!task) throw notFound('AI 导入任务不存在');
-    if (task.state === 'confirmed') {
-      if (task.targetType !== input.targetType) throw conflict('该任务已经确认到其他目标');
-      return task;
-    }
-    const operationKey = `${userId}:ai:${input.opId}`;
-    if (this.assets.has(operationKey)) return task;
-    const targetId = newId(input.targetType === 'wardrobe' ? 'wdi' : 'wli');
-    this.assets.set(operationKey, { id: targetId, ...input.confirmed });
-    task.state = 'confirmed';
-    task.confirmedAt = nowIso();
-    task.targetType = input.targetType;
-    task.targetId = targetId;
+  async updateAiTask(
+    taskId: string,
+    userId: string,
+    patch: Partial<Pick<AiImportTask, 'state' | 'suggestion' | 'confidence' | 'fieldConfidence' | 'evidence' | 'warnings' | 'model'>>,
+  ): Promise<AiImportTask | null> {
+    const task = this.aiTasks.get(taskId);
+    if (!task || task.userId !== userId) return null;
+    if (patch.state !== undefined) task.state = patch.state;
+    if (patch.suggestion !== undefined) task.suggestion = patch.suggestion;
+    if (patch.confidence !== undefined) task.confidence = patch.confidence;
+    if (patch.fieldConfidence !== undefined) task.fieldConfidence = patch.fieldConfidence;
+    if (patch.evidence !== undefined) task.evidence = patch.evidence;
+    if (patch.warnings !== undefined) task.warnings = patch.warnings;
+    if (patch.model !== undefined) task.model = { provider: patch.model.provider, name: patch.model.name, version: patch.model.version };
     return task;
   }
 
-  async searchProducts(query: SearchQuery): Promise<SearchResult> {
+  private readonly aiConfirmOps = new Set<string>();
+
+  async confirmAiTask(userId: string, taskId: string, input: AiConfirmationInput): Promise<AiImportTask> {
+    const task = await this.getAiTask(userId, taskId);
+    if (!task) throw notFound('AI 导入任务不存在');
+    if (task.state === 'confirmed') return task; // 幂等：已确认直接返回
+    if (task.state !== 'ready') throw conflict('任务尚未识别完成，无法确认');
+    // 仅审计关联：目标 purchase 必须存在且属于当前用户；不建单、不覆盖
+    if (!this.userAssets.has(this.userAssetKey(userId, 'purchase', input.targetId))) {
+      throw notFound('目标订单不存在或不属于当前用户');
+    }
+    if (input.opId && this.aiConfirmOps.has(`${userId}:${input.opId}`)) return task; // 同 opId 重试不重复记录
+    this.aiConfirmOps.add(`${userId}:${input.opId ?? taskId}`);
+    task.state = 'confirmed';
+    task.confirmedAt = nowIso();
+    task.targetType = 'purchase';
+    task.targetId = input.targetId;
+    return task;
+  }
+
+  async searchProducts(query: SearchQuery, userId: string | null = null): Promise<SearchResult> {
     let rows = this.products.filter(p => {
       // 关键词搜索（title/brand + 坑向别名命中 category）
       if (query.q) {
@@ -274,6 +318,10 @@ export class MemoryRepository implements AppRepository {
       ...toFeed(p),
       sourceLabel: '搜索结果',
     }));
+    if (userId) {
+      const savedIds = new Set(this.wishlists.filter(w => w.userId === userId && w.productId !== null).map(w => w.productId as string));
+      for (const item of items) item.saved = savedIds.has(item.entityId);
+    }
     const next = offset + items.length;
 
     return {
@@ -317,6 +365,11 @@ export class MemoryRepository implements AppRepository {
   private readonly wishlists: WishlistItem[] = [];
 
   async addWishlist(userId: string, input: CreateWishlistInput): Promise<WishlistItem> {
+    // 幂等：同一用户 + 同一 productId 重复 POST 返回既有条目
+    if (input.productId) {
+      const existing = this.wishlists.find(w => w.userId === userId && w.productId === input.productId);
+      if (existing) return existing;
+    }
     const item: WishlistItem = {
       id: newId('wli'),
       userId,
@@ -362,16 +415,28 @@ export class MemoryRepository implements AppRepository {
 
   private readonly brandFollowers: BrandFollower[] = [];
 
+  /** 品牌 id 或品牌名 → 品牌 id（兼容按名关注；内存模式以种子商品品牌为准） */
+  private memoryResolveBrand(brandId: string): string | null {
+    const byId = this.products.find(p => p.brandId === brandId);
+    if (byId) return byId.brandId;
+    const byName = this.products.find(p => p.brandName === brandId);
+    return byName ? byName.brandId : null;
+  }
+
   async followBrand(userId: string, brandId: string): Promise<BrandFollower> {
-    const existing = this.brandFollowers.find(f => f.userId === userId && f.brandId === brandId);
+    const resolved = this.memoryResolveBrand(brandId);
+    if (!resolved) throw notFound('品牌不存在');
+    const existing = this.brandFollowers.find(f => f.userId === userId && f.brandId === resolved);
     if (existing) return existing;
-    const follower: BrandFollower = { userId, brandId, createdAt: nowIso() };
+    const follower: BrandFollower = { userId, brandId: resolved, createdAt: nowIso() };
     this.brandFollowers.push(follower);
     return follower;
   }
 
   async unfollowBrand(userId: string, brandId: string): Promise<boolean> {
-    const idx = this.brandFollowers.findIndex(f => f.userId === userId && f.brandId === brandId);
+    const resolved = this.memoryResolveBrand(brandId);
+    if (!resolved) return false;
+    const idx = this.brandFollowers.findIndex(f => f.userId === userId && f.brandId === resolved);
     if (idx === -1) return false;
     this.brandFollowers.splice(idx, 1);
     return true;
@@ -452,11 +517,34 @@ export class MemoryRepository implements AppRepository {
     existing.payload = { ...existing.payload, ...patch };
     existing.version += 1;
     existing.updatedAt = nowIso();
+    // 尾款日期联动：更新订单尾款日 → 同步更新关联 BALANCE 提醒（remindDate）
+    if (kind === 'purchase') {
+      const newDeadline = (patch.balanceDueDate ?? patch.deadline) as unknown;
+      if (typeof newDeadline === 'string' && newDeadline !== '') {
+        for (const asset of this.userAssets.values()) {
+          if (asset.type === 'reminder' && asset.payload.relatedPurchaseId === assetId && asset.payload.type === 'BALANCE') {
+            asset.payload = { ...asset.payload, remindDate: newDeadline, resyncedFrom: assetId };
+            asset.version += 1;
+            asset.updatedAt = nowIso();
+          }
+        }
+      }
+    }
     return { ...existing, payload: { ...existing.payload } };
   }
 
   async deleteUserAsset(userId: string, kind: UserAssetKind, assetId: string): Promise<boolean> {
-    return this.userAssets.delete(this.userAssetKey(userId, kind, assetId));
+    const key = this.userAssetKey(userId, kind, assetId);
+    if (!this.userAssets.delete(key)) return false;
+    if (kind === 'purchase') {
+      // 删除订单 → 同步删除关联提醒，杜绝孤儿提醒
+      for (const [reminderKey, asset] of [...this.userAssets.entries()]) {
+        if (asset.type === 'reminder' && asset.payload.relatedPurchaseId === assetId) {
+          this.userAssets.delete(reminderKey);
+        }
+      }
+    }
+    return true;
   }
 
   async getUserSetting(userId: string, key: UserSettingKey): Promise<Record<string, unknown>> {

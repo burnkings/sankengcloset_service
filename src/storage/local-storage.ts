@@ -17,7 +17,8 @@ export class LocalObjectStorage {
   async put(objectKey: string, data: Buffer): Promise<void> {
     const target = this.pathFor(objectKey);
     await mkdir(dirname(target), { recursive: true });
-    await writeFile(target, data, { flag: 'wx' });
+    // 'w'：同 uploadId 网络重试重复 PUT 幂等覆盖，不因 EEXIST 报 500
+    await writeFile(target, data, { flag: 'w' });
   }
 
   async get(objectKey: string): Promise<Buffer> {

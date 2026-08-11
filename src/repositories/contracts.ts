@@ -94,7 +94,7 @@ export interface AppRepository {
   getUser(userId: string): Promise<UserProfile | null>;
   listFeed(userId: string | null, query: FeedQuery): Promise<FeedResult>;
   getProduct(userId: string | null, productId: string): Promise<Product | null>;
-  searchProducts(query: SearchQuery): Promise<SearchResult>;
+  searchProducts(query: SearchQuery, userId?: string | null): Promise<SearchResult>;
   getTrendSummary(period?: string): Promise<TrendSummary>;
 
   // D8: 用户行为事件
@@ -114,7 +114,7 @@ export interface AppRepository {
   isFollowingBrand(userId: string, brandId: string): Promise<boolean>;
   getFollowedBrandIds(userId: string): Promise<string[]>;
 
-  // D8: 个性化评分
+  // 个性化评分
   computePersonalScore(input: PersonalScoreInput): Promise<PersonalScoreResult>;
   getUserPreference(userId: string): Promise<{
     followedBrandIds: string[];
@@ -123,6 +123,11 @@ export interface AppRepository {
     viewedCategories: string[];
     searchedKeywords: string[];
   }>;
+
+  // P0-A: 用户会话（refresh token 轮换）
+  createUserSession(userId: string, deviceId: string, refreshTokenHash: string, expiresAt: string): Promise<void>;
+  rotateUserSession(oldHash: string, newHash: string, newExpiresAt: string): Promise<boolean>;
+  revokeUserSession(refreshTokenHash: string): Promise<boolean>;
 
   applySyncBatch(userId: string, operations: SyncOperationInput[]): Promise<SyncReceipt[]>;
   getSyncCheckpoint(userId: string): Promise<string>;
@@ -133,6 +138,7 @@ export interface AppRepository {
   deleteMediaByObjectKey(userId: string, objectKey: string): Promise<boolean>;
   createAiTask(task: AiImportTask): Promise<AiImportTask>;
   getAiTask(userId: string, taskId: string): Promise<AiImportTask | null>;
+  updateAiTask(taskId: string, userId: string, patch: Partial<Pick<AiImportTask, 'state' | 'suggestion' | 'confidence' | 'fieldConfidence' | 'evidence' | 'warnings' | 'model'>>): Promise<AiImportTask | null>;
   confirmAiTask(userId: string, taskId: string, input: AiConfirmationInput): Promise<AiImportTask>;
 
   // V2.5: 个人管理页的数据资源（衣橱/购买/提醒/愿望/通知）

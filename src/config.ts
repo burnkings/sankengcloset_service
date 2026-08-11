@@ -15,6 +15,8 @@ const schema = z.object({
   UPLOAD_DIR: z.string().default('./var/uploads'),
   UPLOAD_MAX_BYTES: z.coerce.number().int().positive().default(10 * 1024 * 1024),
   AI_PROVIDER: z.enum(['safe_mock', 'remote']).default('safe_mock'),
+  AI_VISION_API_URL: z.string().default(''),
+  AI_VISION_API_KEY: z.string().default(''),
   WECHAT_APP_ID: z.string().default(''),
   WECHAT_APP_SECRET: z.string().default(''),
   TRUST_PROXY: booleanText.default(false),
