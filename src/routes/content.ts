@@ -8,7 +8,7 @@ export const feedQuerySchema = z.object({
   channel: z.enum(['', 'recommend', 'new', 'reservation', 'price_drop', 'outfit']).default(''),
   category: z.enum(['', 'JK', 'LOLITA', 'HANFU', 'OTHER']).default(''),
   categories: z.string().max(200).default(''),
-  cursor: z.string().max(64).default(''),
+  cursor: z.string().max(512).default(''),
   limit: z.preprocess((v) => (v === '' || v == null ? undefined : v), z.coerce.number().int().min(1).max(50).default(20)),
 });
 
@@ -20,7 +20,7 @@ export const searchQuerySchema = z.object({
   brandId: z.string().max(128).default(''),
   minPrice: z.coerce.number().int().min(0).default(0),
   maxPrice: z.coerce.number().int().min(0).default(0),
-  cursor: z.string().max(64).default(''),
+  cursor: z.string().max(512).default(''),
   limit: z.preprocess((v) => (v === '' || v == null ? undefined : v), z.coerce.number().int().min(1).max(50).default(20)),
 });
 

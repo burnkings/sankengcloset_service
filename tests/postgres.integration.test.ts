@@ -19,7 +19,7 @@ describeWithDatabase("PostgreSQL repository integration", () => {
         ai_import_tasks,
         media_objects,
         sync_operations,
-        release_events,
+        product_releases,
         product_images,
         products,
         user_identities,
