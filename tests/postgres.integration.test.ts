@@ -22,6 +22,7 @@ describeWithDatabase("PostgreSQL repository integration", () => {
         product_releases,
         product_images,
         products,
+        brands,
         user_identities,
         users
       restart identity cascade
@@ -38,10 +39,16 @@ describeWithDatabase("PostgreSQL repository integration", () => {
     expect(user.id).toBe("usr_dev");
 
     await admin`
+      insert into brands (id, name, category, review_status)
+      values ('br_ci', 'CI 品牌', 'JK', 'APPROVED')
+    `;
+    await admin`
       insert into products
-        (id, brand_id, brand_name, title, category, status, cover_url, price_cents, original_price_cents)
+        (id, canonical_name, display_name, brand_id, pit_type, sale_status, cover_url,
+         current_price, original_price, review_status, visibility_status, feed_score)
       values
-        ('prd_ci_jk', 'br_ci', 'CI 品牌', 'CI 深蓝格裙', 'JK', 'PRE_ORDER', '/ci/jk.jpg', 12800, 16800)
+        ('prd_ci_jk', 'ci深蓝格裙', 'CI 深蓝格裙', 'br_ci', 'JK', 'PRE_ORDER', '/ci/jk.jpg',
+         12800, 16800, 'APPROVED', 'published', 80)
     `;
 
     const feed = await repository.listFeed(user.id, {
