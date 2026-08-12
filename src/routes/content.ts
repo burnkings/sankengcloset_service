@@ -63,8 +63,7 @@ export async function registerContentRoutes(app: FastifyInstance, repository: Ap
     try { userId = await requireUser(request); } catch { /* 匿名 */ }
     const result = await repository.listFeed(userId, query);
     const enriched = await enrichWithPersonalScore(result.items, userId, repository);
-    // 按 finalScore 重新排序
-    enriched.sort((a, b) => b.finalScore - a.finalScore);
+    // 仓库已按稳定 keyset 顺序分页；不得在单页内二次排序破坏游标语义。
     return success(request, enriched, {
       nextCursor: result.nextCursor, hasMore: result.hasMore, totalHint: result.totalHint,
     });

@@ -1,5 +1,5 @@
 import postgres, { type Sql } from 'postgres';
-import { conflict, notFound } from '../lib/problem.js';
+import { badRequest, conflict, notFound } from '../lib/problem.js';
 import { newId, nowIso } from '../lib/id.js';
 import type { AppRepository, CommunityPost, CommunityPostPage, CommunityPostQuery, CreateCommunityPostInput, FeedQuery, FeedResult, UserAsset, UserAssetKind, UserSettingKey } from './contracts.js';
 import type {
@@ -34,6 +34,30 @@ import { buildTrendSummary } from '../intelligence/trend-engine.js';
 import { computePersonalScore, type UserPreference } from '../intelligence/personal-score.js';
 
 type Row = Record<string, unknown>;
+
+type PageCursor = { v: number; score: number; id: string; scope: string };
+
+function pageScope(parts: string[]): string {
+  return parts.join('\u001f');
+}
+
+function encodePageCursor(score: number, id: string, scope: string): string {
+  return Buffer.from(JSON.stringify({ v: 1, score, id, scope } satisfies PageCursor), 'utf8').toString('base64url');
+}
+
+function decodePageCursor(value: string, expectedScope: string): PageCursor | null {
+  if (value === '') return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(value, 'base64url').toString('utf8')) as Partial<PageCursor>;
+    if (parsed.v !== 1 || typeof parsed.score !== 'number' || typeof parsed.id !== 'string' || parsed.id === '') throw new Error('invalid');
+    if (parsed.scope !== expectedScope) throw badRequest('游标与当前筛选条件不匹配，请重新加载');
+    return parsed as PageCursor;
+  } catch (error) {
+    if (error instanceof Error && error.message === '游标与当前筛选条件不匹配，请重新加载') throw error;
+    throw badRequest('分页游标无效，请重新加载');
+  }
+}
+
 
 function stringValue(value: unknown): string { return value == null ? '' : String(value); }
 function numberValue(value: unknown): number { return Number(value ?? 0); }
@@ -240,75 +264,58 @@ export class PostgresRepository implements AppRepository {
 
   async listFeed(userId: string | null, query: FeedQuery): Promise<FeedResult> {
     const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
-
-    // Resolve category filter: categories (comma-separated) takes precedence over single category
     let categoryFilter: string[] = [];
     if (query.categories) {
-      categoryFilter = query.categories
-        .split(',')
-        .map(c => c.trim().toUpperCase())
-        .filter(c => allowedCategories.has(c));
+      categoryFilter = query.categories.split(',').map(c => c.trim().toUpperCase()).filter(c => allowedCategories.has(c));
     } else if (allowedCategories.has(query.category)) {
       categoryFilter = [query.category];
     }
 
-    const channelReservation = query.channel === 'reservation';
-    const channelNew = query.channel === 'new';
-    const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
+    const scope = pageScope(['feed', query.channel, categoryFilter.join(',')]);
+    const cursor = decodePageCursor(query.cursor, scope);
+    const clauses = [this.sql`p.deleted_at is null`, this.sql`p.visibility_status = 'published'`];
+    if (categoryFilter.length > 0) clauses.push(this.sql`p.pit_type in ${this.sql(categoryFilter)}`);
+    if (query.channel === 'new') clauses.push(this.sql`p.created_at >= now() - interval '7 days'`);
+    if (query.channel === 'reservation') clauses.push(this.sql`(
+      p.sale_status = 'PRE_ORDER' or exists (
+        select 1 from product_releases pr where pr.product_id = p.id and pr.release_type = 'reservation' and pr.deleted_at is null
+      )
+    )`);
+    if (query.channel === 'price_drop') clauses.push(this.sql`(
+      (p.original_price > p.current_price and p.current_price > 0)
+      or exists (select 1 from price_snapshots ps where ps.product_id = p.id and ps.price_cents > p.current_price)
+    )`);
+    if (query.channel === 'outfit') clauses.push(this.sql`false`);
+    if (cursor) clauses.push(this.sql`(p.feed_score < ${cursor.score} or (p.feed_score = ${cursor.score} and p.id < ${cursor.id}))`);
+
+    const whereClause = clauses.reduce((all, clause, index) => index === 0 ? clause : this.sql`${all} and ${clause}`);
     const limit = Math.min(51, Math.max(2, query.limit + 1));
-
-    // Build WHERE clauses with postgres.js tagged-template parameterization
-    const staticClauses = [
-      this.sql`p.deleted_at is null`,
-      this.sql`p.visibility_status = 'published'`,
-    ];
-    if (categoryFilter.length > 0) {
-      staticClauses.push(this.sql`p.pit_type IN ${this.sql(categoryFilter)}`);
-    }
-    if (channelReservation) {
-      staticClauses.push(this.sql`p.sale_status = 'PRE_ORDER'`);
-    }
-    if (channelNew) {
-      staticClauses.push(this.sql`p.sale_status = 'UPCOMING'`);
-    }
-
-    // Combine all WHERE clauses with AND
-    const whereClause = staticClauses.reduce((acc, clause, i) =>
-      i === 0 ? clause : this.sql`${acc} AND ${clause}`
-    );
-
     const rows = await this.sql`
-      select p.*,
-        b.name as brand_name,
-        b.heat_score as brand_heat_score,
-        count(*) over() as total_count,
+      select p.*, b.name as brand_name, b.heat_score as brand_heat_score, count(*) over() as total_count,
         coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
-        -- 最新 release
         (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
         (select pr.release_name from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_name,
         (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease,
         (select pr.end_at from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_end_at,
         (select pr.lifecycle_status from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_lifecycle,
-        (select ps.price_cents from price_snapshots ps where ps.product_id = p.id order by ps.fetched_at desc limit 1) as snapshot_price
-       from products p
-       left join brands b on b.id = p.brand_id
-       where ${whereClause}
-       order by p.feed_score desc, md5(p.id), p.id desc offset ${offset} limit ${limit}
+        (select max(ps.price_cents) from price_snapshots ps where ps.product_id = p.id) as historical_high_price
+      from products p left join brands b on b.id = p.brand_id
+      where ${whereClause}
+      order by p.feed_score desc, p.id desc
+      limit ${limit}
     `;
     const hasMore = rows.length > query.limit;
     const visible = hasMore ? rows.slice(0, query.limit) : rows;
-    // 实时计算当前登录用户的收藏状态（saved）；游客固定 false
+
     let savedSet = new Set<string>();
     if (userId) {
       const productIds = visible.map((r) => stringValue((r as Row).id));
       if (productIds.length > 0) {
-        const savedRows = await this.sql`
-          select product_id from wishlist_items
-          where user_id = ${userId} and product_id in ${this.sql(productIds)}
-        `;
+        const savedRows = await this.sql`select product_id from wishlist_items where user_id = ${userId} and product_id in ${this.sql(productIds)}`;
         savedSet = new Set(savedRows.map((r) => stringValue((r as Row).product_id)));
       }
     }
+
     const items = visible.map((row) => {
       const r = row as Row;
       const product = mapProduct(r);
@@ -319,80 +326,36 @@ export class PostgresRepository implements AppRepository {
       const saleStatus = stringValue(r.sale_status || r.status);
       const feedScore = numberValue(r.feed_score);
       const releaseEndAt = dateValue(r.release_end_at);
-
-      // 判断是否新品（7天内）
-      const createdAt = new Date(product.createdAt).getTime();
-      const isNew = (Date.now() - createdAt) / (1000 * 60 * 60 * 24) <= 7;
-
-      // 价格变化检测
-      const snapshotPrice = numberValue(r.snapshot_price);
-      const hasPriceDrop = snapshotPrice > 0 && snapshotPrice < product.priceCents;
-
-      const feedReason = generateFeedReason({
-        saleStatus,
-        releaseType,
-        isRerelease,
-        isNew,
-        brandHeatScore,
-        hasPriceDrop,
-        priceTrend: hasPriceDrop ? 'down' : 'stable',
-        feedScore,
-        eventEndAt: releaseEndAt,
-      });
-
-      // 前端期望的 badgeText 字段
-      const badgeText: string =
-        hasPriceDrop ? '降价'
-        : saleStatus === 'PRE_ORDER' ? '预约'
-        : isNew ? '新品'
-        : '';
-
+      const isNew = (Date.now() - new Date(product.createdAt).getTime()) / (1000 * 60 * 60 * 24) <= 7;
+      const historicalHigh = Math.max(numberValue(r.historical_high_price), product.originalPriceCents);
+      const hasPriceDrop = product.priceCents > 0 && historicalHigh > product.priceCents;
+      const feedReason = generateFeedReason({ saleStatus, releaseType, isRerelease, isNew, brandHeatScore, hasPriceDrop, priceTrend: hasPriceDrop ? 'down' : 'stable', feedScore, eventEndAt: releaseEndAt });
+      const badgeText = hasPriceDrop ? '降价' : saleStatus === 'PRE_ORDER' ? '预约' : isNew ? '新品' : '';
       return {
-        id: `feed_${product.id}`,
-        feedType: 'product',
-        entityId: product.id,
-        title: product.title,
-        subtitle: product.brandName,
-        coverUrl: product.coverUrl,
-        secondaryCoverUrl: images[1] ?? '',
-        brandId: product.brandId,
-        brandName: product.brandName,
-        category: product.category,
-        pitType: product.category,
-        price: product.priceCents,
-        originalPrice: product.originalPriceCents,
-        priceSummary: formatPriceSummary(product.priceCents),
-        saleStatus,
-        releaseType,
-        releaseTypeName: getReleaseTypeName(releaseType),
+        id: `feed_${product.id}`, feedType: 'product', entityId: product.id, title: product.title, subtitle: product.brandName,
+        coverUrl: product.coverUrl, secondaryCoverUrl: images[1] ?? '', brandId: product.brandId, brandName: product.brandName,
+        category: product.category, pitType: product.category, price: product.priceCents, originalPrice: product.originalPriceCents,
+        priceSummary: formatPriceSummary(product.priceCents), saleStatus, releaseType, releaseTypeName: getReleaseTypeName(releaseType),
         tags: mergeTags(
           Array.isArray(r.season_tags) ? r.season_tags.map(String) : [],
           Array.isArray(r.scene_tags) ? r.scene_tags.map(String) : [],
           Array.isArray(r.element_tags) ? r.element_tags.map(String) : [],
           Array.isArray(r.recommended_tags) ? r.recommended_tags.map(String) : [],
         ),
-        feedScore,
-        rankingScore: feedScore,
-        feedReason,
-        badgeText,
-        eventStartAt: '',
-        eventEndAt: releaseEndAt,
-        liked: false,
-        saved: savedSet.has(product.id),
-        sourceLabel: '品牌官方',
-        publishedAt: product.createdAt,
-        createdAt: product.createdAt,
+        feedScore, rankingScore: feedScore, feedReason, badgeText, eventStartAt: '', eventEndAt: releaseEndAt,
+        liked: false, saved: savedSet.has(product.id), sourceLabel: '品牌官方', publishedAt: product.createdAt, createdAt: product.createdAt,
       };
     });
+    const last = visible.at(-1) as Row | undefined;
     return {
       items,
-      nextCursor: hasMore ? String(offset + query.limit) : '',
+      nextCursor: hasMore && last ? encodePageCursor(numberValue(last.feed_score), stringValue(last.id), scope) : '',
       hasMore,
       totalHint: rows.length === 0 ? 0 : numberValue((rows[0] as Row).total_count),
     };
   }
 
-  /**
+    /**
    * 搜索关键词 → 坑向分类别名映射：
    * 洛丽塔/Lolita/LOLITA → LOLITA；汉服/HANFU → HANFU；JK/制服 → JK。
    * 命中别名时额外按 p.pit_type 匹配，确保「搜洛丽塔出 Lolita 分类」。
@@ -436,7 +399,9 @@ export class PostgresRepository implements AppRepository {
     if (query.maxPrice > 0) clauses.push(this.sql`p.current_price <= ${query.maxPrice}`);
 
     const whereClause = clauses.reduce((all, clause, index) => index === 0 ? clause : this.sql`${all} and ${clause}`);
-    const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
+    const scope = pageScope(['search', query.q, query.category, query.saleStatus, query.releaseStatus, query.brandId, String(query.minPrice), String(query.maxPrice)]);
+    const cursor = decodePageCursor(query.cursor, scope);
+    if (cursor) clauses.push(this.sql`(p.feed_score < ${cursor.score} or (p.feed_score = ${cursor.score} and p.id < ${cursor.id}))`);
     const limit = Math.min(51, Math.max(2, query.limit + 1));
     const rows = await this.sql`
       select p.*,
@@ -449,8 +414,8 @@ export class PostgresRepository implements AppRepository {
       from products p
       left join brands b on b.id = p.brand_id
       where ${whereClause}
-      order by p.feed_score desc, md5(p.id), p.id desc
-      offset ${offset} limit ${limit}
+      order by p.feed_score desc, p.id desc
+      limit ${limit}
     `;
 
     const hasMore = rows.length > query.limit;
@@ -518,9 +483,10 @@ export class PostgresRepository implements AppRepository {
         createdAt: product.createdAt,
       };
     });
+    const last = visible.at(-1) as Row | undefined;
     return {
       items,
-      nextCursor: hasMore ? String(offset + query.limit) : '',
+      nextCursor: hasMore && last ? encodePageCursor(numberValue(last.feed_score), stringValue(last.id), scope) : '',
       hasMore,
       totalHint: rows.length === 0 ? 0 : numberValue((rows[0] as Row).total_count),
     };

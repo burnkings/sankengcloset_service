@@ -1,4 +1,4 @@
-import { conflict, notFound } from '../lib/problem.js';
+import { badRequest, conflict, notFound } from '../lib/problem.js';
 import { newId, nowIso } from '../lib/id.js';
 import type { AppRepository, FeedQuery, FeedResult } from './contracts.js';
 import type {
@@ -25,6 +25,30 @@ import type { CommunityPost, CommunityPostPage, CommunityPostQuery, CreateCommun
 import { generateFeedReason, computeRankingScore, formatPriceSummary, getReleaseTypeName, mergeTags } from '../intelligence/feed-ranker.js';
 import { buildTrendSummary } from '../intelligence/trend-engine.js';
 import { computePersonalScore, type UserPreference } from '../intelligence/personal-score.js';
+
+
+type PageCursor = { v: number; score: number; id: string; scope: string };
+
+function pageScope(parts: string[]): string {
+  return parts.join('\u001f');
+}
+
+function encodePageCursor(score: number, id: string, scope: string): string {
+  return Buffer.from(JSON.stringify({ v: 1, score, id, scope } satisfies PageCursor), 'utf8').toString('base64url');
+}
+
+function decodePageCursor(value: string, expectedScope: string): PageCursor | null {
+  if (value === '') return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(value, 'base64url').toString('utf8')) as Partial<PageCursor>;
+    if (parsed.v !== 1 || typeof parsed.score !== 'number' || typeof parsed.id !== 'string' || parsed.id === '') throw new Error('invalid');
+    if (parsed.scope !== expectedScope) throw badRequest('游标与当前筛选条件不匹配，请重新加载');
+    return parsed as PageCursor;
+  } catch (error) {
+    if (error instanceof Error && error.message === '游标与当前筛选条件不匹配，请重新加载') throw error;
+    throw badRequest('分页游标无效，请重新加载');
+  }
+}
 
 /** 搜索关键词 → 坑向分类别名（与 postgres.ts 保持一致） */
 function resolveAliasCategory(q: string): string {
@@ -163,7 +187,6 @@ export class MemoryRepository implements AppRepository {
   }
 
   async listFeed(userId: string | null, query: FeedQuery): Promise<FeedResult> {
-    let rows = this.products;
     const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
     let categoryFilter: string[] = [];
     if (query.categories) {
@@ -171,17 +194,40 @@ export class MemoryRepository implements AppRepository {
     } else if (allowedCategories.has(query.category)) {
       categoryFilter = [query.category];
     }
+
+    let rows = [...this.products];
     if (categoryFilter.length > 0) rows = rows.filter((item) => categoryFilter.includes(item.category));
-    if (query.channel === 'reservation') rows = rows.filter((item) => item.status === 'PRE_ORDER');
-    if (query.channel === 'new') rows = rows.filter((item) => item.status === 'UPCOMING');
-    const offset = Number.parseInt(query.cursor || '0', 10) || 0;
-    const items = rows.slice(offset, offset + query.limit).map(toFeed);
+    if (query.channel === 'new') {
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      rows = rows.filter((item) => new Date(item.createdAt).getTime() >= cutoff);
+    } else if (query.channel === 'reservation') {
+      rows = rows.filter((item) => item.status === 'PRE_ORDER');
+    } else if (query.channel === 'price_drop') {
+      rows = rows.filter((item) => item.originalPriceCents > item.priceCents && item.priceCents > 0);
+    } else if (query.channel === 'outfit') {
+      rows = [];
+    }
+
+    rows.sort((a, b) => b.id.localeCompare(a.id));
+    const scope = pageScope(['feed', query.channel, categoryFilter.join(',')]);
+    const cursor = decodePageCursor(query.cursor, scope);
+    if (cursor) rows = rows.filter((item) => item.id < cursor.id);
+
+    const total = rows.length;
+    const visible = rows.slice(0, query.limit);
+    const items = visible.map(toFeed);
     if (userId) {
       const savedIds = new Set(this.wishlists.filter(w => w.userId === userId && w.productId !== null).map(w => w.productId as string));
       for (const item of items) item.saved = savedIds.has(item.entityId);
     }
-    const next = offset + items.length;
-    return { items, nextCursor: next < rows.length ? String(next) : '', hasMore: next < rows.length, totalHint: rows.length };
+    const hasMore = rows.length > visible.length;
+    const last = visible.at(-1);
+    return {
+      items,
+      nextCursor: hasMore && last ? encodePageCursor(1, last.id, scope) : '',
+      hasMore,
+      totalHint: total,
+    };
   }
 
   async getProduct(_userId: string | null, productId: string): Promise<Product | null> {
@@ -293,41 +339,36 @@ export class MemoryRepository implements AppRepository {
 
   async searchProducts(query: SearchQuery, userId: string | null = null): Promise<SearchResult> {
     let rows = this.products.filter(p => {
-      // 关键词搜索（title/brand + 坑向别名命中 category）
       if (query.q) {
         const q = query.q.toLowerCase();
         const aliasCategory = resolveAliasCategory(query.q);
-        const matchTitle = p.title.toLowerCase().includes(q);
-        const matchBrand = p.brandName.toLowerCase().includes(q);
-        const matchCategory = aliasCategory !== '' && p.category === aliasCategory;
-        if (!matchTitle && !matchBrand && !matchCategory) return false;
+        if (!p.title.toLowerCase().includes(q) && !p.brandName.toLowerCase().includes(q) && !(aliasCategory !== '' && p.category === aliasCategory)) return false;
       }
-      // 分类过滤
       if (query.category && p.category !== query.category) return false;
-      // 发售状态过滤
       if (query.saleStatus && p.status !== query.saleStatus) return false;
-      // 价格范围
       if (query.minPrice > 0 && p.priceCents < query.minPrice) return false;
       if (query.maxPrice > 0 && p.priceCents > query.maxPrice) return false;
       return true;
     });
 
+    rows.sort((a, b) => b.id.localeCompare(a.id));
+    const scope = pageScope(['search', query.q, query.category, query.saleStatus, query.releaseStatus, query.brandId, String(query.minPrice), String(query.maxPrice)]);
+    const cursor = decodePageCursor(query.cursor, scope);
+    if (cursor) rows = rows.filter((item) => item.id < cursor.id);
+
     const total = rows.length;
-    const offset = Number.parseInt(query.cursor || '0', 10) || 0;
-    const items = rows.slice(offset, offset + query.limit).map(p => ({
-      ...toFeed(p),
-      sourceLabel: '搜索结果',
-    }));
+    const visible = rows.slice(0, query.limit);
+    const items = visible.map(p => ({ ...toFeed(p), sourceLabel: '搜索结果' }));
     if (userId) {
       const savedIds = new Set(this.wishlists.filter(w => w.userId === userId && w.productId !== null).map(w => w.productId as string));
       for (const item of items) item.saved = savedIds.has(item.entityId);
     }
-    const next = offset + items.length;
-
+    const hasMore = rows.length > visible.length;
+    const last = visible.at(-1);
     return {
       items,
-      nextCursor: next < total ? String(next) : '',
-      hasMore: next < total,
+      nextCursor: hasMore && last ? encodePageCursor(1, last.id, scope) : '',
+      hasMore,
       totalHint: total,
     };
   }

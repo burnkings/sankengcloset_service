@@ -115,12 +115,38 @@ describe('P0 统一契约与核心闭环', () => {
     expect(page1.json().page.hasMore).toBe(true);
     const cursor = page1.json().page.nextCursor as string;
     expect(cursor).not.toBe('');
+    expect(Number.isNaN(Number(cursor))).toBe(true);
     const page2 = await instance.inject({ method: 'GET', url: `/api/v1/feed?limit=2&cursor=${encodeURIComponent(cursor)}` });
     expect(page2.statusCode).toBe(200);
     const ids1 = new Set(page1.json().data.map((item: { id: string }) => item.id));
     const ids2 = page2.json().data.map((item: { id: string }) => item.id);
     expect(ids2.every((id: string) => !ids1.has(id))).toBe(true);
     expect(page2.json().page.hasMore).toBe(false);
+  });
+
+  it('Feed 频道契约：新品、预约、降价各自过滤，穿搭不伪装普通商品', async () => {
+    const instance = await createApp();
+    const newest = await instance.inject({ method: 'GET', url: '/api/v1/feed?channel=new&limit=10' });
+    expect(newest.statusCode).toBe(200);
+    expect(newest.json().data.length).toBeGreaterThan(0);
+    const reservation = await instance.inject({ method: 'GET', url: '/api/v1/feed?channel=reservation&limit=10' });
+    expect(reservation.json().data.every((item: { saleStatus: string }) => item.saleStatus === 'PRE_ORDER')).toBe(true);
+    const priceDrop = await instance.inject({ method: 'GET', url: '/api/v1/feed?channel=price_drop&limit=10' });
+    expect(priceDrop.json().data.length).toBeGreaterThan(0);
+    expect(priceDrop.json().data.every((item: { originalPrice: number; price: number }) => item.originalPrice > item.price)).toBe(true);
+    const outfit = await instance.inject({ method: 'GET', url: '/api/v1/feed?channel=outfit&limit=10' });
+    expect(outfit.statusCode).toBe(200);
+    expect(outfit.json().data).toEqual([]);
+  });
+
+  it('Feed 游标非法或跨筛选复用时返回 400', async () => {
+    const instance = await createApp();
+    const invalid = await instance.inject({ method: 'GET', url: '/api/v1/feed?cursor=123&limit=2' });
+    expect(invalid.statusCode).toBe(400);
+    const first = await instance.inject({ method: 'GET', url: '/api/v1/feed?limit=1' });
+    const cursor = first.json().page.nextCursor as string;
+    const wrongScope = await instance.inject({ method: 'GET', url: `/api/v1/feed?channel=reservation&limit=1&cursor=${encodeURIComponent(cursor)}` });
+    expect(wrongScope.statusCode).toBe(400);
   });
 
   it('重复收藏：同 productId 二次 POST 返回既有条目，不产生重复', async () => {
