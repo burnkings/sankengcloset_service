@@ -2,6 +2,8 @@ import type {
   AiConfirmationInput,
   AiImportTask,
   BrandFollower,
+  BrandInfo,
+  BrandProductItem,
   ContentFeedItem,
   CreateUserEventInput,
   CreateWishlistInput,
@@ -10,15 +12,20 @@ import type {
   PersonalScoreInput,
   PersonalScoreResult,
   Product,
+  RankingItem,
+  RankingTab,
   SearchQuery,
   SearchResult,
+  StyleDetail,
   SyncOperationInput,
   SyncReceipt,
   TrendSummary,
+  CalendarEvent,
   UserEvent,
   UserProfile,
   WishlistItem,
 } from '../types.js';
+import type { SearchAliasRow } from '../lib/search-terms.js';
 
 export interface FeedQuery {
   channel: string;
@@ -66,6 +73,8 @@ export interface CommunityPost {
   topic: string;
   likeCount: number;
   liked: boolean;
+  /** Phase 2.3-A：关联商品（可空——普通闲聊/非商品内容为 null） */
+  productId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -84,6 +93,30 @@ export interface CreateCommunityPostInput {
   caption: string;
   category: string;
   topic: string;
+  /** Phase 2.3-A：可选商品关联；null/undefined = 普通内容（不绑定 Release） */
+  productId?: string | null;
+}
+
+/** Phase 2.6：意见反馈提交 */
+export interface CreateFeedbackInput {
+  id: string;
+  type: string;
+  content: string;
+  contact: string;
+  images: string[];
+  createdAt: string;
+}
+
+/** Phase 2.6：意见反馈记录 */
+export interface FeedbackRecord {
+  id: string;
+  userId: string | null;
+  type: string;
+  content: string;
+  contact: string;
+  images: string[];
+  status: string;
+  createdAt: string;
 }
 
 export interface AppRepository {
@@ -93,9 +126,22 @@ export interface AppRepository {
   ensureWechatUser(openId: string, nickname: string): Promise<UserProfile>;
   getUser(userId: string): Promise<UserProfile | null>;
   listFeed(userId: string | null, query: FeedQuery): Promise<FeedResult>;
-  getProduct(userId: string | null, productId: string): Promise<Product | null>;
+  getProduct(userId: string | null, productId: string, releaseId?: string): Promise<Product | null>;
+  /** 款式详情 + 关联商品（Phase 2.1；不存在返回 null） */
+  getStyle(styleId: string): Promise<StyleDetail | null>;
+  /**
+   * 搜索别名解析（Phase 2.2-A）：按规范化词查找 active 别名（term 精确/包含匹配）。
+   * 词库为空或未命中时返回空数组，调用方必须继续原始文本搜索。
+   */
+  resolveSearchAliases(normalizedTerm: string): Promise<SearchAliasRow[]>;
   searchProducts(query: SearchQuery, userId?: string | null): Promise<SearchResult>;
   getTrendSummary(period?: string): Promise<TrendSummary>;
+
+  // 发售日历
+  listCalendar(month: string, limit?: number): Promise<CalendarEvent[]>;
+
+  // 通知生成（基于用户 reminders/purchases/关注品牌 生成真实通知）
+  generateNotifications(userId: string): Promise<UserAsset[]>;
 
   // D8: 用户行为事件
   recordEvent(userId: string | null, input: CreateUserEventInput): Promise<UserEvent>;
@@ -113,6 +159,17 @@ export interface AppRepository {
   unfollowBrand(userId: string, brandId: string): Promise<boolean>;
   isFollowingBrand(userId: string, brandId: string): Promise<boolean>;
   getFollowedBrandIds(userId: string): Promise<string[]>;
+
+  // Phase 2.6: 品牌目录（列表 / 详情 / 品牌商品）
+  listBrands(userId?: string | null): Promise<BrandInfo[]>;
+  getBrandById(brandId: string, userId?: string | null): Promise<BrandInfo | null>;
+  listBrandProducts(brandId: string, limit?: number): Promise<BrandProductItem[]>;
+
+  // Phase 2.6: 三坑榜单（hot 热榜 / new 上新榜）
+  getRanking(tab: RankingTab, limit?: number): Promise<RankingItem[]>;
+
+  // Phase 2.6: 意见反馈
+  createFeedback(userId: string | null, input: CreateFeedbackInput): Promise<FeedbackRecord>;
 
   // 个性化评分
   computePersonalScore(input: PersonalScoreInput): Promise<PersonalScoreResult>;
@@ -153,6 +210,8 @@ export interface AppRepository {
   // V2.5: 圈子动态及点赞
   listCommunityPosts(viewerUserId: string | null, query: CommunityPostQuery): Promise<CommunityPostPage>;
   listMyCommunityPosts(userId: string, query: Pick<CommunityPostQuery, 'cursor' | 'limit'>): Promise<CommunityPostPage>;
+  /** Phase 2.3-A：商品关联社区内容（商品详情「真实买家」模块数据源） */
+  listProductCommunityPosts(productId: string, query: Pick<CommunityPostQuery, 'cursor' | 'limit'>): Promise<CommunityPostPage>;
   createCommunityPost(userId: string, input: CreateCommunityPostInput): Promise<CommunityPost>;
   getCommunityPost(viewerUserId: string | null, postId: string): Promise<CommunityPost | null>;
   setCommunityPostLike(userId: string, postId: string, liked: boolean): Promise<{ liked: boolean; likeCount: number } | null>;

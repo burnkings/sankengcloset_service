@@ -1,7 +1,7 @@
 import { newId, nowIso } from '../lib/id.js';
 import { emptyAiSuggestion, type AiImportTask, type MediaObject } from '../types.js';
 import type { AppRepository } from '../repositories/contracts.js';
-import type { LocalObjectStorage } from '../storage/local-storage.js';
+import type { ObjectStorage } from '../storage/types.js';
 import { AI_UNAVAILABLE_MESSAGE, type OrderRecognizer } from './vision-ocr.js';
 
 /**
@@ -45,7 +45,7 @@ export function createPendingTask(input: {
 
 export interface AiWorkerContext {
   repository: AppRepository;
-  storage: LocalObjectStorage;
+  storage: ObjectStorage;
   recognizer: OrderRecognizer;
   task: AiImportTask;
   media: MediaObject;

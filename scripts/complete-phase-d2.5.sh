@@ -22,22 +22,10 @@ echo "   PostgreSQL 启动完成"
 echo "   等待 PostgreSQL 就绪..."
 sleep 10
 
-# 2. 启动 Directus
-echo "2. 启动 Directus..."
-docker-compose -f docker-compose.infra.yml --env-file .env.infra up -d directus
-echo "   Directus 启动完成"
-
-# 等待 Directus 就绪
-echo "   等待 Directus 就绪..."
-sleep 15
-
-# 3. 验证服务
-echo "3. 验证服务..."
+# 2. 验证服务
+echo "2. 验证服务..."
 echo "   PostgreSQL:"
 docker exec $(docker ps -q -f "name=postgres") pg_isready -U sankeng 2>&1 || echo "   PostgreSQL 未就绪"
-
-echo "   Directus:"
-curl -sI http://127.0.0.1:8055 2>&1 | head -3 || echo "   Directus 未就绪"
 
 # 4. 申请 HTTPS 证书
 echo "4. 申请 HTTPS 证书..."
@@ -45,7 +33,6 @@ sudo certbot --nginx \
   -d sankengcloset.icu \
   -d www.sankengcloset.icu \
   -d api.sankengcloset.icu \
-  -d admin.sankengcloset.icu \
   --non-interactive \
   --agree-tos \
   --email admin@sankengcloset.icu
@@ -65,10 +52,8 @@ sudo ss -lntp | grep -E "8055|8787|5432|6379" || echo "   所有敏感端口未�
 echo "   HTTP 访问测试:"
 curl -sI https://www.sankengcloset.icu 2>&1 | head -3
 curl -sI https://api.sankengcloset.icu 2>&1 | head -3
-curl -sI https://admin.sankengcloset.icu 2>&1 | head -3
 
 echo ""
 echo "=== Phase D2.5 完成 ==="
-echo "管理后台: https://admin.sankengcloset.icu"
 echo "API: https://api.sankengcloset.icu"
 echo "主域名: https://www.sankengcloset.icu"

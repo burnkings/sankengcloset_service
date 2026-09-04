@@ -1,5 +1,5 @@
-# sankengcloset 基础设施 — PostgreSQL + Directus
-# PostgreSQL 不暴露公网端口，Directus 仅监听 127.0.0.1:8055
+# sankengcloset 基础设施 — PostgreSQL
+# PostgreSQL 不暴露公网端口
 # 使用 docker-compose v1 语法
 
 services:
@@ -24,45 +24,9 @@ services:
       - no-new-privileges:true
     # 不映射端口到公网，仅 Docker 内部网络访问
 
-  directus:
-    image: directus/directus:11
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:8055:8055"
-    environment:
-      KEY: ${DIRECTUS_KEY:?DIRECTUS_KEY is required}
-      SECRET: ${DIRECTUS_SECRET:?DIRECTUS_SECRET is required}
-      DB_CLIENT: "pg"
-      DB_HOST: "postgres"
-      DB_PORT: "5432"
-      DB_DATABASE: "sankeng"
-      DB_USER: "sankeng"
-      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@sankengcloset.icu}
-      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD:?DIRECTUS_ADMIN_PASSWORD is required}
-      PUBLIC_URL: "https://admin.sankengcloset.icu"
-      WEBSOCKETS_ENABLED: "true"
-      FILE_MAX_SIZE: "10"
-      UPLOAD_DIR: "/directus/uploads"
-      CORS_ORIGIN: "https://admin.sankengcloset.icu"
-    volumes:
-      - sankeng_directus_uploads:/directus/uploads
-      - sankeng_directus_database:/directus/database
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - internal
-      - edge
-    security_opt:
-      - no-new-privileges:true
-
 networks:
   internal:
     internal: true
-  edge:
 
 volumes:
   sankeng_pgdata:
-  sankeng_directus_uploads:
-  sankeng_directus_database:

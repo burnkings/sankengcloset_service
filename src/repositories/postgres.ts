@@ -1,12 +1,16 @@
-import postgres, { type Sql } from 'postgres';
+import postgres, { type Sql, type PendingQuery } from 'postgres';
+import { createHash } from 'node:crypto';
 import { badRequest, conflict, notFound } from '../lib/problem.js';
 import { newId, nowIso } from '../lib/id.js';
-import type { AppRepository, CommunityPost, CommunityPostPage, CommunityPostQuery, CreateCommunityPostInput, FeedQuery, FeedResult, UserAsset, UserAssetKind, UserSettingKey } from './contracts.js';
+import { escapeLikePattern, normalizeSearchTerm, resolveSearchTerms, type SearchAliasRow } from '../lib/search-terms.js';
+import type { AppRepository, CommunityPost, CommunityPostPage, CommunityPostQuery, CreateCommunityPostInput, CreateFeedbackInput, FeedbackRecord, FeedQuery, FeedResult, UserAsset, UserAssetKind, UserSettingKey } from './contracts.js';
 import type {
   AiConfirmationInput,
   AiImportTask,
   AiSuggestion,
   BrandFollower,
+  BrandInfo,
+  BrandProductItem,
   ContentFeedItem,
   CreateUserEventInput,
   CreateWishlistInput,
@@ -14,11 +18,15 @@ import type {
   PersonalScoreInput,
   PersonalScoreResult,
   Product,
+  RankingItem,
+  RankingTab,
   SearchQuery,
   SearchResult,
+  StyleDetail,
   SyncOperationInput,
   SyncReceipt,
   TrendSummary,
+  CalendarEvent,
   UserEvent,
   UserProfile,
   WishlistItem,
@@ -35,21 +43,27 @@ import { computePersonalScore, type UserPreference } from '../intelligence/perso
 
 type Row = Record<string, unknown>;
 
-type PageCursor = { v: number; score: number; id: string; scope: string };
+/** postgres.js 模板 fragment 返回类型（包内部不导出 Fragment，用 PendingQuery 表示） */
+type SqlFragment = PendingQuery<any[]>;
+
+type PageCursor = { v: number; score: number; id: string; scope: string; rank?: number };
 
 function pageScope(parts: string[]): string {
   return parts.join('\u001f');
 }
 
-function encodePageCursor(score: number, id: string, scope: string): string {
-  return Buffer.from(JSON.stringify({ v: 1, score, id, scope } satisfies PageCursor), 'utf8').toString('base64url');
+function encodePageCursor(score: number, id: string, scope: string, rank?: number): string {
+  const cursor: PageCursor = rank == null
+    ? { v: 1, score, id, scope }
+    : { v: 2, score, id, scope, rank };
+  return Buffer.from(JSON.stringify(cursor), 'utf8').toString('base64url');
 }
 
 function decodePageCursor(value: string, expectedScope: string): PageCursor | null {
   if (value === '') return null;
   try {
     const parsed = JSON.parse(Buffer.from(value, 'base64url').toString('utf8')) as Partial<PageCursor>;
-    if (parsed.v !== 1 || typeof parsed.score !== 'number' || typeof parsed.id !== 'string' || parsed.id === '') throw new Error('invalid');
+    if ((parsed.v !== 1 && parsed.v !== 2) || typeof parsed.score !== 'number' || typeof parsed.id !== 'string' || parsed.id === '') throw new Error('invalid');
     if (parsed.scope !== expectedScope) throw badRequest('游标与当前筛选条件不匹配，请重新加载');
     return parsed as PageCursor;
   } catch (error) {
@@ -75,21 +89,49 @@ function mapUser(row: Row): UserProfile {
 
 function mapProduct(row: Row): Product {
   const images = Array.isArray(row.images) ? row.images.map(String) : [];
+  const featureTags = Array.from(new Set([
+    ...(Array.isArray(row.season_tags) ? row.season_tags.map(String) : []),
+    ...(Array.isArray(row.scene_tags) ? row.scene_tags.map(String) : []),
+    ...(Array.isArray(row.element_tags) ? row.element_tags.map(String) : []),
+    ...(Array.isArray(row.recommended_tags) ? row.recommended_tags.map(String) : []),
+  ]));
+  const variants = Array.isArray(row.variants) ? (row.variants as unknown[]).map((v) => {
+    const vr = v as Record<string, unknown>;
+    return {
+      id: String(vr.id ?? ''),
+      name: String(vr.name ?? ''),
+      colorName: String(vr.colorName ?? ''),
+      sizeName: String(vr.sizeName ?? ''),
+      skuCode: String(vr.skuCode ?? ''),
+      priceCents: typeof vr.priceCents === 'number' ? vr.priceCents : 0,
+      stockStatus: String(vr.stockStatus ?? 'IN_STOCK'),
+    };
+  }) : [];
   return {
     id: stringValue(row.id),
     brandId: stringValue(row.brand_id),
     brandName: stringValue(row.brand_name),
     title: stringValue(row.display_name || row.canonical_name),
     category: (stringValue(row.pit_type) || '') as Product['category'],
+    subCategory: stringValue(row.category),
     status: stringValue(row.sale_status || row.status),
     coverUrl: stringValue(row.cover_url),
     images,
     priceCents: numberValue(row.current_price || row.price_cents),
     originalPriceCents: numberValue(row.original_price || row.original_price_cents),
+    priceType: stringValue(row.price_type) || 'UNKNOWN',
+    depositCents: numberValue(row.deposit_price),
+    balanceCents: numberValue(row.balance_price),
+    colorTags: Array.isArray(row.color_tags) ? row.color_tags.map(String) : [],
+    materialTags: Array.isArray(row.material_tags) ? row.material_tags.map(String) : [],
+    featureTags,
+    variants,
     description: stringValue(row.description),
     shopUrl: stringValue(row.source_url),
     createdAt: dateValue(row.created_at),
     updatedAt: dateValue(row.updated_at),
+    styleId: row.style_id == null ? null : stringValue(row.style_id),
+    currentRelease: null, // getProduct 单独填充；列表场景不使用
   };
 }
 
@@ -117,6 +159,8 @@ function mapCommunityPost(row: Row): CommunityPost {
     topic: stringValue(row.topic),
     likeCount: numberValue(row.like_count),
     liked: row.liked === true,
+    // Phase 2.3-A：product_id 列可空（普通内容为 null）
+    productId: row.product_id == null ? null : stringValue(row.product_id),
     createdAt: dateValue(row.created_at),
     updatedAt: dateValue(row.updated_at),
   };
@@ -281,6 +325,12 @@ export class PostgresRepository implements AppRepository {
         select 1 from product_releases pr where pr.product_id = p.id and pr.release_type = 'reservation' and pr.deleted_at is null
       )
     )`);
+    // Phase 2.6：现货频道（前端「现货」channel=spot）——有现货批次或 ON_SALE 状态
+    if (query.channel === 'spot') clauses.push(this.sql`(
+      p.sale_status = 'ON_SALE' or exists (
+        select 1 from product_releases pr where pr.product_id = p.id and pr.release_type = 'spot' and pr.deleted_at is null
+      )
+    )`);
     if (query.channel === 'price_drop') clauses.push(this.sql`(
       (p.original_price > p.current_price and p.current_price > 0)
       or exists (select 1 from price_snapshots ps where ps.product_id = p.id and ps.price_cents > p.current_price)
@@ -296,6 +346,7 @@ export class PostgresRepository implements AppRepository {
         (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
         (select pr.release_name from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_name,
         (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease,
+        (select pr.full_price_cents from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_full_price,
         (select pr.end_at from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_end_at,
         (select pr.lifecycle_status from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_lifecycle,
         (select max(ps.price_cents) from price_snapshots ps where ps.product_id = p.id) as historical_high_price
@@ -334,7 +385,10 @@ export class PostgresRepository implements AppRepository {
       return {
         id: `feed_${product.id}`, feedType: 'product', entityId: product.id, title: product.title, subtitle: product.brandName,
         coverUrl: product.coverUrl, secondaryCoverUrl: images[1] ?? '', brandId: product.brandId, brandName: product.brandName,
-        category: product.category, pitType: product.category, price: product.priceCents, originalPrice: product.originalPriceCents,
+        category: product.category, pitType: product.category, subCategory: product.subCategory, price: product.priceCents, originalPrice: product.originalPriceCents,
+        priceType: product.priceType, depositCents: product.depositCents, balanceCents: product.balanceCents,
+        colorTags: product.colorTags, materialTags: product.materialTags,
+        fullPriceCents: numberValue(r.release_full_price),
         priceSummary: formatPriceSummary(product.priceCents), saleStatus, releaseType, releaseTypeName: getReleaseTypeName(releaseType),
         tags: mergeTags(
           Array.isArray(r.season_tags) ? r.season_tags.map(String) : [],
@@ -356,16 +410,30 @@ export class PostgresRepository implements AppRepository {
   }
 
     /**
-   * 搜索关键词 → 坑向分类别名映射：
-   * 洛丽塔/Lolita/LOLITA → LOLITA；汉服/HANFU → HANFU；JK/制服 → JK。
-   * 命中别名时额外按 p.pit_type 匹配，确保「搜洛丽塔出 Lolita 分类」。
+   * 搜索别名解析（Phase 2.2-A）：按规范化词查找 active 别名。
+   * term 精确匹配优先、包含匹配其次；词库数据驱动（替代已删除的硬编码 resolveAliasCategory）。
    */
-  resolveAliasCategory(q: string): string {
-    const lower = q.trim().toLowerCase();
-    if (lower.includes('洛丽塔') || lower === 'lolita') return 'LOLITA';
-    if (lower.includes('汉服') || lower === 'hanfu') return 'HANFU';
-    if (lower === 'jk' || lower.includes('jk') || lower.includes('制服')) return 'JK';
-    return '';
+  async resolveSearchAliases(normalizedTerm: string): Promise<SearchAliasRow[]> {
+    if (normalizedTerm === '') return [];
+    const rows = await this.sql`
+      select id, term, canonical_term, alias_type, status, confidence, source
+      from aliases
+      where status = 'active' and deleted_at is null
+        and (${normalizedTerm} = term or ${normalizedTerm} like '%' || term || '%')
+      order by (case when ${normalizedTerm} = term then 0 else 1 end), confidence desc
+    `;
+    return rows.map((row) => {
+      const r = row as Row;
+      return {
+        id: stringValue(r.id),
+        term: stringValue(r.term),
+        canonicalTerm: stringValue(r.canonical_term),
+        aliasType: stringValue(r.alias_type) as SearchAliasRow['aliasType'],
+        status: stringValue(r.status),
+        confidence: numberValue(r.confidence),
+        source: stringValue(r.source),
+      };
+    });
   }
 
   async searchProducts(query: SearchQuery, userId: string | null = null): Promise<SearchResult> {
@@ -374,15 +442,24 @@ export class PostgresRepository implements AppRepository {
       this.sql`p.deleted_at is null`,
       this.sql`p.visibility_status = 'published'`,
     ];
-    if (query.q) {
-      const pattern = `%${query.q}%`;
-      const aliasCategory = this.resolveAliasCategory(query.q);
-      let keywordClause = this.sql`(
+
+    // Phase 2.2-A 搜索链：normalize（NFKC）→ alias 解析（category/brand/style）→ 文本/实体搜索
+    const normalized = normalizeSearchTerm(query.q);
+    const resolved = normalized === '' ? null : resolveSearchTerms(normalized, await this.resolveSearchAliases(normalized));
+
+    if (resolved) {
+      const pattern = `%${escapeLikePattern(normalized)}%`;
+      const textClause = this.sql`(
         p.display_name ilike ${pattern}
         or p.canonical_name ilike ${pattern}
         or b.name ilike ${pattern}
+        or st.canonical_name ilike ${pattern}
       )`;
-      if (aliasCategory !== '') keywordClause = this.sql`(${keywordClause} or p.pit_type = ${aliasCategory})`;
+      const orParts = [textClause];
+      if (resolved.categoryMatches.length > 0) orParts.push(this.sql`p.pit_type = any(${this.sql(resolved.categoryMatches)})`);
+      if (resolved.brandIds.length > 0) orParts.push(this.sql`p.brand_id = any(${this.sql(resolved.brandIds)})`);
+      if (resolved.styleIds.length > 0) orParts.push(this.sql`p.style_id = any(${this.sql(resolved.styleIds)})`);
+      const keywordClause = orParts.slice(1).reduce((all, part) => this.sql`(${all} or ${part})`, textClause);
       clauses.push(keywordClause);
     }
     const allowedCategories = new Set(['JK', 'LOLITA', 'HANFU', 'OTHER']);
@@ -400,21 +477,60 @@ export class PostgresRepository implements AppRepository {
 
     const whereClause = clauses.reduce((all, clause, index) => index === 0 ? clause : this.sql`${all} and ${clause}`);
     const scope = pageScope(['search', query.q, query.category, query.saleStatus, query.releaseStatus, query.brandId, String(query.minPrice), String(query.maxPrice)]);
+
+    // Phase 2.2-A 相关性排序：exact entity > exact text > prefix/category > contains > feed_score
+    // 仅有关键词时启用（无关键词保持原 feed_score 排序，避免污染分类浏览）
+    const hasKeyword = resolved != null;
+    let rankClause = this.sql`3`;
+    if (resolved) {
+      const entityParts: SqlFragment[] = [];
+      if (resolved.brandIds.length > 0) entityParts.push(this.sql`p.brand_id = any(${this.sql(resolved.brandIds)})`);
+      if (resolved.styleIds.length > 0) entityParts.push(this.sql`p.style_id = any(${this.sql(resolved.styleIds)})`);
+      const entityClause = entityParts.length > 0
+        ? entityParts.slice(1).reduce((all, part) => this.sql`(${all} or ${part})`, entityParts[0]!)
+        : null;
+      const prefix = `${escapeLikePattern(normalized)}%`;
+      const exactClause = this.sql`(lower(p.display_name) = ${normalized} or lower(p.canonical_name) = ${normalized} or lower(b.name) = ${normalized} or lower(st.canonical_name) = ${normalized})`;
+      const categoryClause = resolved.categoryMatches.length > 0 ? this.sql`p.pit_type = any(${this.sql(resolved.categoryMatches)})` : null;
+      const prefixClause = this.sql`(p.display_name ilike ${prefix} or p.canonical_name ilike ${prefix} or b.name ilike ${prefix} or st.canonical_name ilike ${prefix})`;
+      rankClause = this.sql`(
+        case
+          when ${entityClause ?? this.sql`false`} then 6
+          when ${exactClause} then 5
+          when ${categoryClause ?? this.sql`false`} then 4
+          when ${prefixClause} then 4
+          else 3
+        end
+      )`;
+    }
+
     const cursor = decodePageCursor(query.cursor, scope);
-    if (cursor) clauses.push(this.sql`(p.feed_score < ${cursor.score} or (p.feed_score = ${cursor.score} and p.id < ${cursor.id}))`);
+    if (cursor) {
+      if (hasKeyword) {
+        if (cursor.v !== 2 || typeof cursor.rank !== 'number') throw badRequest('游标无效，请重新加载');
+        clauses.push(this.sql`(${rankClause} < ${cursor.rank} or (${rankClause} = ${cursor.rank} and (p.feed_score < ${cursor.score} or (p.feed_score = ${cursor.score} and p.id < ${cursor.id}))))`);
+      } else {
+        clauses.push(this.sql`(p.feed_score < ${cursor.score} or (p.feed_score = ${cursor.score} and p.id < ${cursor.id}))`);
+      }
+    }
     const limit = Math.min(51, Math.max(2, query.limit + 1));
+    const orderBy = hasKeyword
+      ? this.sql`order by ${rankClause} desc, p.feed_score desc, p.id desc`
+      : this.sql`order by p.feed_score desc, p.id desc`;
     const rows = await this.sql`
       select p.*,
         b.name as brand_name,
         b.heat_score as brand_heat_score,
+        ${rankClause} as search_rank,
         count(*) over() as total_count,
         coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
         (select pr.release_type from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
         (select pr.is_rerelease from product_releases pr where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as is_rerelease
       from products p
       left join brands b on b.id = p.brand_id
+      left join styles st on st.id = p.style_id
       where ${whereClause}
-      order by p.feed_score desc, p.id desc
+      ${orderBy}
       limit ${limit}
     `;
 
@@ -458,8 +574,15 @@ export class PostgresRepository implements AppRepository {
         brandName: product.brandName,
         category: product.category,
         pitType: product.category,
+        subCategory: product.subCategory,
         price: product.priceCents,
         originalPrice: product.originalPriceCents,
+        priceType: product.priceType,
+        depositCents: product.depositCents,
+        balanceCents: product.balanceCents,
+        colorTags: product.colorTags,
+        materialTags: product.materialTags,
+        fullPriceCents: numberValue(r.release_full_price),
         priceSummary: formatPriceSummary(product.priceCents),
         saleStatus,
         releaseType,
@@ -486,7 +609,7 @@ export class PostgresRepository implements AppRepository {
     const last = visible.at(-1) as Row | undefined;
     return {
       items,
-      nextCursor: hasMore && last ? encodePageCursor(numberValue(last.feed_score), stringValue(last.id), scope) : '',
+      nextCursor: hasMore && last ? encodePageCursor(numberValue(last.feed_score), stringValue(last.id), scope, hasKeyword ? numberValue((last as Row).search_rank) : undefined) : '',
       hasMore,
       totalHint: rows.length === 0 ? 0 : numberValue((rows[0] as Row).total_count),
     };
@@ -584,15 +707,394 @@ export class PostgresRepository implements AppRepository {
     return buildTrendSummary(brandTrends, productTrends);
   }
 
-  async getProduct(_userId: string | null, productId: string): Promise<Product | null> {
+  async listCalendar(month: string, limit: number = 50): Promise<CalendarEvent[]> {
+    const m = /^(\d{4})-(\d{2})$/.exec(month);
+    if (!m) return [];
+    const start = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, 1));
+    const end = new Date(Date.UTC(Number(m[1]), Number(m[2]), 1));
+    const rows = await this.sql`
+      select ev.id, ev.title, ev.brand_name, ev.brand_id, ev.category, ev.event_type,
+             ev.start_at, ev.end_at, ev.price_cents, ev.deposit_cents, ev.balance_cents,
+             ev.product_id, ev.status, ev.source
+      from (
+        select pr.id, coalesce(nullif(pr.release_name, ''), p.display_name) as title,
+               b.name as brand_name, b.id as brand_id, p.pit_type as category,
+               pr.release_type::text as event_type, pr.start_at, pr.end_at,
+               pr.full_price_cents as price_cents, pr.deposit_price_cents as deposit_cents,
+               pr.balance_price_cents as balance_cents, pr.product_id, pr.sale_status::text as status,
+               'release' as source
+        from product_releases pr
+        join products p on p.id = pr.product_id and p.deleted_at is null
+        left join brands b on b.id = p.brand_id
+        where pr.deleted_at is null and pr.visibility_status = 'published'
+          and pr.start_at is not null and pr.start_at >= ${start} and pr.start_at < ${end}
+        union all
+        select se.id, coalesce(nullif(se.title, ''), p.display_name) as title,
+               b.name as brand_name, b.id as brand_id, p.pit_type as category,
+               se.event_type::text as event_type, se.start_at, se.end_at,
+               (coalesce(se.deposit_amount, 0) + coalesce(se.balance_amount, 0)) as price_cents,
+               se.deposit_amount as deposit_cents, se.balance_amount as balance_cents,
+               se.product_id, se.status::text as status, 'sale_event' as source
+        from sale_events se
+        join products p on p.id = se.product_id and p.deleted_at is null
+        left join brands b on b.id = p.brand_id
+        where se.start_at is not null and se.start_at >= ${start} and se.start_at < ${end}
+      ) ev
+      order by ev.start_at asc, ev.id asc
+      limit ${Math.min(100, Math.max(1, limit))}
+    `;
+    return (rows as Row[]).map((r) => ({
+      id: stringValue(r.id),
+      title: stringValue(r.title),
+      brandName: stringValue(r.brand_name),
+      brandId: stringValue(r.brand_id),
+      category: stringValue(r.category),
+      eventType: stringValue(r.event_type),
+      startAt: dateValue(r.start_at),
+      endAt: r.end_at != null ? dateValue(r.end_at) : null,
+      priceCents: numberValue(r.price_cents),
+      depositCents: numberValue(r.deposit_cents),
+      balanceCents: numberValue(r.balance_cents),
+      productId: stringValue(r.product_id),
+      status: stringValue(r.status),
+      source: (r.source === 'sale_event' ? 'sale_event' : 'release') as CalendarEvent['source'],
+    }));
+  }
+
+  async generateNotifications(userId: string): Promise<UserAsset[]> {
+    const now = new Date();
+    const day = (offset: number): string => new Date(now.getTime() + offset * 24 * 3600 * 1000).toISOString().slice(0, 10);
+    const today = day(0);
+    const tomorrow = day(1);
+    const in3Days = day(3);
+    const weekAgoIso = new Date(now.getTime() - 7 * 24 * 3600 * 1000).toISOString();
+
+    type Draft = { type: string; title: string; body: string; actionTarget: string; key: string };
+    const drafts: Draft[] = [];
+
+    // 1. 提醒到期（reminders：PENDING 且 remindDate <= 明天）
+    const reminderRows = await this.sql`
+      select id, payload_json from user_assets
+      where user_id = ${userId} and asset_type = 'reminder' and deleted_at is null
+    `;
+    for (const row of reminderRows as Row[]) {
+      const p = (row.payload_json ?? {}) as Record<string, unknown>;
+      if (String(p.status ?? '') !== 'PENDING') continue;
+      const remindDate = String(p.remindDate ?? '');
+      if (remindDate === '' || remindDate > tomorrow) continue;
+      const rType = String(p.type ?? 'CUSTOM');
+      drafts.push({
+        type: rType === 'BALANCE' ? 'price' : rType === 'RELEASE' ? 'release' : 'system',
+        title: rType === 'BALANCE' ? '尾款提醒' : rType === 'RELEASE' ? '发售提醒' : '日程提醒',
+        body: `${String(p.title ?? '提醒事项')}（${remindDate}）`,
+        actionTarget: '/pages/reminder/index',
+        key: `REM_${rType}_${stringValue(row.id)}_${remindDate}`,
+      });
+    }
+
+    // 2. 订单尾款/到货（purchases：未完成 + 日期在 3 天内）
+    const purchaseRows = await this.sql`
+      select id, payload_json from user_assets
+      where user_id = ${userId} and asset_type = 'purchase' and deleted_at is null
+    `;
+    for (const row of purchaseRows as Row[]) {
+      const p = (row.payload_json ?? {}) as Record<string, unknown>;
+      const status = String(p.paymentStatus ?? p.status ?? '');
+      if (status === 'COMPLETED' || status === 'CANCELLED') continue;
+      const name = String(p.name ?? '订单');
+      const due = String(p.balanceDueDate ?? '');
+      if (due !== '' && due >= today && due <= in3Days) {
+        drafts.push({
+          type: 'price',
+          title: '尾款即将截止',
+          body: `${name} 尾款截止 ${due}`,
+          actionTarget: `/pages/purchase/detail?id=${stringValue(row.id)}`,
+          key: `BALANCE_${stringValue(row.id)}_${due}`,
+        });
+      }
+      const arrival = String(p.arrivalDate ?? '');
+      if (arrival !== '' && arrival >= today && arrival <= in3Days) {
+        drafts.push({
+          type: 'system',
+          title: '预计到货',
+          body: `${name} 预计 ${arrival} 到货`,
+          actionTarget: `/pages/purchase/detail?id=${stringValue(row.id)}`,
+          key: `ARRIVAL_${stringValue(row.id)}_${arrival}`,
+        });
+      }
+    }
+
+    // 3. 关注品牌 7 天新品（brand_followers + products）
+    const followedRows = await this.sql`select brand_id from brand_followers where user_id = ${userId}`;
+    const followedBrandIds = (followedRows as Row[]).map((r) => stringValue(r.brand_id)).filter((id) => id !== '');
+    if (followedBrandIds.length > 0) {
+      const newProductRows = await this.sql`
+        select p.id, p.display_name, b.name as brand_name
+        from products p
+        left join brands b on b.id = p.brand_id
+        where p.deleted_at is null and p.visibility_status = 'published'
+          and p.brand_id in ${this.sql(followedBrandIds)}
+          and p.created_at >= ${weekAgoIso}
+        order by p.created_at desc
+        limit 10
+      `;
+      for (const row of newProductRows as Row[]) {
+        const brandName = stringValue(row.brand_name) || '关注品牌';
+        drafts.push({
+          type: 'release',
+          title: `${brandName} 上新`,
+          body: stringValue(row.display_name),
+          actionTarget: `/pages/search/index?q=${encodeURIComponent(brandName)}`,
+          key: `BRAND_NEW_${stringValue(row.id)}`,
+        });
+      }
+    }
+
+    // 4. 幂等写入（同 key 已存在则跳过）
+    await this.sql.begin(async (tx) => {
+      for (const draft of drafts) {
+        const assetId = `not_${createHash('sha256').update(draft.key).digest('hex').slice(0, 24)}`;
+        const exists = await tx`
+          select id from user_assets
+          where user_id = ${userId} and asset_type = 'notification' and id = ${assetId}
+        `;
+        if (exists.length > 0) continue;
+        const payload = {
+          type: draft.type,
+          title: draft.title,
+          body: draft.body,
+          actionTarget: draft.actionTarget,
+          read: false,
+        };
+        await tx`
+          insert into user_assets (user_id, asset_type, id, payload_json)
+          values (${userId}, 'notification', ${assetId}, ${this.sql.json(payload)})
+        `;
+      }
+    });
+
+    return this.listUserAssets(userId, 'notification');
+  }
+
+  async getProduct(_userId: string | null, productId: string, releaseId?: string): Promise<Product | null> {
     const rows = await this.sql`
       select p.*, b.name as brand_name,
-        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
+        coalesce((select jsonb_agg(jsonb_build_object(
+            'id', v.id, 'name', v.name, 'colorName', v.color, 'sizeName', v.size,
+            'skuCode', v.sku, 'priceCents', v.price_cents, 'stockStatus', v.stock_status)
+          order by v.color, v.size) from product_variants v where v.product_id = p.id), '[]'::jsonb) as variants,
+        pr.id as release_id, pr.release_name, pr.release_type, pr.sale_status as release_sale_status,
+        pr.lifecycle_status, pr.is_rerelease, pr.deposit_price_cents, pr.balance_price_cents,
+        pr.full_price_cents, pr.start_at, pr.end_at, pr.balance_due_at, pr.ship_at
       from products p
       left join brands b on b.id = p.brand_id
+      left join lateral (
+        select * from product_releases r
+        where r.product_id = p.id and r.deleted_at is null
+        order by (${releaseId ?? ''} <> '' and r.id = ${releaseId ?? ''}) desc, r.created_at desc limit 1
+      ) pr on true
       where p.id = ${productId} and p.deleted_at is null and p.visibility_status = 'published'
     `;
-    return rows.length === 0 ? null : mapProduct(rows[0] as Row);
+    if (rows.length === 0) return null;
+    const product = mapProduct(rows[0] as Row);
+    const r = rows[0] as Row;
+    const releaseType = stringValue(r.release_type);
+    product.currentRelease = releaseType === '' ? null : {
+      id: stringValue(r.release_id),
+      releaseName: stringValue(r.release_name),
+      releaseType,
+      saleStatus: stringValue(r.release_sale_status) || product.status,
+      lifecycleStatus: stringValue(r.lifecycle_status),
+      isRerelease: Boolean(r.is_rerelease),
+      depositCents: numberValue(r.deposit_price_cents),
+      balanceCents: numberValue(r.balance_price_cents),
+      fullPriceCents: numberValue(r.full_price_cents),
+      startAt: r.start_at != null ? dateValue(r.start_at) : '',
+      endAt: r.end_at != null ? dateValue(r.end_at) : '',
+      balanceDueAt: r.balance_due_at != null ? dateValue(r.balance_due_at) : '',
+      shipAt: r.ship_at != null ? dateValue(r.ship_at) : '',
+    };
+    return product;
+  }
+
+  async getStyle(styleId: string): Promise<StyleDetail | null> {
+    const rows = await this.sql`
+      select s.*, b.name as brand_name,
+        (select count(*)::int from products p
+          where p.style_id = s.id and p.deleted_at is null and p.visibility_status = 'published') as product_count
+      from styles s
+      left join brands b on b.id = s.brand_id
+      where s.id = ${styleId} and s.deleted_at is null
+    `;
+    if (rows.length === 0) return null;
+    const row = rows[0] as Row;
+    const productRows = await this.sql`
+      select p.*, b.name as brand_name
+      from products p
+      left join brands b on b.id = p.brand_id
+      where p.style_id = ${styleId} and p.deleted_at is null and p.visibility_status = 'published'
+      order by p.feed_score desc, p.id desc
+    `;
+    return {
+      id: stringValue(row.id),
+      brandId: stringValue(row.brand_id),
+      brandName: stringValue(row.brand_name),
+      canonicalName: stringValue(row.canonical_name),
+      category: stringValue(row.category),
+      subCategory: stringValue(row.sub_category),
+      styleTags: Array.isArray(row.style_tags) ? (row.style_tags as unknown[]).map(String) : [],
+      description: stringValue(row.description),
+      productCount: numberValue(row.product_count),
+      createdAt: dateValue(row.created_at),
+      updatedAt: dateValue(row.updated_at),
+      products: productRows.map((r) => mapProduct(r as Row)),
+    };
+  }
+
+  // ─── Phase 2.6: 品牌目录 ────────────────────────────────────────────
+
+  async listBrands(userId?: string | null): Promise<BrandInfo[]> {
+    const rows = await this.sql`
+      select b.*, (select count(*)::int from products p
+          where p.brand_id = b.id and p.deleted_at is null and p.visibility_status = 'published') as product_count
+      from brands b
+      where b.deleted_at is null
+      order by b.heat_score desc, b.follower_count desc, b.name asc
+      limit 200
+    `;
+    const followed = userId ? await this.getFollowedBrandIds(userId) : [];
+    const followedSet = new Set(followed);
+    return (rows as Row[]).map((row) => this.mapBrandRow(row, followedSet));
+  }
+
+  async getBrandById(brandId: string, userId?: string | null): Promise<BrandInfo | null> {
+    const rows = await this.sql`
+      select b.*, (select count(*)::int from products p
+          where p.brand_id = b.id and p.deleted_at is null and p.visibility_status = 'published') as product_count
+      from brands b
+      where b.id = ${brandId} and b.deleted_at is null
+    `;
+    if (rows.length === 0) return null;
+    const followed = userId ? await this.getFollowedBrandIds(userId) : [];
+    return this.mapBrandRow(rows[0] as Row, new Set(followed));
+  }
+
+  async listBrandProducts(brandId: string, limit = 50): Promise<BrandProductItem[]> {
+    const cap = Math.min(100, Math.max(1, limit));
+    const rows = await this.sql`
+      select p.*, b.name as brand_name,
+        coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi
+          where pi.product_id = p.id), '{}') as images,
+        (select pr.release_type from product_releases pr
+          where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type
+      from products p
+      left join brands b on b.id = p.brand_id
+      where p.brand_id = ${brandId} and p.deleted_at is null and p.visibility_status = 'published'
+      order by p.feed_score desc, p.id desc
+      limit ${cap}
+    `;
+    return (rows as Row[]).map((row) => {
+      const releaseType = stringValue(row.release_type);
+      const saleStatus = stringValue(row.sale_status);
+      let badgeText = '';
+      if (saleStatus === 'PRE_ORDER' || releaseType === 'reservation') badgeText = '预约';
+      else if (releaseType === 'first_release') badgeText = '新品';
+      else if (saleStatus === 'ON_SALE') badgeText = '现货';
+      return {
+        id: stringValue(row.id),
+        title: stringValue(row.display_name) || stringValue(row.canonical_name),
+        description: stringValue(row.description),
+        brandId: stringValue(row.brand_id),
+        brandName: stringValue(row.brand_name),
+        category: stringValue(row.pit_type),
+        priceCents: numberValue(row.current_price),
+        originalPriceCents: numberValue(row.original_price),
+        badgeText,
+        coverUrl: Array.isArray(row.images) && (row.images as unknown[]).length > 0
+          ? String((row.images as unknown[])[0]) : '',
+        createdAt: dateValue(row.created_at),
+      };
+    });
+  }
+
+  // ─── Phase 2.6: 三坑榜单 ────────────────────────────────────────────
+
+  async getRanking(tab: RankingTab, limit = 50): Promise<RankingItem[]> {
+    const cap = Math.min(100, Math.max(1, limit));
+    let rows: PendingQuery<Row[]> | Row[] = [];
+    if (tab === 'hot') {
+      // 热榜：按收藏数 desc，无收藏的按 feed_score 兜底
+      rows = await this.sql`
+        select p.*, b.name as brand_name,
+          coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi
+            where pi.product_id = p.id), '{}') as images,
+          (select count(*)::int from wishlist_items w
+            where w.product_id = p.id) as favorite_count,
+          (select pr.release_type from product_releases pr
+            where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
+          (select count(*)::int from product_releases pr
+            where pr.product_id = p.id and pr.release_type = 'reservation' and pr.deleted_at is null) as reservation_count
+        from products p
+        left join brands b on b.id = p.brand_id
+        where p.deleted_at is null and p.visibility_status = 'published'
+        order by (select count(*)::int from wishlist_items w where w.product_id = p.id) desc, p.feed_score desc, p.id desc
+        limit ${cap}
+      `;
+    } else if (tab === 'new') {
+      // 上新榜：最近 30 天创建/发售的新品，按时间倒序
+      rows = await this.sql`
+        select p.*, b.name as brand_name,
+          coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi
+            where pi.product_id = p.id), '{}') as images,
+          (select pr.release_type from product_releases pr
+            where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
+          (select count(*)::int from product_releases pr
+            where pr.product_id = p.id and pr.release_type = 'reservation' and pr.deleted_at is null) as reservation_count
+        from products p
+        left join brands b on b.id = p.brand_id
+        where p.deleted_at is null and p.visibility_status = 'published'
+          and p.created_at >= now() - interval '30 days'
+        order by p.created_at desc, p.id desc
+        limit ${cap}
+      `;
+    }
+    return (rows as Row[]).map((row, index) => this.mapRankingRow(row, index + 1));
+  }
+
+  private mapBrandRow(row: Row, followedSet: Set<string>): BrandInfo {
+    return {
+      id: stringValue(row.id),
+      name: stringValue(row.name),
+      nameEn: stringValue(row.name_en),
+      logo: stringValue(row.logo_url),
+      description: stringValue(row.description),
+      category: stringValue(row.category),
+      officialUrl: stringValue(row.official_url),
+      followerCount: numberValue(row.follower_count),
+      isFollowed: followedSet.has(stringValue(row.id)),
+      createdAt: dateValue(row.created_at),
+      updatedAt: dateValue(row.updated_at),
+    };
+  }
+
+  private mapRankingRow(row: Row, rank: number): RankingItem {
+    const releaseType = stringValue(row.release_type);
+    const priceCents = numberValue(row.current_price);
+    return {
+      rank,
+      entityId: stringValue(row.id),
+      title: stringValue(row.display_name) || stringValue(row.canonical_name),
+      brandName: stringValue(row.brand_name),
+      coverUrl: Array.isArray(row.images) && (row.images as unknown[]).length > 0
+        ? String((row.images as unknown[])[0]) : '',
+      priceCents,
+      category: stringValue(row.pit_type),
+      favoriteCount: numberValue(row.favorite_count),
+      releaseTypeName: getReleaseTypeName(releaseType),
+      daysAgo: Math.max(0, Math.floor((Date.now() - new Date(dateValue(row.created_at)).getTime()) / 86400000)),
+      reservationCount: numberValue(row.reservation_count),
+    };
   }
 
   async applySyncBatch(userId: string, operations: SyncOperationInput[]): Promise<SyncReceipt[]> {
@@ -600,12 +1102,13 @@ export class PostgresRepository implements AppRepository {
       const receipts: SyncReceipt[] = [];
       for (const operation of operations) {
         const version = Date.now();
+        // 同步负载是前端 JSON 字符串：sql.json 保留字符串语义（jsonb 文本）
         const inserted = await tx`
           insert into sync_operations
             (user_id, op_id, device_id, entity_type, entity_id, action, payload_json, result, server_version, client_created_at)
           values
             (${userId}, ${operation.opId}, ${operation.deviceId}, ${operation.entityType}, ${operation.entityId},
-             ${operation.action}, ${operation.payload}::jsonb, 'accepted', ${version}, ${new Date(Number(operation.createdAt) || Date.now())})
+             ${operation.action}, ${this.sql.json(operation.payload)}, 'accepted', ${version}, ${new Date(Number(operation.createdAt) || Date.now())})
           on conflict (user_id, op_id) do nothing
           returning op_id, result, server_version
         `;
@@ -675,9 +1178,9 @@ export class PostgresRepository implements AppRepository {
         insert into ai_import_suggestions
           (task_id, suggestion_json, confidence, field_confidence_json, evidence_json, warnings_json)
         values
-          (${task.taskId}, ${JSON.stringify(task.suggestion)}::jsonb, ${task.confidence},
-           ${JSON.stringify(task.fieldConfidence)}::jsonb, ${JSON.stringify(task.evidence)}::jsonb,
-           ${JSON.stringify(task.warnings)}::jsonb)
+          (${task.taskId}, ${task.suggestion}::jsonb, ${task.confidence},
+           ${task.fieldConfidence}::jsonb, ${task.evidence}::jsonb,
+           ${task.warnings}::jsonb)
       `;
     });
     return task;
@@ -713,9 +1216,9 @@ export class PostgresRepository implements AppRepository {
         insert into ai_import_suggestions
           (task_id, suggestion_json, confidence, field_confidence_json, evidence_json, warnings_json)
         values
-          (${taskId}, ${JSON.stringify(suggestion)}::jsonb, ${patch.confidence ?? 0},
-           ${JSON.stringify(patch.fieldConfidence ?? {})}::jsonb, ${JSON.stringify(patch.evidence ?? [])}::jsonb,
-           ${JSON.stringify(patch.warnings ?? [])}::jsonb)
+          (${taskId}, ${suggestion}::jsonb, ${patch.confidence ?? 0},
+           ${patch.fieldConfidence ?? {}}::jsonb, ${patch.evidence ?? []}::jsonb,
+           ${patch.warnings ?? []}::jsonb)
         on conflict (task_id) do update
           set suggestion_json = excluded.suggestion_json,
               confidence = excluded.confidence,
@@ -761,17 +1264,17 @@ export class PostgresRepository implements AppRepository {
           (id, task_id, user_id, target_type, target_id, confirmed_json, correction_json, op_id)
         values
           (${newId('aic')}, ${taskId}, ${userId}, 'purchase', ${input.targetId},
-           ${JSON.stringify(input.confirmed)}::jsonb,
-           ${JSON.stringify({ before: task.suggestion, after: input.confirmed })}::jsonb,
+           ${input.confirmed}::jsonb,
+           ${{ before: task.suggestion, after: input.confirmed }}::jsonb,
            ${input.opId ?? ''})
         on conflict (task_id) do nothing
       `;
       const updated = await tx`
         update ai_import_tasks set state = 'confirmed', confirmed_at = now(), target_type = 'purchase', target_id = ${input.targetId}
         where id = ${taskId}
-        returning *, ${JSON.stringify(task.suggestion)}::jsonb as suggestion_json, ${task.confidence}::double precision as confidence,
-          ${JSON.stringify(task.fieldConfidence)}::jsonb as field_confidence_json, ${JSON.stringify(task.evidence)}::jsonb as evidence_json,
-          ${JSON.stringify(task.warnings)}::jsonb as warnings_json
+        returning *, ${task.suggestion}::jsonb as suggestion_json, ${task.confidence}::double precision as confidence,
+          ${task.fieldConfidence}::jsonb as field_confidence_json, ${task.evidence}::jsonb as evidence_json,
+          ${task.warnings}::jsonb as warnings_json
       `;
       return mapAiTask(updated[0] as Row);
     });
@@ -781,13 +1284,12 @@ export class PostgresRepository implements AppRepository {
 
   async recordEvent(userId: string | null, input: CreateUserEventInput): Promise<UserEvent> {
     const id = newId('evt');
-    const metadataJson = JSON.stringify(input.metadata ?? {});
     if (userId) {
       await this.sql`INSERT INTO user_events (id, user_id, event_type, target_type, target_id, metadata)
-        VALUES (${id}, ${userId}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${metadataJson}::jsonb)`;
+        VALUES (${id}, ${userId}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${input.metadata ?? {}}::jsonb)`;
     } else {
       await this.sql`INSERT INTO user_events (id, event_type, target_type, target_id, metadata)
-        VALUES (${id}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${metadataJson}::jsonb)`;
+        VALUES (${id}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${input.metadata ?? {}}::jsonb)`;
     }
     return {
       id, userId, eventType: input.eventType,
@@ -984,10 +1486,9 @@ export class PostgresRepository implements AppRepository {
   }
 
   async createUserAsset(userId: string, kind: UserAssetKind, assetId: string, payload: Record<string, unknown>): Promise<UserAsset> {
-    const payloadJson = JSON.stringify(payload);
     const rows = await this.sql`
       insert into user_assets (user_id, asset_type, id, payload_json)
-      values (${userId}, ${kind}, ${assetId}, ${payloadJson}::jsonb)
+      values (${userId}, ${kind}, ${assetId}, ${payload}::jsonb)
       returning id, asset_type, payload_json, version, created_at, updated_at
     `;
     return mapUserAsset(rows[0] as Row);
@@ -995,10 +1496,9 @@ export class PostgresRepository implements AppRepository {
 
   async updateUserAsset(userId: string, kind: UserAssetKind, assetId: string, patch: Record<string, unknown>): Promise<UserAsset | null> {
     return this.sql.begin(async (tx) => {
-      const patchJson = JSON.stringify(patch);
       const rows = await tx`
         update user_assets
-        set payload_json = payload_json || ${patchJson}::jsonb,
+        set payload_json = payload_json || ${patch}::jsonb,
             version = version + 1,
             updated_at = now()
         where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
@@ -1051,10 +1551,9 @@ export class PostgresRepository implements AppRepository {
   }
 
   async putUserSetting(userId: string, key: UserSettingKey, payload: Record<string, unknown>): Promise<Record<string, unknown>> {
-    const payloadJson = JSON.stringify(payload);
     const rows = await this.sql`
       insert into user_settings (user_id, setting_key, payload_json)
-      values (${userId}, ${key}, ${payloadJson}::jsonb)
+      values (${userId}, ${key}, ${payload}::jsonb)
       on conflict (user_id, setting_key) do update
         set payload_json = excluded.payload_json, updated_at = now()
       returning payload_json
@@ -1062,14 +1561,14 @@ export class PostgresRepository implements AppRepository {
     return (rows[0] as Row).payload_json as Record<string, unknown>;
   }
 
-  private async communityPage(viewerUserId: string | null, query: CommunityPostQuery, authorUserId = ''): Promise<CommunityPostPage> {
+  private async communityPage(viewerUserId: string | null, query: CommunityPostQuery, authorUserId = '', productId = ''): Promise<CommunityPostPage> {
     const offset = Math.max(0, Number.parseInt(query.cursor || '0', 10) || 0);
     const limit = Math.min(51, Math.max(2, query.limit + 1));
     const viewerId = viewerUserId ?? '';
     const category = query.category ?? '';
     const topic = query.topic ?? '';
     const rows = await this.sql`
-      select p.id, p.author_user_id, u.nickname as author_nickname, p.media_id, p.image_url, p.caption, p.category, p.topic, p.created_at, p.updated_at,
+      select p.id, p.author_user_id, u.nickname as author_nickname, p.media_id, p.image_url, p.caption, p.category, p.topic, p.product_id, p.created_at, p.updated_at,
         (select count(*)::int from community_post_likes l where l.post_id = p.id) as like_count,
         exists(select 1 from community_post_likes l where l.post_id = p.id and l.user_id = ${viewerId}) as liked,
         count(*) over() as total_count
@@ -1080,6 +1579,7 @@ export class PostgresRepository implements AppRepository {
         and (${authorUserId} <> '' or p.visibility = 'public')
         and (${category} = '' or p.category = ${category})
         and (${topic} = '' or p.topic = ${topic})
+        and (${productId} = '' or p.product_id = ${productId})
       order by p.created_at desc, p.id desc
       offset ${offset} limit ${limit}
     `;
@@ -1101,11 +1601,16 @@ export class PostgresRepository implements AppRepository {
     return this.communityPage(userId, query, userId);
   }
 
+  /** Phase 2.3-A：商品关联社区内容（商品详情「真实买家」模块数据源） */
+  async listProductCommunityPosts(productId: string, query: Pick<CommunityPostQuery, 'cursor' | 'limit'>): Promise<CommunityPostPage> {
+    return this.communityPage(null, query, '', productId);
+  }
+
   async createCommunityPost(userId: string, input: CreateCommunityPostInput): Promise<CommunityPost> {
     const rows = await this.sql`
-      insert into community_posts (id, author_user_id, media_id, image_url, caption, category, topic)
-      values (${input.id}, ${userId}, ${input.mediaId}, ${input.imageUrl}, ${input.caption}, ${input.category}, ${input.topic})
-      returning id, author_user_id, media_id, image_url, caption, category, topic, created_at, updated_at
+      insert into community_posts (id, author_user_id, media_id, image_url, caption, category, topic, product_id)
+      values (${input.id}, ${userId}, ${input.mediaId}, ${input.imageUrl}, ${input.caption}, ${input.category}, ${input.topic}, ${input.productId ?? null})
+      returning id, author_user_id, media_id, image_url, caption, category, topic, product_id, created_at, updated_at
     `;
     const row = rows[0] as Row;
     return {
@@ -1113,6 +1618,7 @@ export class PostgresRepository implements AppRepository {
       authorNickname: (await this.getUser(userId))?.nickname ?? '三坑同好',
       mediaId: stringValue(row.media_id), imageUrl: stringValue(row.image_url),
       caption: stringValue(row.caption), category: stringValue(row.category), topic: stringValue(row.topic),
+      productId: row.product_id == null ? null : stringValue(row.product_id),
       likeCount: 0, liked: false, createdAt: dateValue(row.created_at), updatedAt: dateValue(row.updated_at),
     };
   }
@@ -1120,7 +1626,7 @@ export class PostgresRepository implements AppRepository {
   async getCommunityPost(viewerUserId: string | null, postId: string): Promise<CommunityPost | null> {
     const viewerId = viewerUserId ?? '';
     const rows = await this.sql`
-      select p.id, p.author_user_id, u.nickname as author_nickname, p.media_id, p.image_url, p.caption, p.category, p.topic, p.created_at, p.updated_at,
+      select p.id, p.author_user_id, u.nickname as author_nickname, p.media_id, p.image_url, p.caption, p.category, p.topic, p.product_id, p.created_at, p.updated_at,
         (select count(*)::int from community_post_likes l where l.post_id = p.id) as like_count,
         exists(select 1 from community_post_likes l where l.post_id = p.id and l.user_id = ${viewerId}) as liked
       from community_posts p join users u on u.id = p.author_user_id
@@ -1160,6 +1666,27 @@ export class PostgresRepository implements AppRepository {
       from media_objects where id = ${mediaId}
     `;
     return rows.length === 0 ? null : mapMedia(rows[0] as Row);
+  }
+
+  // ─── Phase 2.6: 意见反馈 ─────────────────────────────────────────────
+
+  async createFeedback(userId: string | null, input: CreateFeedbackInput): Promise<FeedbackRecord> {
+    await this.sql`
+      insert into feedback_records (id, user_id, type, content, contact, images, created_at)
+      values (${input.id}, ${userId}, ${input.type}, ${input.content}, ${input.contact},
+              ${this.sql.json(input.images)}, ${new Date(Number(input.createdAt) || Date.now())})
+      on conflict (id) do nothing
+    `;
+    return {
+      id: input.id,
+      userId,
+      type: input.type,
+      content: input.content,
+      contact: input.contact,
+      images: input.images,
+      status: 'open',
+      createdAt: input.createdAt,
+    };
   }
 
 }

@@ -4,7 +4,7 @@ import type { AppConfig } from '../config.js';
 import { requireUser, success } from '../http.js';
 import { AppProblem, notFound } from '../lib/problem.js';
 import type { AppRepository } from '../repositories/contracts.js';
-import type { LocalObjectStorage } from '../storage/local-storage.js';
+import type { ObjectStorage } from '../storage/types.js';
 import type { AiImportTask } from '../types.js';
 import { createPendingTask, runImportTaskWorker } from '../services/ai-import.js';
 import { createHttpOrderRecognizer, type OrderRecognizer } from '../services/vision-ocr.js';
@@ -63,7 +63,7 @@ export async function registerAiImportRoutes(
   app: FastifyInstance,
   config: AppConfig,
   repository: AppRepository,
-  storage: LocalObjectStorage,
+  storage: ObjectStorage,
   recognizer: OrderRecognizer = createHttpOrderRecognizer(config),
 ) {
   app.post('/api/v1/ai/import-tasks', async (request, reply) => {

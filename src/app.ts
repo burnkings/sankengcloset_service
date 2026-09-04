@@ -11,7 +11,7 @@ import { requireUser } from './http.js';
 import type { AppRepository } from './repositories/contracts.js';
 import { MemoryRepository } from './repositories/memory.js';
 import { PostgresRepository } from './repositories/postgres.js';
-import { LocalObjectStorage } from './storage/local-storage.js';
+import { createObjectStorage } from './storage/factory.js';
 import { registerHealthRoutes } from './routes/health.js';
 import { registerSessionRoutes } from './routes/sessions.js';
 import { registerContentRoutes } from './routes/content.js';
@@ -20,7 +20,9 @@ import { registerUploadRoutes } from './routes/uploads.js';
 import { registerAiImportRoutes } from './routes/ai-import.js';
 import { registerReviewRoutes } from './routes/review.js';
 import { registerInteractionRoutes } from './routes/interaction.js';
+import { registerCalendarRoutes } from './routes/calendar.js';
 import { registerUserDataRoutes } from './routes/user-data.js';
+import { registerFeedbackRoutes } from './routes/feedback.js';
 import type { OrderRecognizer } from './services/vision-ocr.js';
 import { createHttpOrderRecognizer } from './services/vision-ocr.js';
 import postgres from 'postgres';
@@ -131,7 +133,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     return payload;
   });
 
-  const storage = new LocalObjectStorage(config.UPLOAD_DIR);
+  const storage = createObjectStorage(config);
   await registerHealthRoutes(app, repository);
 
   // 管理面板
@@ -146,7 +148,9 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await registerUploadRoutes(app, config, repository, storage);
   await registerAiImportRoutes(app, config, repository, storage, visionRecognizer);
   await registerInteractionRoutes(app, repository);
+  await registerCalendarRoutes(app, repository);
   await registerUserDataRoutes(app, config, repository);
+  await registerFeedbackRoutes(app, repository);
 
   // 审核路由（仅 postgres 模式）
   if (config.DATA_DRIVER === 'postgres') {

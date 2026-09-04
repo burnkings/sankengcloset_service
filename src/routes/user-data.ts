@@ -64,11 +64,14 @@ export const purchaseSchema = z.object({
 export const reminderSchema = z.object({
   id: idSchema.optional(),
   title: z.string().trim().min(1).max(160),
-  type: z.enum(['ARRIVAL', 'BALANCE', 'RELEASE', 'CUSTOM']).default('CUSTOM'),
+  type: z.enum(['ARRIVAL', 'BALANCE', 'RELEASE', 'OUTFIT', 'PHOTO', 'ORGANIZE', 'WISH', 'CHECKIN', 'CUSTOM']).default('CUSTOM'),
   remindDate: z.string().min(1).max(32),
   remindTime: z.string().max(16).default(''),
   relatedPurchaseId: idSchema.or(z.literal('')).default(''),
   relatedWishId: idSchema.or(z.literal('')).default(''),
+  // Phase 1.1-C：商品锚 + 批次锚（user_assets jsonb 透传，零 migration；旧数据缺省为空串兼容）
+  productId: idSchema.or(z.literal('')).default(''),
+  relatedReleaseId: idSchema.or(z.literal('')).default(''),
   note: z.string().max(2_000).default(''),
   status: z.enum(['PENDING', 'DONE', 'MISSED']).default('PENDING'),
 });
@@ -116,6 +119,8 @@ export const postCreateSchema = z.object({
   caption: z.string().trim().max(600).default(''),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'MIXED']),
   topic: z.string().trim().max(80).default(''),
+  // Phase 2.3-A：可选商品关联（可空）；非空时服务端校验商品存在且已发布
+  productId: z.string().trim().min(1).max(128).nullable().optional(),
 });
 export const postParamsSchema = z.object({ id: idSchema });
 export const postLikeSchema = z.object({ liked: z.boolean() });
@@ -189,6 +194,13 @@ export async function registerUserDataRoutes(app: FastifyInstance, config: AppCo
   ];
   for (const asset of assets) registerAssetRoutes(app, repository, asset);
 
+  // 通知生成：基于用户 reminders/purchases/关注品牌 生成真实通知（幂等，可重复调用）
+  app.post('/api/v1/me/notifications:generate', async (request) => {
+    const userId = await requireUser(request);
+    const items = await repository.generateNotifications(userId);
+    return success(request, items);
+  });
+
   app.get('/api/v1/me/budget', async (request) => {
     const userId = await requireUser(request);
     return success(request, await repository.getUserSetting(userId, 'budget'));
@@ -231,6 +243,13 @@ export async function registerUserDataRoutes(app: FastifyInstance, config: AppCo
     if (!media || media.ownerUserId !== userId || media.deletedAt !== null || media.sizeBytes <= 0 || media.purpose !== 'outfit') {
       throw new AppProblem(400, 'VALIDATION_FAILED', '请先上传有效的穿搭图片', false);
     }
+    // Phase 2.3-A：productId 非空时校验商品存在且已发布（不存在的商品明确拒绝，不静默创建）
+    let productId: string | null = null;
+    if (body.productId != null && body.productId !== '') {
+      const product = await repository.getProduct(null, body.productId);
+      if (!product) throw new AppProblem(400, 'VALIDATION_FAILED', '关联的商品不存在或未发布', false);
+      productId = body.productId;
+    }
     const post = await repository.createCommunityPost(userId, {
       id: newId('post'),
       mediaId: media.id,
@@ -238,6 +257,7 @@ export async function registerUserDataRoutes(app: FastifyInstance, config: AppCo
       caption: body.caption,
       category: body.category,
       topic: body.topic,
+      productId,
     });
     return reply.code(201).send(success(request, post));
   });

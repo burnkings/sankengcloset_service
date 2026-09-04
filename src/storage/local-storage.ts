@@ -1,7 +1,8 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, resolve, sep } from 'node:path';
+import type { ObjectStorage } from './types.js';
 
-export class LocalObjectStorage {
+export class LocalObjectStorage implements ObjectStorage {
   private readonly root: string;
 
   constructor(uploadDir: string) {
@@ -27,5 +28,14 @@ export class LocalObjectStorage {
 
   async delete(objectKey: string): Promise<void> {
     await rm(this.pathFor(objectKey), { force: true });
+  }
+
+  /** 本地磁盘无公开 URL（媒体统一经 API 中转） */
+  isPublic(_objectKey: string): boolean {
+    return false;
+  }
+
+  publicUrl(_objectKey: string): string | null {
+    return null;
   }
 }

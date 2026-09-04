@@ -14,15 +14,89 @@ export interface Product {
   brandName: string;
   title: string;
   category: Category;
+  /** 细分类目（格裙/衬衫/JSK/OP/襦裙/马面…，DB products.category） */
+  subCategory: string;
   status: string;
   coverUrl: string;
   images: string[];
   priceCents: number;
   originalPriceCents: number;
+  /** 价格语义（Phase 2.5-D）：FULL/DEPOSIT/BALANCE/INTENTION/UNKNOWN，前端按此生成价格摘要，禁止猜测 */
+  priceType: string;
+  /** 定金（分，DB products.deposit_price） */
+  depositCents: number;
+  /** 尾款（分，DB products.balance_price） */
+  balanceCents: number;
+  /** 可选颜色（DB products.color_tags） */
+  colorTags: string[];
+  /** 材质标签（DB products.material_tags），前端汇总为 material_summary 展示 */
+  materialTags: string[];
+  /** 特点标签（season+scene+element+recommended 合并去重） */
+  featureTags: string[];
+  /** 规格变体（product_variants；未解析/无数据为空数组） */
+  variants: ProductVariantDto[];
   description: string;
   shopUrl: string;
   createdAt: string;
   updatedAt: string;
+  /** 所属款式（Phase 2.1：Brand → Style → Product → Release；未归并商品为 null） */
+  styleId: string | null;
+  /** 当前有效发售批次（product_releases 最新一条），详情页发售状态唯一事实源 */
+  currentRelease: ProductRelease | null;
+}
+
+/** 规格变体 DTO（product_variants 行；空表/未解析时为 []，前端款式模块不显示） */
+export interface ProductVariantDto {
+  id: string;
+  name: string;        // "粉色 S" / "蓝色 M"
+  colorName: string;   // 粉色
+  sizeName: string;    // S / M / L / 均码
+  skuCode: string;
+  priceCents: number;
+  stockStatus: string; // IN_STOCK / LOW_STOCK / OUT_OF_STOCK / PRE_ORDER
+}
+
+/**
+ * 三坑款式（Phase 2.1 Style Entity MVP）
+ * Style ≠ Product：一个款式可对应多个商品（黑/酒红/再售版本），发售批次继续由 product_releases 负责。
+ */
+export interface Style {
+  id: string;
+  brandId: string;
+  brandName: string;
+  canonicalName: string;
+  category: string;
+  subCategory: string;
+  styleTags: string[];
+  description: string;
+  productCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 款式详情：基础信息 + 关联商品（GET /api/v1/styles/:id） */
+export interface StyleDetail extends Style {
+  products: Product[];
+}
+
+/**
+ * 发售批次（product_releases 行，仅详情展示所需字段）
+ * 前端映射到已有 ReleaseEvent Domain，禁止复制数据模型。
+ */
+export interface ProductRelease {
+  id: string;
+  releaseName: string;            // 批次名（"一期首发"等）
+  releaseType: string;            // first_release / rerelease / reservation / spot / lottery / unknown
+  saleStatus: string;             // UPCOMING / ON_SALE / PRE_ORDER / SOLD_OUT / ENDED
+  lifecycleStatus: string;        // upcoming / active / ended / sold_out / unknown
+  isRerelease: boolean;
+  depositCents: number;           // 定金（分）
+  balanceCents: number;           // 尾款（分）
+  fullPriceCents: number;         // 全价（分）
+  startAt: string;                // 开售/预约开始（ISO）
+  endAt: string;                  // 结束时间（ISO）
+  balanceDueAt: string;           // 尾款截止（ISO）
+  shipAt: string;                 // 预计发货（ISO）
 }
 
 export interface FeedItem {
@@ -154,6 +228,20 @@ export interface ContentFeedItem {
   brandName: string;
   category: string;           // JK | LOLITA | HANFU | OTHER
   pitType: string;            // 主要品类标签
+  /** 细分类目（格裙/衬衫/JSK/OP/襦裙/马面…，DB products.category；与 pitType 不同维度） */
+  subCategory: string;
+  /** 价格语义（Product V2）：FULL/DEPOSIT/BALANCE/INTENTION/UNKNOWN，前端按此生成价格摘要，禁止猜测 */
+  priceType: string;
+  /** 定金（分，DB products.deposit_price） */
+  depositCents: number;
+  /** 尾款（分，DB products.balance_price） */
+  balanceCents: number;
+  /** 全款/现货价（分，来源 product_releases.full_price_cents；DEPOSIT 摘要「定金 ¥X · 全款 ¥Y」用） */
+  fullPriceCents: number;
+  /** 可选颜色（Product V2 colors） */
+  colorTags: string[];
+  /** 材质标签（Product V2 material_tags，前端汇总为 material_summary 展示） */
+  materialTags: string[];
   price: number;              // 当前价格（分）
   originalPrice: number;
   priceSummary: string;       // 价格摘要 e.g. "¥368.00"
@@ -231,6 +319,26 @@ export interface TrendSummary {
   generatedAt: string;
 }
 
+// ─── 发售日历（Calendar）──────────────────────────────────
+
+/** 日历事件来源：product_releases 或 sale_events */
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  brandName: string;
+  brandId: string;
+  category: string;          // JK / LOLITA / HANFU / OTHER
+  eventType: string;         // release_type（first_release/rerelease/reservation/spot/lottery）或 sale_events.event_type
+  startAt: string;           // ISO
+  endAt: string | null;
+  priceCents: number;
+  depositCents: number;
+  balanceCents: number;
+  productId: string;
+  status: string;            // sale_status / lifecycle_status
+  source: 'release' | 'sale_event';
+}
+
 // ─── Phase D8: User Interaction & Personalization ──────────
 
 /**
@@ -291,6 +399,61 @@ export interface BrandFollower {
   brandId: string;
   createdAt: string;
 }
+
+/**
+ * 品牌信息（Phase 2.6 品牌目录：/api/v1/brands 列表 + /api/v1/brands/:id 详情）
+ */
+export interface BrandInfo {
+  id: string;
+  name: string;
+  nameEn: string;
+  logo: string;
+  description: string;
+  category: string;           // JK / LOLITA / HANFU / OTHER
+  officialUrl: string;
+  followerCount: number;
+  isFollowed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * 品牌商品列表项（/api/v1/brands/:id/products；复用 ContentFeedItem 展示字段，前端 FeedItem 协议兼容）
+ */
+export interface BrandProductItem {
+  id: string;
+  title: string;
+  description: string;
+  brandId: string;
+  brandName: string;
+  category: string;
+  priceCents: number;
+  originalPriceCents: number;
+  badgeText: string;
+  coverUrl: string;
+  createdAt: string;
+}
+
+/**
+ * 三坑榜单条目（/api/v1/ranking；hot/new 两榜共用）
+ */
+export interface RankingItem {
+  rank: number;
+  entityId: string;           // 商品 id（点击跳详情）
+  title: string;
+  brandName: string;
+  coverUrl: string;
+  priceCents: number;
+  category: string;           // JK / Lolita / 汉服
+  // 热榜
+  favoriteCount: number;
+  // 上新榜
+  releaseTypeName: string;    // 首发 / 再贩 / 现货
+  daysAgo: number;            // 「X 天前上新」
+  reservationCount: number;   // 「X 人蹲预约」
+}
+
+export type RankingTab = 'hot' | 'new';
 
 /**
  * 个性化评分

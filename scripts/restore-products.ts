@@ -28,6 +28,8 @@ interface RawItem {
   main_image?: string;
   product_url?: string;
   categories?: string[];
+  /** 显式坑向分类（数据文件自带时优先使用）：JK | LOLITA | HANFU | OTHER */
+  pit_type?: string;
   [key: string]: unknown;
 }
 
@@ -45,13 +47,22 @@ function yuanToCents(price: unknown): number {
   return Math.round(n * 100);
 }
 
-/** 分类推断（与 import-taobao-products.ts 一致） */
-function inferPitType(categories: string[] | undefined): string {
-  if (!categories || categories.length === 0) return 'OTHER';
-  const first = categories[0] ?? '';
-  if (/JK|制服/.test(first)) return 'JK';
-  if (/LOLITA|洛丽塔|LO/.test(first)) return 'LOLITA';
-  if (/汉服|汉元素/.test(first)) return 'HANFU';
+/** 坑向分类推断。优先级：① 数据文件显式 pit_type 字段 → ② categories 枚举值（三坑直接分类）→ ③ 标题正则 → ④ OTHER。
+ *  categories 语义 = 三坑直接分类（JK/LOLITA/HANFU），与 pit_type 一致，非淘宝主类目/子类目层级。 */
+function inferPitType(item: RawItem): string {
+  const explicit = (item.pit_type ?? '').trim().toUpperCase();
+  if (explicit === 'JK' || explicit === 'LOLITA' || explicit === 'HANFU' || explicit === 'OTHER') {
+    return explicit;
+  }
+  const cats = item.categories ?? [];
+  for (const c of cats) {
+    const up = c.trim().toUpperCase();
+    if (up === 'JK' || up === 'LOLITA' || up === 'HANFU' || up === 'OTHER') return up;
+  }
+  const title = item.title ?? '';
+  if (/(洛丽塔|lolita|lo裙|jsk|花嫁|甜系|哥特|公主裙|洋装|小裙子|\mop\M)/i.test(title)) return 'LOLITA';
+  if (/(汉服|汉元素|马面|襦裙|齐胸)/i.test(title)) return 'HANFU';
+  if (/(格裙|制服|水手服|\mjk\M)/i.test(title)) return 'JK';
   return 'OTHER';
 }
 
@@ -150,7 +161,7 @@ async function main() {
     const priceYuan = item.current_price;
     const imageUrl = item.main_image ?? '';
     const productUrl = item.product_url ?? '';
-    const pitType = inferPitType(item.categories);
+    const pitType = inferPitType(item);
 
     const brandId = brandMap.get(shopName);
     if (!brandId) {

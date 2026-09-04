@@ -10,7 +10,7 @@
 import type { FastifySchema } from 'fastify';
 import { z, type ZodTypeAny } from 'zod';
 
-import { feedQuerySchema, searchQuerySchema, trendQuerySchema, productParamsSchema } from './routes/content.js';
+import { feedQuerySchema, searchQuerySchema, trendQuerySchema, productParamsSchema, productCommunityQuerySchema } from './routes/content.js';
 import { devLoginSchema, refreshSchema, wechatSchema } from './routes/sessions.js';
 import {
   createEventSchema, getEventsSchema, addWishlistSchema, updateWishlistSchema, wishlistQuerySchema, followBrandSchema,
@@ -189,6 +189,11 @@ export const ROUTE_DOCS: Record<string, RouteDoc> = {
   },
   'put /api/v1/me/preferences': {
     tags: ['preferences'], summary: '保存内容偏好', security: true, body: preferenceSchema, responses: DEFAULT_RESPONSES,
+  },
+
+  'get /api/v1/products/:id/community': {
+    tags: ['content'], summary: '商品关联社区内容（真实买家返图）', params: productParamsSchema,
+    query: productCommunityQuerySchema, responses: DEFAULT_RESPONSES,
   },
 
   // ── 圈子动态 ──
