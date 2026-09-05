@@ -1178,9 +1178,9 @@ export class PostgresRepository implements AppRepository {
         insert into ai_import_suggestions
           (task_id, suggestion_json, confidence, field_confidence_json, evidence_json, warnings_json)
         values
-          (${task.taskId}, ${task.suggestion}::jsonb, ${task.confidence},
-           ${task.fieldConfidence}::jsonb, ${task.evidence}::jsonb,
-           ${task.warnings}::jsonb)
+          (${task.taskId}, ${this.sql.json(task.suggestion as any)}, ${task.confidence},
+           ${this.sql.json(task.fieldConfidence as any)}, ${this.sql.json(task.evidence as any)},
+           ${this.sql.json(task.warnings as any)})
       `;
     });
     return task;
@@ -1216,9 +1216,9 @@ export class PostgresRepository implements AppRepository {
         insert into ai_import_suggestions
           (task_id, suggestion_json, confidence, field_confidence_json, evidence_json, warnings_json)
         values
-          (${taskId}, ${suggestion}::jsonb, ${patch.confidence ?? 0},
-           ${patch.fieldConfidence ?? {}}::jsonb, ${patch.evidence ?? []}::jsonb,
-           ${patch.warnings ?? []}::jsonb)
+          (${taskId}, ${this.sql.json(suggestion as any)}, ${patch.confidence ?? 0},
+           ${this.sql.json((patch.fieldConfidence ?? {}) as any)}, ${this.sql.json((patch.evidence ?? []) as any)},
+           ${this.sql.json((patch.warnings ?? []) as any)})
         on conflict (task_id) do update
           set suggestion_json = excluded.suggestion_json,
               confidence = excluded.confidence,
@@ -1264,17 +1264,17 @@ export class PostgresRepository implements AppRepository {
           (id, task_id, user_id, target_type, target_id, confirmed_json, correction_json, op_id)
         values
           (${newId('aic')}, ${taskId}, ${userId}, 'purchase', ${input.targetId},
-           ${input.confirmed}::jsonb,
-           ${{ before: task.suggestion, after: input.confirmed }}::jsonb,
+           ${this.sql.json(input.confirmed as any)},
+           ${this.sql.json({ before: task.suggestion, after: input.confirmed } as any)},
            ${input.opId ?? ''})
         on conflict (task_id) do nothing
       `;
       const updated = await tx`
         update ai_import_tasks set state = 'confirmed', confirmed_at = now(), target_type = 'purchase', target_id = ${input.targetId}
         where id = ${taskId}
-        returning *, ${task.suggestion}::jsonb as suggestion_json, ${task.confidence}::double precision as confidence,
-          ${task.fieldConfidence}::jsonb as field_confidence_json, ${task.evidence}::jsonb as evidence_json,
-          ${task.warnings}::jsonb as warnings_json
+        returning *, ${this.sql.json(task.suggestion as any)} as suggestion_json, ${task.confidence}::double precision as confidence,
+          ${this.sql.json(task.fieldConfidence as any)} as field_confidence_json, ${this.sql.json(task.evidence as any)} as evidence_json,
+          ${this.sql.json(task.warnings as any)} as warnings_json
       `;
       return mapAiTask(updated[0] as Row);
     });
@@ -1286,10 +1286,10 @@ export class PostgresRepository implements AppRepository {
     const id = newId('evt');
     if (userId) {
       await this.sql`INSERT INTO user_events (id, user_id, event_type, target_type, target_id, metadata)
-        VALUES (${id}, ${userId}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${input.metadata ?? {}}::jsonb)`;
+        VALUES (${id}, ${userId}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${this.sql.json((input.metadata ?? {}) as any)})`;
     } else {
       await this.sql`INSERT INTO user_events (id, event_type, target_type, target_id, metadata)
-        VALUES (${id}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${input.metadata ?? {}}::jsonb)`;
+        VALUES (${id}, ${input.eventType}, ${input.targetType}, ${input.targetId}, ${this.sql.json((input.metadata ?? {}) as any)})`;
     }
     return {
       id, userId, eventType: input.eventType,
@@ -1488,7 +1488,7 @@ export class PostgresRepository implements AppRepository {
   async createUserAsset(userId: string, kind: UserAssetKind, assetId: string, payload: Record<string, unknown>): Promise<UserAsset> {
     const rows = await this.sql`
       insert into user_assets (user_id, asset_type, id, payload_json)
-      values (${userId}, ${kind}, ${assetId}, ${payload}::jsonb)
+      values (${userId}, ${kind}, ${assetId}, ${this.sql.json(payload as any)})
       returning id, asset_type, payload_json, version, created_at, updated_at
     `;
     return mapUserAsset(rows[0] as Row);
@@ -1498,7 +1498,7 @@ export class PostgresRepository implements AppRepository {
     return this.sql.begin(async (tx) => {
       const rows = await tx`
         update user_assets
-        set payload_json = payload_json || ${patch}::jsonb,
+        set payload_json = payload_json || ${this.sql.json(patch as any)},
             version = version + 1,
             updated_at = now()
         where user_id = ${userId} and asset_type = ${kind} and id = ${assetId} and deleted_at is null
@@ -1553,7 +1553,7 @@ export class PostgresRepository implements AppRepository {
   async putUserSetting(userId: string, key: UserSettingKey, payload: Record<string, unknown>): Promise<Record<string, unknown>> {
     const rows = await this.sql`
       insert into user_settings (user_id, setting_key, payload_json)
-      values (${userId}, ${key}, ${payload}::jsonb)
+      values (${userId}, ${key}, ${this.sql.json(payload as any)})
       on conflict (user_id, setting_key) do update
         set payload_json = excluded.payload_json, updated_at = now()
       returning payload_json
