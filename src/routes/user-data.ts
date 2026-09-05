@@ -28,6 +28,8 @@ export const wardrobeSchema = z.object({
   purchaseDate: z.string().max(32).default(''),
   purchasePrice: z.number().int().min(0).max(100_000_000).default(0),
   purchaseSource: z.string().max(120).default(''),
+  purchaseId: idSchema.or(z.literal('')).default(''),
+  wishId: idSchema.or(z.literal('')).default(''),
   note: z.string().max(2_000).default(''),
   isFavorite: z.boolean().default(false),
 });
@@ -43,6 +45,7 @@ export const purchaseSchema = z.object({
   totalCents: z.number().int().min(0).max(100_000_000).default(0),
   depositCents: z.number().int().min(0).max(100_000_000).default(0),
   paidCents: z.number().int().min(0).max(100_000_000).default(0),
+  remainingCents: z.number().int().min(0).max(100_000_000).default(0),
   balanceDueDate: z.string().max(32).default(''),
   arrivalDate: z.string().max(32).default(''),
   status: z.string().max(32).default(''),
@@ -57,6 +60,10 @@ export const purchaseSchema = z.object({
   paymentStatus: z.enum(['PRE_ORDER', 'DEPOSIT_PAID', 'BALANCE_PENDING', 'COMPLETED', 'CANCELLED']).default('PRE_ORDER'),
   purchaseDate: z.string().max(32).default(''),
   deadline: z.string().max(32).default(''),
+  wishId: idSchema.or(z.literal('')).default(''),
+  wardrobeId: idSchema.or(z.literal('')).default(''),
+  productId: idSchema.or(z.literal('')).default(''),
+  releaseId: idSchema.or(z.literal('')).default(''),
   note: z.string().max(2_000).default(''),
   isFavorite: z.boolean().default(false),
 });
@@ -67,11 +74,13 @@ export const reminderSchema = z.object({
   type: z.enum(['ARRIVAL', 'BALANCE', 'RELEASE', 'OUTFIT', 'PHOTO', 'ORGANIZE', 'WISH', 'CHECKIN', 'CUSTOM']).default('CUSTOM'),
   remindDate: z.string().min(1).max(32),
   remindTime: z.string().max(16).default(''),
+  isAllDay: z.boolean().default(false),
   relatedPurchaseId: idSchema.or(z.literal('')).default(''),
   relatedWishId: idSchema.or(z.literal('')).default(''),
   // Phase 1.1-C：商品锚 + 批次锚（user_assets jsonb 透传，零 migration；旧数据缺省为空串兼容）
   productId: idSchema.or(z.literal('')).default(''),
   relatedReleaseId: idSchema.or(z.literal('')).default(''),
+  wardrobeBindings: z.array(idSchema).max(50).default([]),
   note: z.string().max(2_000).default(''),
   status: z.enum(['PENDING', 'DONE', 'MISSED']).default('PENDING'),
 });
