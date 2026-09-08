@@ -27,8 +27,7 @@ import type { OrderRecognizer } from './services/vision-ocr.js';
 import { createHttpOrderRecognizer } from './services/vision-ocr.js';
 import postgres from 'postgres';
 import { readFile } from 'node:fs/promises';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
 export interface BuildAppOptions {
   config?: AppConfig;
@@ -111,7 +110,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     if (!key || !['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) return;
     let userId = '';
     try { userId = await requireUser(request); } catch { return; }
-    const cacheKey = `${userId}:${String(key)}`;
+    const cacheKey = `${userId}:${request.method}:${request.url}:${String(key)}`;
     const cached = idempotencyStore.get(cacheKey);
     if (cached && cached.expiresAt > Date.now()) {
       return reply.code(cached.statusCode).type('application/json').send(cached.body);
@@ -137,9 +136,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await registerHealthRoutes(app, repository);
 
   // 管理面板
-  const __dirname = dirname(fileURLToPath(import.meta.url));
   app.get('/admin', async (_, reply) => {
-    const html = await readFile(resolve(__dirname, '../public/admin.html'), 'utf8');
+    const html = await readFile(resolve(process.cwd(), 'public/admin.html'), 'utf8');
     return reply.type('text/html').send(html);
   });
   await registerSessionRoutes(app, config, repository);
@@ -155,7 +153,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   // 审核路由（仅 postgres 模式）
   if (config.DATA_DRIVER === 'postgres') {
     const reviewSql = postgres(config.DATABASE_URL, { max: 5 });
-    await registerReviewRoutes(app, reviewSql);
+    await registerReviewRoutes(app, reviewSql, config.CATALOG_ADMIN_IDS.split(',').map(s=>s.trim()).filter(Boolean));
     app.addHook('onClose', async () => { await reviewSql.end(); });
   }
 

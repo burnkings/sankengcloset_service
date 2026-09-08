@@ -115,6 +115,7 @@ function mapProduct(row: Row): Product {
     category: (stringValue(row.pit_type) || '') as Product['category'],
     subCategory: stringValue(row.category),
     status: stringValue(row.sale_status || row.status),
+    shopName: stringValue(row.shop_name),
     coverUrl: stringValue(row.cover_url),
     images,
     priceCents: numberValue(row.current_price || row.price_cents),
@@ -473,7 +474,7 @@ export class PostgresRepository implements AppRepository {
     }
     if (query.brandId) clauses.push(this.sql`p.brand_id = ${query.brandId}`);
     if (query.minPrice > 0) clauses.push(this.sql`p.current_price >= ${query.minPrice}`);
-    if (query.maxPrice > 0) clauses.push(this.sql`p.current_price <= ${query.maxPrice}`);
+    if (query.maxPrice > 0) clauses.push(this.sql`p.current_price > 0 and p.current_price <= ${query.maxPrice}`);
 
     const whereClause = clauses.reduce((all, clause, index) => index === 0 ? clause : this.sql`${all} and ${clause}`);
     const scope = pageScope(['search', query.q, query.category, query.saleStatus, query.releaseStatus, query.brandId, String(query.minPrice), String(query.maxPrice)]);
@@ -726,7 +727,7 @@ export class PostgresRepository implements AppRepository {
         from product_releases pr
         join products p on p.id = pr.product_id and p.deleted_at is null
         left join brands b on b.id = p.brand_id
-        where pr.deleted_at is null and pr.visibility_status = 'published'
+        where pr.deleted_at is null and pr.visibility_status = 'published' and p.visibility_status = 'published'
           and pr.start_at is not null and pr.start_at >= ${start} and pr.start_at < ${end}
         union all
         select se.id, coalesce(nullif(se.title, ''), p.display_name) as title,
@@ -738,12 +739,13 @@ export class PostgresRepository implements AppRepository {
         from sale_events se
         join products p on p.id = se.product_id and p.deleted_at is null
         left join brands b on b.id = p.brand_id
-        where se.start_at is not null and se.start_at >= ${start} and se.start_at < ${end}
+        where p.visibility_status = 'published'
+          and se.start_at is not null and se.start_at >= ${start} and se.start_at < ${end}
       ) ev
       order by ev.start_at asc, ev.id asc
       limit ${Math.min(100, Math.max(1, limit))}
     `;
-    return (rows as Row[]).map((r) => ({
+    const originalEvents:CalendarEvent[] = (rows as Row[]).map((r) => ({
       id: stringValue(r.id),
       title: stringValue(r.title),
       brandName: stringValue(r.brand_name),
@@ -759,6 +761,7 @@ export class PostgresRepository implements AppRepository {
       status: stringValue(r.status),
       source: (r.source === 'sale_event' ? 'sale_event' : 'release') as CalendarEvent['source'],
     }));
+    return originalEvents;
   }
 
   async generateNotifications(userId: string): Promise<UserAsset[]> {

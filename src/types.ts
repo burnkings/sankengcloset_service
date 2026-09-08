@@ -43,6 +43,8 @@ export interface Product {
   styleId: string | null;
   /** 当前有效发售批次（product_releases 最新一条），详情页发售状态唯一事实源 */
   currentRelease: ProductRelease | null;
+  /** 来源店铺名，与品牌独立；未填写品牌时用于详情展示。 */
+  shopName?: string;
 }
 
 /** 规格变体 DTO（product_variants 行；空表/未解析时为 []，前端款式模块不显示） */

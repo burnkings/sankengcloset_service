@@ -8,6 +8,7 @@ const schema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(8787),
   LOG_LEVEL: z.string().default('info'),
   DATA_DRIVER: z.enum(['memory', 'postgres']).default('memory'),
+  CATALOG_ADMIN_IDS: z.string().default(''),
   DATABASE_URL: z.string().default('postgres://sankeng:sankeng@localhost:5432/sankeng'),
   JWT_SECRET: z.string().min(32).default('local-development-secret-change-me-now'),
   CORS_ORIGINS: z.string().default('http://localhost:5173,http://localhost:3000'),

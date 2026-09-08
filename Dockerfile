@@ -16,6 +16,7 @@ RUN npm install --omit=dev --maxsockets=2
 COPY --from=build /app/dist ./dist
 COPY migrations ./migrations
 RUN mkdir -p /app/var/uploads && chown -R node:node /app
+COPY public ./public
 USER node
 EXPOSE 8787
 CMD ["node", "dist/src/server.js"]

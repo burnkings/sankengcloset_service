@@ -1,5 +1,13 @@
 # 三坑绮橱 API
 
+## 商品单表采集更新
+
+公开仓库：https://github.com/burnkings/sankengcloset_service
+
+商品资料采用现有前端 Product 字段和已有数据库表；用户只需填写一张 Excel。参见 [字段映射、数据库变更及导入命令](docs/PRODUCT-INTAKE.md)。已取消独立部件报价与采集后台模型。
+
+`npm run catalog:import -- 商品.xlsx` 默认只校验，`--apply` 导入草稿，人工确认后加 `--publish` 发布。先执行现有迁移命令。代码提交不表示线上数据库已迁移。
+
 V2.3 后端基础服务。当前目标是让 UniApp X 客户端可以从 Mock 平滑切换到真实 HTTP API，并保留离线同步、幂等、AI 人工确认和外部购买记录的业务边界。
 
 ## 技术栈

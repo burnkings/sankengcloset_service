@@ -3,8 +3,8 @@
 
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { success } from '../http.js';
-import { notFound, badRequest } from '../lib/problem.js';
+import { success, requireUser } from '../http.js';
+import { notFound, badRequest, AppProblem } from '../lib/problem.js';
 import type postgres from 'postgres';
 
 const visibilityStatuses = ['draft', 'reviewing', 'published', 'hidden'] as const;
@@ -18,7 +18,11 @@ export const batchUpdateSchema = z.object({
   visibility_status: z.enum(visibilityStatuses),
 });
 
-export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.Sql) {
+export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.Sql, adminIds:string[] = []) {
+  app.addHook('onRequest', async request=>{
+    if(!request.url.startsWith('/api/v1/review/'))return;
+    if(!adminIds.includes(await requireUser(request)))throw new AppProblem(403,'FORBIDDEN','需要目录管理员权限');
+  });
   // ── 单个商品状态更新 ──
   app.patch<{ Params: { id: string }; Body: { visibility_status: string } }>(
     '/api/v1/review/products/:id/visibility',
@@ -43,9 +47,9 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
 
       // 写入审核记录
       await sql`
-        INSERT INTO review_records (id, entity_type, entity_id, action, old_value, new_value, reviewer, notes)
+        INSERT INTO review_records (id, entity_type, entity_id, action, field_changes, reviewer_id, reason)
         VALUES (${`rev_${id}_${Date.now()}`}, 'product', ${id}, 'visibility_change',
-          ${String(oldStatus)}, ${body.visibility_status}, 'system', ${`从 ${oldStatus} 变更为 ${body.visibility_status}`})
+          ${sql.json({before:oldStatus,after:body.visibility_status})}, ${await requireUser(request)}, ${`从 ${oldStatus} 变更为 ${body.visibility_status}`})
       `;
 
       return success(request, {
@@ -73,9 +77,9 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
           const oldStatus = existing[0]!.visibility_status;
           await sql`UPDATE products SET visibility_status = ${body.visibility_status}, updated_at = now() WHERE id = ${productId}`;
           await sql`
-            INSERT INTO review_records (id, entity_type, entity_id, action, old_value, new_value, reviewer, notes)
+            INSERT INTO review_records (id, entity_type, entity_id, action, field_changes, reviewer_id, reason)
             VALUES (${`rev_${productId}_${Date.now()}`}, 'product', ${productId}, 'visibility_change',
-              ${String(oldStatus)}, ${body.visibility_status}, 'system', ${`批量变更`})
+              ${sql.json({before:oldStatus,after:body.visibility_status})}, ${await requireUser(request)}, ${`批量变更`})
           `;
           results.push({ id: productId, old_status: oldStatus, new_status: body.visibility_status, ok: true });
         } catch (e) {
@@ -160,10 +164,10 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
       entity_type: String(r.entity_type),
       entity_id: String(r.entity_id),
       action: String(r.action),
-      old_value: String(r.old_value ?? ''),
-      new_value: String(r.new_value ?? ''),
-      reviewer: String(r.reviewer ?? ''),
-      notes: String(r.notes ?? ''),
+      old_value: JSON.stringify(r.field_changes?.before ?? ''),
+      new_value: JSON.stringify(r.field_changes?.after ?? ''),
+      reviewer: String(r.reviewer_id ?? ''),
+      notes: String(r.reason ?? ''),
       created_at: String(r.created_at),
     })));
   });
