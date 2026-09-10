@@ -160,7 +160,7 @@ export async function registerContentRoutes(app: FastifyInstance, repository: Ap
   // Phase 2.6: 三坑榜单（hot 热榜 / new 上新榜）
   app.get('/api/v1/ranking', async (request) => {
     const q = request.query as Record<string, unknown>;
-    const tab = q.tab === 'new' ? 'new' : 'hot';
+    const tab = q.tab === 'new' ? 'new' : q.tab === 'favorite' ? 'favorite' : 'hot';
     const rawLimit = typeof q.limit === 'string' && q.limit !== '' ? Number(q.limit) : 50;
     const items = await repository.getRanking(tab, Number.isFinite(rawLimit) ? rawLimit : 50);
     return success(request, items, { totalHint: items.length });

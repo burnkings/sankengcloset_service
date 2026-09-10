@@ -1026,8 +1026,8 @@ export class PostgresRepository implements AppRepository {
   async getRanking(tab: RankingTab, limit = 50): Promise<RankingItem[]> {
     const cap = Math.min(100, Math.max(1, limit));
     let rows: PendingQuery<Row[]> | Row[] = [];
-    if (tab === 'hot') {
-      // 热榜：按收藏数 desc，无收藏的按 feed_score 兜底
+    if (tab === 'hot' || tab === 'favorite') {
+      // 收藏榜按当前收藏关系总数；热榜按 feed_score。均在全量候选排序后截取。
       rows = await this.sql`
         select p.*, b.name as brand_name,
           coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi
@@ -1041,7 +1041,7 @@ export class PostgresRepository implements AppRepository {
         from products p
         left join brands b on b.id = p.brand_id
         where p.deleted_at is null and p.visibility_status = 'published'
-        order by (select count(*)::int from wishlist_items w where w.product_id = p.id) desc, p.feed_score desc, p.id desc
+        order by case when ${tab} = 'favorite' then (select count(*)::int from wishlist_items w where w.product_id = p.id) else p.feed_score end desc, p.id desc
         limit ${cap}
       `;
     } else if (tab === 'new') {

@@ -9,6 +9,8 @@ export interface UserProfile {
 }
 
 export interface Product {
+  /** 持久层内容热度；内存种子未设置时按 0 处理。 */
+  feedScore?: number;
   id: string;
   brandId: string;
   brandName: string;
@@ -455,7 +457,7 @@ export interface RankingItem {
   reservationCount: number;   // 「X 人蹲预约」
 }
 
-export type RankingTab = 'hot' | 'new';
+export type RankingTab = 'hot' | 'new' | 'favorite';
 
 /**
  * 个性化评分

@@ -80,3 +80,7 @@ curl -X POST http://localhost:8787/api/v1/sessions/dev \
 - `safe_mock` 不读取图片内容、不猜品牌，便于先打通链路。
 - 图片与结构化记录分开上传，批量同步只传 objectKey。
 - 生产必须更换 JWT Secret、对象存储适配器并关闭开发登录。
+
+## 2026-09-09 收藏与榜单可靠性修复
+
+详见 [docs/CONTENT-CONSISTENCY-20260909.md](docs/CONTENT-CONSISTENCY-20260909.md)，包含测试结果及尚未完成的平台验收。
