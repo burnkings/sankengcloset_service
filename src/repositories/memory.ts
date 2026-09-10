@@ -307,13 +307,15 @@ export class MemoryRepository implements AppRepository {
   async getRanking(tab: RankingTab, limit = 50): Promise<RankingItem[]> {
     const cap = Math.min(100, Math.max(1, limit));
     let rows = [...this.products];
-    if (tab === 'hot') {
+    if (tab === 'favorite') {
       // 热榜：按收藏数 desc（内存实现按 wishlist 计数）
       rows.sort((a, b) => {
         const aFav = this.wishlists.filter(w => w.productId === a.id).length;
         const bFav = this.wishlists.filter(w => w.productId === b.id).length;
         return bFav - aFav || b.id.localeCompare(a.id);
       });
+    } else if (tab === 'hot') {
+      rows.sort((a, b) => (b.feedScore ?? 0) - (a.feedScore ?? 0) || b.id.localeCompare(a.id));
     } else if (tab === 'new') {
       rows.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
