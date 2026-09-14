@@ -1520,8 +1520,9 @@ export class PostgresRepository implements AppRepository {
         if (typeof newDeadline === 'string' && newDeadline !== '') {
           await tx`
             update user_assets
-            set payload_json = jsonb_set(payload_json, '{remindDate}', to_jsonb(${newDeadline}), true),
-                payload_json = jsonb_set(payload_json, '{resyncedFrom}', to_jsonb(${assetId}), true),
+            set payload_json = jsonb_set(
+                  jsonb_set(payload_json, '{remindDate}', to_jsonb(${newDeadline}::text), true),
+                  '{resyncedFrom}', to_jsonb(${assetId}::text), true),
                 version = version + 1,
                 updated_at = now()
             where user_id = ${userId} and asset_type = 'reminder' and deleted_at is null

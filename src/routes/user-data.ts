@@ -23,12 +23,12 @@ export const wardrobeSchema = z.object({
   brand: z.string().max(120).default(''),
   color: z.string().max(80).default(''),
   size: z.string().max(80).default(''),
-  wearStatus: z.enum(['UNWORN', 'WORN', 'IDLE']).default('UNWORN'),
+  wearStatus: z.enum(['UNWORN', 'WORN', 'FREQUENT', 'IDLE']).default('UNWORN'),
   seasons: z.array(z.string().max(40)).max(12).default([]),
   images: z.array(z.string().max(512)).max(12).default([]),
   tags: z.array(z.string().max(40)).max(30).default([]),
   purchaseDate: z.string().max(32).default(''),
-  purchasePrice: z.number().int().min(0).max(100_000_000).default(0),
+  purchasePrice: z.number().min(0).max(100_000_000).default(0),
   purchaseSource: z.string().max(120).default(''),
   purchaseId: idSchema.or(z.literal('')).default(''),
   wishId: idSchema.or(z.literal('')).default(''),
@@ -181,6 +181,11 @@ function registerAssetRoutes(app: FastifyInstance, repository: AppRepository, de
     const userId = await requireUser(request);
     const { id } = assetParamsSchema.parse(request.params);
     const patch = definition.updateSchema.parse(request.body) as Record<string, unknown>;
+    // Zod 默认值可穿过 partial；PATCH 仅更新请求中显式提交的字段。
+    const submitted = request.body as Record<string, unknown>;
+    for (const key of Object.keys(patch)) {
+      if (!Object.prototype.hasOwnProperty.call(submitted, key)) delete patch[key];
+    }
     delete patch.id;
     const asset = await repository.updateUserAsset(userId, definition.kind, id, patch);
     if (!asset) throw notFound('记录不存在');
