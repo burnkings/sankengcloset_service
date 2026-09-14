@@ -22,9 +22,11 @@ describe('前端个人资产契约', () => {
   });
 
   it('衣橱保留购买与心愿来源字段', () => {
-    const parsed = wardrobeSchema.parse({ id: 'wardrobe_client_1', name: '深蓝格裙', category: 'JK', purchaseId: 'purchase_1', wishId: 'wish_1' });
+    const parsed = wardrobeSchema.parse({ id: 'wardrobe_client_1', name: '宋制马面裙', category: 'HANFU', style: '马面裙', silhouette: '明制', purchaseId: 'purchase_1', wishId: 'wish_1' });
     expect(parsed.purchaseId).toBe('purchase_1');
     expect(parsed.wishId).toBe('wish_1');
+    expect(parsed.style).toBe('马面裙');
+    expect(parsed.silhouette).toBe('明制');
   });
 
   it('提醒保留全天与衣橱绑定字段', () => {

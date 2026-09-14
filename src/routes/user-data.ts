@@ -18,6 +18,8 @@ export const wardrobeSchema = z.object({
   name: z.string().trim().min(1).max(160),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'OTHER']),
   style: z.string().max(100).default(''),
+  // 汉服形制/年代；与 style（部件/衣型）并列，确保用户资产同步不丢字段。
+  silhouette: z.string().max(100).default(''),
   brand: z.string().max(120).default(''),
   color: z.string().max(80).default(''),
   size: z.string().max(80).default(''),

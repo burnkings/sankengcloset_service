@@ -329,6 +329,7 @@ export class MemoryRepository implements AppRepository {
         coverUrl: p.coverUrl,
         priceCents: p.priceCents,
         category: p.category,
+        viewCount: this.events.filter(e => e.targetType === 'product' && e.targetId === p.id && e.eventType === 'VIEW_PRODUCT').length,
         favoriteCount,
         releaseTypeName: p.status === 'PRE_ORDER' ? '预约' : p.status === 'ON_SALE' ? '现货' : '首发',
         daysAgo: Math.max(0, Math.floor((Date.now() - new Date(p.createdAt).getTime()) / 86400000)),

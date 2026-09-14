@@ -16,6 +16,7 @@ it('favorite ranks the entire published catalog before limit; hot uses feed scor
     await db.query('UPDATE products SET feed_score=100 WHERE id=$1', [ids[0]]);
     await db.query("UPDATE products SET visibility_status='draft' WHERE id=$1", [ids[2]]);
     await db.query("INSERT INTO users(id,nickname) VALUES ('u1','用户1'),('u2','用户2')");
+    await db.query("INSERT INTO user_events(id,user_id,event_type,target_type,target_id) VALUES ('e1','u1','VIEW_PRODUCT','product',$1),('e2','u2','VIEW_PRODUCT','product',$1)", [ids[0]]);
     await db.query("INSERT INTO wishlist_items(id,user_id,title,status,product_id) VALUES ('w1','u1','收藏','WISH',$1),('w2','u2','收藏','WANT',$1),('w3','u1','草稿','WISH',$2)", [ids[1],ids[2]]);
     // Run the real repository SQL against PostgreSQL in memory, with the same tagged parameters.
     const repository = Object.create(PostgresRepository.prototype) as PostgresRepository;
@@ -27,6 +28,7 @@ it('favorite ranks the entire published catalog before limit; hot uses feed scor
     expect(favorite[0]?.entityId).toBe(ids[1]);
     expect(favorite[0]?.favoriteCount).toBe(2);
     expect((await repository.getRanking('hot', 1))[0]?.entityId).toBe(ids[0]);
+    expect((await repository.getRanking('hot', 1))[0]?.viewCount).toBe(2);
     expect((await repository.getRanking('favorite', 100)).map(row=>row.entityId)).not.toContain(ids[2]);
     await db.query("DELETE FROM wishlist_items WHERE id='w2'");
     expect((await repository.getRanking('favorite', 1))[0]?.favoriteCount).toBe(1);

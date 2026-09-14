@@ -102,6 +102,7 @@ function mapProduct(row: Row): Product {
       name: String(vr.name ?? ''),
       colorName: String(vr.colorName ?? ''),
       sizeName: String(vr.sizeName ?? ''),
+      styleName: String(vr.styleName ?? ''),
       skuCode: String(vr.skuCode ?? ''),
       priceCents: typeof vr.priceCents === 'number' ? vr.priceCents : 0,
       stockStatus: String(vr.stockStatus ?? 'IN_STOCK'),
@@ -884,7 +885,7 @@ export class PostgresRepository implements AppRepository {
       select p.*, b.name as brand_name,
         coalesce((select array_agg(pi.url order by pi.sort_order) from product_images pi where pi.product_id = p.id), '{}') as images,
         coalesce((select jsonb_agg(jsonb_build_object(
-            'id', v.id, 'name', v.name, 'colorName', v.color, 'sizeName', v.size,
+            'id', v.id, 'name', v.name, 'styleName', v.style_name, 'colorName', v.color, 'sizeName', v.size,
             'skuCode', v.sku, 'priceCents', v.price_cents, 'stockStatus', v.stock_status)
           order by v.color, v.size) from product_variants v where v.product_id = p.id), '[]'::jsonb) as variants,
         pr.id as release_id, pr.release_name, pr.release_type, pr.sale_status as release_sale_status,
@@ -1034,6 +1035,8 @@ export class PostgresRepository implements AppRepository {
             where pi.product_id = p.id), '{}') as images,
           (select count(*)::int from wishlist_items w
             where w.product_id = p.id) as favorite_count,
+          (select count(*)::int from user_events e
+            where e.target_type = 'product' and e.target_id = p.id and e.event_type = 'VIEW_PRODUCT') as view_count,
           (select pr.release_type from product_releases pr
             where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
           (select count(*)::int from product_releases pr
@@ -1052,6 +1055,8 @@ export class PostgresRepository implements AppRepository {
             where pi.product_id = p.id), '{}') as images,
           (select pr.release_type from product_releases pr
             where pr.product_id = p.id and pr.deleted_at is null order by pr.created_at desc limit 1) as release_type,
+          (select count(*)::int from user_events e
+            where e.target_type = 'product' and e.target_id = p.id and e.event_type = 'VIEW_PRODUCT') as view_count,
           (select count(*)::int from product_releases pr
             where pr.product_id = p.id and pr.release_type = 'reservation' and pr.deleted_at is null) as reservation_count
         from products p
@@ -1093,6 +1098,7 @@ export class PostgresRepository implements AppRepository {
         ? String((row.images as unknown[])[0]) : '',
       priceCents,
       category: stringValue(row.pit_type),
+      viewCount: numberValue(row.view_count),
       favoriteCount: numberValue(row.favorite_count),
       releaseTypeName: getReleaseTypeName(releaseType),
       daysAgo: Math.max(0, Math.floor((Date.now() - new Date(dateValue(row.created_at)).getTime()) / 86400000)),
