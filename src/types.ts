@@ -55,6 +55,7 @@ export interface ProductVariantDto {
   name: string;        // "粉色 S" / "蓝色 M"
   colorName: string;   // 粉色
   sizeName: string;    // S / M / L / 均码
+  styleName: string;   // JSK / OP / SK 等款式属性，可为空
   skuCode: string;
   priceCents: number;
   stockStatus: string; // IN_STOCK / LOW_STOCK / OUT_OF_STOCK / PRE_ORDER
@@ -450,6 +451,7 @@ export interface RankingItem {
   priceCents: number;
   category: string;           // JK / Lolita / 汉服
   // 热榜
+  viewCount: number;          // 商品浏览事件总数
   favoriteCount: number;
   // 上新榜
   releaseTypeName: string;    // 首发 / 再贩 / 现货
