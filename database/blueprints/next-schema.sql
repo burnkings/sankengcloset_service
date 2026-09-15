@@ -1,4 +1,4 @@
--- Sankeng Closet 14表新基线，替换废止的26表稿
+-- Sankeng Closet 12表新基线，替换废止的26表稿
 -- 仅在空的独立数据库执行；现有服务尚未适配此结构。
 -- 不包含旧表兼容、数据搬运、DROP SCHEMA 或自动生产迁移。
 -- 所有应用表建在 public；Directus 系统表不在本文件管理范围。
@@ -186,39 +186,6 @@ COMMENT ON COLUMN product_releases.created_at IS '创建时间';
 COMMENT ON COLUMN product_releases.updated_at IS '修改时间';
 COMMENT ON COLUMN product_releases.deleted_at IS '软删除时间';
 
-CREATE TABLE product_favorites (
-  id text PRIMARY KEY,
-  user_id text NOT NULL REFERENCES users(id),
-  product_id text NOT NULL REFERENCES products(id),
-  release_id text,
-  intent_status text CHECK(intent_status IN ('WANT','WATCHING','WAIT_RELEASE','WAIT_BALANCE','PURCHASED')),
-  note text NOT NULL DEFAULT '',
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE(user_id,product_id),
-  FOREIGN KEY(release_id,product_id) REFERENCES product_releases(id,product_id)
-);
-COMMENT ON TABLE product_favorites IS '替代 wishlist_items；商品收藏及待购意向';
-COMMENT ON COLUMN product_favorites.id IS '业务 ID，由服务端生成；允许前端提交幂等 ID';
-COMMENT ON COLUMN product_favorites.user_id IS '所属用户';
-COMMENT ON COLUMN product_favorites.product_id IS '被收藏商品，禁止空关联';
-COMMENT ON COLUMN product_favorites.release_id IS '关注批次，可空';
-COMMENT ON COLUMN product_favorites.intent_status IS 'NULL 表示无待购意向；收藏由关系存在表示';
-COMMENT ON COLUMN product_favorites.note IS '个人备注';
-COMMENT ON COLUMN product_favorites.created_at IS '创建时间';
-COMMENT ON COLUMN product_favorites.updated_at IS '修改时间';
-
-CREATE TABLE brand_followers (
-  user_id text NOT NULL REFERENCES users(id),
-  brand_id text NOT NULL REFERENCES brands(id),
-  created_at timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY(user_id,brand_id)
-);
-COMMENT ON TABLE brand_followers IS '唯一品牌关注数据源';
-COMMENT ON COLUMN brand_followers.user_id IS '所属用户';
-COMMENT ON COLUMN brand_followers.brand_id IS '品牌 ID，禁止存名称';
-COMMENT ON COLUMN brand_followers.created_at IS '创建时间';
-
 CREATE TABLE user_assets (
   user_id text NOT NULL REFERENCES users(id),
   asset_type text NOT NULL CHECK(asset_type IN ('wardrobe','purchase','reminder','wish','notification')),
@@ -291,17 +258,6 @@ COMMENT ON COLUMN community_posts.product_id IS '可选关联商品';
 COMMENT ON COLUMN community_posts.created_at IS '创建时间';
 COMMENT ON COLUMN community_posts.updated_at IS '修改时间';
 COMMENT ON COLUMN community_posts.deleted_at IS '软删除时间';
-
-CREATE TABLE community_post_likes (
-  post_id text NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
-  user_id text NOT NULL REFERENCES users(id),
-  created_at timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY(post_id,user_id)
-);
-COMMENT ON TABLE community_post_likes IS '点赞关系；不等同收藏';
-COMMENT ON COLUMN community_post_likes.post_id IS '动态';
-COMMENT ON COLUMN community_post_likes.user_id IS '所属用户';
-COMMENT ON COLUMN community_post_likes.created_at IS '创建时间';
 
 CREATE TABLE feedback_records (
   id text PRIMARY KEY,
@@ -400,9 +356,6 @@ CREATE INDEX products_feed ON products(category,feed_score DESC,id) WHERE delete
 CREATE INDEX products_brand ON products(brand_id,created_at DESC,id) WHERE deleted_at IS NULL;
 CREATE INDEX products_group ON products(group_key) WHERE deleted_at IS NULL;
 CREATE INDEX releases_product ON product_releases(product_id,release_no DESC) WHERE deleted_at IS NULL;
-CREATE INDEX favorites_product ON product_favorites(product_id);
-CREATE INDEX favorites_user ON product_favorites(user_id,created_at DESC,id);
-CREATE INDEX followers_brand ON brand_followers(brand_id);
 CREATE INDEX assets_user ON user_assets(user_id,asset_type,updated_at DESC,id) WHERE deleted_at IS NULL;
 CREATE INDEX assets_purchase_reminders ON user_assets(user_id,(payload_json->>'relatedPurchaseId')) WHERE asset_type='reminder' AND deleted_at IS NULL;
 CREATE INDEX community_public ON community_posts(created_at DESC,id DESC) WHERE deleted_at IS NULL AND visibility='public';
@@ -424,4 +377,45 @@ COMMENT ON COLUMN product_releases.start_at IS '批次开始时间';
 COMMENT ON COLUMN product_releases.end_at IS '批次结束时间';
 COMMENT ON COLUMN product_releases.balance_due_at IS '明确尾款截止时间';
 COMMENT ON COLUMN product_releases.ship_at IS '明确发货时间，不确定信息写shipping_note';
+CREATE TABLE user_interactions (
+  id text PRIMARY KEY,
+  user_id text NOT NULL REFERENCES users(id),
+  kind text NOT NULL CHECK(kind IN ('PRODUCT_FAVORITE','BRAND_FOLLOW','POST_LIKE')),
+  product_id text REFERENCES products(id),
+  brand_id text REFERENCES brands(id),
+  post_id text REFERENCES community_posts(id) ON DELETE CASCADE,
+  release_id text,
+  intent_status text CHECK(intent_status IN ('WANT','WATCHING','WAIT_RELEASE','WAIT_BALANCE','PURCHASED')),
+  note text NOT NULL DEFAULT '',
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  FOREIGN KEY(release_id,product_id) REFERENCES product_releases(id,product_id),
+  CHECK (
+    (kind='PRODUCT_FAVORITE' AND product_id IS NOT NULL AND brand_id IS NULL AND post_id IS NULL)
+    OR (kind='BRAND_FOLLOW' AND brand_id IS NOT NULL AND product_id IS NULL AND post_id IS NULL
+        AND release_id IS NULL AND intent_status IS NULL AND note='')
+    OR (kind='POST_LIKE' AND post_id IS NOT NULL AND product_id IS NULL AND brand_id IS NULL
+        AND release_id IS NULL AND intent_status IS NULL AND note='')
+  )
+);
+COMMENT ON TABLE user_interactions IS '当前三种用户互动；共用存储，业务接口分别校验，不接受任意目标类型';
+COMMENT ON COLUMN user_interactions.id IS '互动记录ID';
+COMMENT ON COLUMN user_interactions.user_id IS '操作者';
+COMMENT ON COLUMN user_interactions.kind IS '商品收藏、品牌关注、动态点赞';
+COMMENT ON COLUMN user_interactions.product_id IS '仅商品收藏填写';
+COMMENT ON COLUMN user_interactions.brand_id IS '仅品牌关注填写';
+COMMENT ON COLUMN user_interactions.post_id IS '仅动态点赞填写';
+COMMENT ON COLUMN user_interactions.release_id IS '收藏关注的批次，必须属于商品';
+COMMENT ON COLUMN user_interactions.intent_status IS '仅收藏的待购意向，空表示无意向';
+COMMENT ON COLUMN user_interactions.note IS '仅收藏的个人备注';
+COMMENT ON COLUMN user_interactions.created_at IS '创建时间';
+COMMENT ON COLUMN user_interactions.updated_at IS '修改时间';
+CREATE UNIQUE INDEX interactions_product_unique ON user_interactions(user_id,product_id) WHERE kind='PRODUCT_FAVORITE';
+CREATE UNIQUE INDEX interactions_brand_unique ON user_interactions(user_id,brand_id) WHERE kind='BRAND_FOLLOW';
+CREATE UNIQUE INDEX interactions_post_unique ON user_interactions(user_id,post_id) WHERE kind='POST_LIKE';
+CREATE INDEX interactions_user ON user_interactions(user_id,kind,created_at DESC,id);
+CREATE INDEX interactions_product_count ON user_interactions(product_id) WHERE kind='PRODUCT_FAVORITE';
+CREATE INDEX interactions_brand_count ON user_interactions(brand_id) WHERE kind='BRAND_FOLLOW';
+CREATE INDEX interactions_post_count ON user_interactions(post_id) WHERE kind='POST_LIKE';
+
 COMMIT;
