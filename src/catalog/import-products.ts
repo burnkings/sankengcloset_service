@@ -28,7 +28,7 @@ export function normalizeRow(row:Record<string,string>){
 export function normalizeRows(rows:Record<string,string>[]){
   const seen=new Set<string>();return rows.map((row,i)=>{try{const p=normalizeRow(row),key=p.platform+':'+p.externalId;if(seen.has(key))throw new Error('同一商品链接重复，请合并为一行');seen.add(key);return p;}catch(e){throw new Error(`第 ${i+2} 行：${String(e)}`);}});
 }
-/** 新14表基线，整表事务，图片内嵌；不兼容旧商品结构。 */
+/** 新12表基线，整表事务，图片内嵌；不兼容旧商品结构。 */
 export async function importProducts(db:ImportDB,products:ReturnType<typeof normalizeRows>,publish=false){
   return db.transaction(async tx=>{
     const ids:string[]=[];
