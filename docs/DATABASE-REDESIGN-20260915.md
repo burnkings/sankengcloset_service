@@ -1,6 +1,35 @@
-# 当前 App 的 14 表基线与适配进度
+# 当前 App 的 12 表基线与适配进度
 
 本文件完全替换此前 26 表方案。项目自建表总计 14 张，已包含会话、媒体、AI任务和迁移记录，不另追加支撑表。Directus 自带系统表不属于本项目自建表，不执行删除。
+
+## 设计取舍：针对当前项目，不宣称行业唯一最佳
+
+数据库没有按“现代化应用”统一规定的表数。页面只是需求入口；最终依据是实际业务边界、数据由谁维护、哪些内容必须一起更新、有哪些跨对象查询，以及维护成本。关联查询是正常能力，不作为必须消灭的成本；拆表也不是默认答案。
+
+本项目选择固定业务字段 + 少量结构化 JSONB。PostgreSQL 官方 Designing JSON Documents 明确支持关系模型和 JSON 共存，建议 JSON 保持可预测结构，并提醒更新 JSON 也会锁定整行。来源：https://www.postgresql.org/docs/17/datatype-json.html#JSON-DOC-DESIGN 。该来源支持设计原则，不替本项目决定表数。
+
+| 业务边界 | 选择 | 收益与承担的代价 |
+|---|---|---|
+| 用户账户 | 资料、偏好、预算同表；会话分离 | 不把设置拆成零碎表；会话有独立过期与撤销需求 |
+| 商品目录 | 图片、展示规格、说明在商品内 | 资料一起维护；结构化 JSON 仍要校验，不能随意加键 |
+| 用户互动 | 收藏、关注、点赞合并一表 | 共用去重、时间及用户归属；接受少量可空列和类型约束，不做任意插件化关系引擎 |
+| 发售安排 | 保留商品批次表 | 当前日历跨商品查询、提醒引用批次；只维护批次一份日期，不再另建事件表 |
+| 个人记录 | 复用 user_assets，每条衣物/购买/提醒各自一行 | 适合当前按用户读取；服务按类型分别校验，禁止一行塞下整个衣橱 |
+| 媒体与AI任务 | 各一表 | 上传和识别有独立状态、权限、失败重试；结果附属于各自记录，不再拆子表 |
+
+最终 12 张是本轮边界选择的结果，不是为了凑数：users、user_sessions、products、brands、product_releases、user_assets、user_interactions、community_posts、media_objects、ai_import_tasks、feedback_records、schema_migrations。包含全部项目支撑表，不另加采集、价格历史、标签、图片、审核历史、同步流水表。
+
+### 合并互动后并不增加前端负担
+
+已有收藏、关注、点赞接口仍可保持各自业务路径；后端调用同一存储表。不要向前端暴露“随便传类型和目标”的通用写接口。
+
+- PRODUCT_FAVORITE：只填 product_id，可有 release_id、intent_status、note。
+- BRAND_FOLLOW：只填 brand_id，不接受待购或批次字段。
+- POST_LIKE：只填 post_id，不接受待购或批次字段。
+- 每种用户+目标唯一，目标有实际外键；收藏批次必须属于对应商品。
+- 计数按类型聚合，同一用户取消品牌关注不影响商品收藏。
+
+Directus 日常只配置商品、品牌、发售三个采集入口。用户详情可用后台查询展示互动列表，物理上无需把全部数据嵌进 users。
 
 ## 1. 前端依据及错误纠正
 
@@ -17,11 +46,9 @@
 | products | 商品、图片数组、展示规格数组、当前报价、外链、同款分组、浏览计数 |
 | brands | 品牌介绍 |
 | product_releases | 批次与日历明确日期 |
-| product_favorites | 收藏与待购意向 |
-| brand_followers | 关注关系 |
+| user_interactions | 商品收藏、品牌关注、动态点赞；三种明确类型 |
 | user_assets | 衣橱、购买、提醒、手写心愿、通知，按类型校验 |
 | community_posts | 轻社区动态 |
-| community_post_likes | 点赞关系 |
 | media_objects | 用户上传媒体 |
 | ai_import_tasks | 识别、建议、确认合一 |
 | feedback_records | 反馈与举报 |
@@ -29,7 +56,7 @@
 
 图片只存 products.images（URL数组，第一张封面），不另写封面列或图片表。已确认的展示规格存 variants，不生成颜色×尺码组合。group_key 支持当前同款查询；接口不需要因底层删表而消失。品牌名与店铺名分开，未填写品牌不自动生成。
 
-发售批次直接存 start_at/end_at/balance_due_at/ship_at；日历从批次生成，不需要 sale_events。未知年份等原文存 shipping_note，不伪造日期。收藏、关注、点赞保留独立唯一关系，避免数组并发覆盖。浏览次数原子递增，不是独立浏览人数。
+发售批次直接存 start_at/end_at/balance_due_at/ship_at；日历从批次生成，不需要 sale_events。未知年份等原文存 shipping_note，不伪造日期。收藏、关注、点赞合并为 user_interactions，每条互动仍是独立记录；使用三个目标外键及类型检查，不使用无法建立外键的泛化 target_id。浏览次数原子递增，不是独立浏览人数。
 
 偏好、预算并入 users；当前单一登录方式的 provider/subject 直接唯一约束，暂不支持多提供方绑定。AI单任务建议和确认并入同一行，确认操作 ID 唯一，跨任务重用应报冲突。
 
@@ -37,7 +64,7 @@
 
 已完成：
 
-- 替换 26 表 SQL，保留 14 表；字段注释与唯一约束。
+- 替换 26 表 SQL，保留 12 表；字段注释与唯一约束。
 - 单页 Excel 导入器适配新 products/brands；图片 JSON 单源、不写旧附属表，未知价格存 NULL。
 - 保留整表事务和商品 ID；增加新基线实际建库、导入、重复更新、回滚验证。
 
@@ -133,7 +160,7 @@ type、title、body、actionTarget、read 沿用语义；新增 dedupeKey（服�
 ### settings
 
 - budget：monthlyLimitCents（整数分 ≥0）、alertPercent（1..100）。不再接受无单位 monthlyLimit。
-- preferences：pitTypes、priceRange、themeMode；删除 followedBrands 重复存储，关注只读 brand_followers。价格区间采用稳定枚举，由前后端共享含义。
+- preferences：pitTypes、priceRange、themeMode；删除 followedBrands 重复存储，关注只读 user_interactions（BRAND_FOLLOW）。价格区间采用稳定枚举，由前后端共享含义。
 - 屏蔽品牌、屏蔽动态及浏览历史目前是本地功能，本轮不擅自增加跨端同步表。
 - 消费日志从购买记录派生。由于当前只有累计 paidCents 和 purchaseDate，只能准确称“按购买日期归属的累计已付”；不能宣称精确的每月实际付款流水。若产品坚持按定金/尾款实际支付月份统计，再单独立项 payment_entries，此稿不预先新增交易式流水表。
 
@@ -144,15 +171,15 @@ type、title、body、actionTarget、read 沿用语义；新增 dedupeKey（服�
 
 预算/偏好从 users 的 budget_json/preferences_json 读取，品牌关注不重复写偏好。当前消费日志不新增支付录入功能；付款明细仅是未来需要精确付款月份时的方案，本轮不擅自生成历史支付数据。
 
-仅有表和导入通过不代表 App 已贯通。当前 runtime 未切换，旧 migrations 不可在新基线上重放。日常 Directus 只需商品、品牌、发售三个录入入口。
+本轮增加合并互动的数据库约束测试，未完成运行时路由适配。仅有表和导入通过不代表 App 已贯通。当前 runtime 未切换，旧 migrations 不可在新基线上重放。日常 Directus 只需商品、品牌、发售三个录入入口。
 
 ## 6. 字段字典
 
-SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操作更新，DEFAULT now() 不会自动更新。表级复合外键、唯一键和索引见 SQL。
+表级 CHECK、复合外键与索引以 next-schema.sql 为准。
 
 ### users
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | nickname | text NOT NULL | 昵称 |
@@ -167,7 +194,7 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 
 ### user_sessions
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | user_id | text NOT NULL REFERENCES users(id) | 所属用户 |
@@ -181,7 +208,7 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 
 ### brands
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | name | text NOT NULL CHECK (length(btrim(name))>0) | 品牌名称 |
@@ -199,7 +226,7 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 
 ### products
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | title | text NOT NULL CHECK(length(btrim(title))>0) | 唯一正式名称，替代 canonical_name/display_name |
@@ -238,7 +265,7 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 
 ### product_releases
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | product_id | text NOT NULL REFERENCES products(id) | 商品 |
@@ -260,30 +287,9 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 | updated_at | timestamptz NOT NULL DEFAULT now() | 修改时间 |
 | deleted_at | timestamptz | 软删除时间 |
 
-### product_favorites
-
-| 字段 | SQL 类型及约束 | 说明 |
-|---|---|---|
-| id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
-| user_id | text NOT NULL REFERENCES users(id) | 所属用户 |
-| product_id | text NOT NULL REFERENCES products(id) | 被收藏商品，禁止空关联 |
-| release_id | text | 关注批次，可空 |
-| intent_status | text CHECK(intent_status IN ('WANT','WATCHING','WAIT_RELEASE','WAIT_BALANCE','PURCHASED')) | NULL 表示无待购意向；收藏由关系存在表示 |
-| note | text NOT NULL DEFAULT '' | 个人备注 |
-| created_at | timestamptz NOT NULL DEFAULT now() | 创建时间 |
-| updated_at | timestamptz NOT NULL DEFAULT now() | 修改时间 |
-
-### brand_followers
-
-| 字段 | SQL 类型及约束 | 说明 |
-|---|---|---|
-| user_id | text NOT NULL REFERENCES users(id) | 所属用户 |
-| brand_id | text NOT NULL REFERENCES brands(id) | 品牌 ID，禁止存名称 |
-| created_at | timestamptz NOT NULL DEFAULT now() | 创建时间 |
-
 ### user_assets
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | user_id | text NOT NULL REFERENCES users(id) | 所属用户 |
 | asset_type | text NOT NULL CHECK(asset_type IN ('wardrobe','purchase','reminder','wish','notification')) | 资产类型 |
@@ -296,7 +302,7 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 
 ### media_objects
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | owner_user_id | text NOT NULL REFERENCES users(id) | 上传人 |
@@ -312,7 +318,7 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 
 ### community_posts
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | author_user_id | text NOT NULL REFERENCES users(id) | 作者 |
@@ -326,17 +332,9 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 | updated_at | timestamptz NOT NULL DEFAULT now() | 修改时间 |
 | deleted_at | timestamptz | 软删除时间 |
 
-### community_post_likes
-
-| 字段 | SQL 类型及约束 | 说明 |
-|---|---|---|
-| post_id | text NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE | 动态 |
-| user_id | text NOT NULL REFERENCES users(id) | 所属用户 |
-| created_at | timestamptz NOT NULL DEFAULT now() | 创建时间 |
-
 ### feedback_records
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | user_id | text REFERENCES users(id) | 反馈人，可匿名 |
@@ -353,7 +351,7 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 
 ### ai_import_tasks
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | id | text PRIMARY KEY | 业务 ID，由服务端生成；允许前端提交幂等 ID |
 | user_id | text NOT NULL REFERENCES users(id) | 所属用户 |
@@ -382,7 +380,23 @@ SQL 为唯一结构定义，JSON业务字段见上文。updated_at 由写入操�
 
 ### schema_migrations
 
-| 字段 | SQL 类型及约束 | 说明 |
+| 字段 | 类型及约束 | 注释 |
 |---|---|---|
 | filename | text PRIMARY KEY | 迁移文件名 |
 | applied_at | timestamptz NOT NULL DEFAULT now() | 执行时间 |
+
+### user_interactions
+
+| 字段 | 类型及约束 | 注释 |
+|---|---|---|
+| id | text PRIMARY KEY | 互动记录ID |
+| user_id | text NOT NULL REFERENCES users(id) | 操作者 |
+| kind | text NOT NULL CHECK(kind IN ('PRODUCT_FAVORITE','BRAND_FOLLOW','POST_LIKE')) | 商品收藏、品牌关注、动态点赞 |
+| product_id | text REFERENCES products(id) | 仅商品收藏填写 |
+| brand_id | text REFERENCES brands(id) | 仅品牌关注填写 |
+| post_id | text REFERENCES community_posts(id) ON DELETE CASCADE | 仅动态点赞填写 |
+| release_id | text | 收藏关注的批次，必须属于商品 |
+| intent_status | text CHECK(intent_status IN ('WANT','WATCHING','WAIT_RELEASE','WAIT_BALANCE','PURCHASED')) | 仅收藏的待购意向，空表示无意向 |
+| note | text NOT NULL DEFAULT '' | 仅收藏的个人备注 |
+| created_at | timestamptz NOT NULL DEFAULT now() | 创建时间 |
+| updated_at | timestamptz NOT NULL DEFAULT now() | 修改时间 |
