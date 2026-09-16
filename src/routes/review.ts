@@ -1,5 +1,4 @@
 // routes/review.ts — 商品审核路由
-// 审核流：Crawler → draft → Directus审核 → published → Feed API
 
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
@@ -23,33 +22,26 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
     if(!request.url.startsWith('/api/v1/review/'))return;
     if(!adminIds.includes(await requireUser(request)))throw new AppProblem(403,'FORBIDDEN','需要目录管理员权限');
   });
-  // ── 单个商品状态更新 ──
+
+  // 单个商品状态更新
   app.patch<{ Params: { id: string }; Body: { visibility_status: string } }>(
     '/api/v1/review/products/:id/visibility',
     async (request) => {
       const { id } = request.params;
       const body = updateVisibilitySchema.parse(request.body);
 
-      // 验证商品存在
-      const existing = await sql`SELECT id, visibility_status FROM products WHERE id = ${id} AND deleted_at IS NULL`;
+      const existing = await sql`SELECT id, visibility_status, reviewed_by, reviewed_at FROM products WHERE id = ${id} AND deleted_at IS NULL`;
       if (existing.length === 0) throw notFound('商品不存在');
-
-      // 记录原始状态（审核日志）
       const oldStatus = existing[0]!.visibility_status;
+      const reviewerId = await requireUser(request);
 
-      // 更新状态
       await sql`
         UPDATE products SET
           visibility_status = ${body.visibility_status},
+          reviewed_by = ${reviewerId},
+          reviewed_at = now(),
           updated_at = now()
         WHERE id = ${id}
-      `;
-
-      // 写入审核记录
-      await sql`
-        INSERT INTO review_records (id, entity_type, entity_id, action, field_changes, reviewer_id, reason)
-        VALUES (${`rev_${id}_${Date.now()}`}, 'product', ${id}, 'visibility_change',
-          ${sql.json({before:oldStatus,after:body.visibility_status})}, ${await requireUser(request)}, ${`从 ${oldStatus} 变更为 ${body.visibility_status}`})
       `;
 
       return success(request, {
@@ -60,11 +52,12 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
     },
   );
 
-  // ── 批量状态更新 ──
+  // 批量状态更新
   app.post<{ Body: { product_ids: string[]; visibility_status: string } }>(
     '/api/v1/review/products/batch-visibility',
     async (request) => {
       const body = batchUpdateSchema.parse(request.body);
+      const reviewerId = await requireUser(request);
       const results: { id: string; old_status: string; new_status: string; ok: boolean; error?: string }[] = [];
 
       for (const productId of body.product_ids) {
@@ -75,12 +68,7 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
             continue;
           }
           const oldStatus = existing[0]!.visibility_status;
-          await sql`UPDATE products SET visibility_status = ${body.visibility_status}, updated_at = now() WHERE id = ${productId}`;
-          await sql`
-            INSERT INTO review_records (id, entity_type, entity_id, action, field_changes, reviewer_id, reason)
-            VALUES (${`rev_${productId}_${Date.now()}`}, 'product', ${productId}, 'visibility_change',
-              ${sql.json({before:oldStatus,after:body.visibility_status})}, ${await requireUser(request)}, ${`批量变更`})
-          `;
+          await sql`UPDATE products SET visibility_status = ${body.visibility_status}, reviewed_by = ${reviewerId}, reviewed_at = now(), updated_at = now() WHERE id = ${productId}`;
           results.push({ id: productId, old_status: oldStatus, new_status: body.visibility_status, ok: true });
         } catch (e) {
           results.push({ id: productId, old_status: '', new_status: body.visibility_status, ok: false, error: (e as Error).message });
@@ -93,7 +81,7 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
     },
   );
 
-  // ── 查询待审核商品列表 ──
+  // 查询待审核商品列表
   app.get('/api/v1/review/products', async (request) => {
     const query = (request.query as Record<string, string>) ?? {};
     const status = query.status || 'draft';
@@ -105,9 +93,9 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
     }
 
     const rows = await sql`
-      SELECT p.id, p.canonical_name, p.brand_id, b.name as brand_name,
-        p.pit_type, p.category, p.current_price, p.sale_status,
-        p.visibility_status, p.review_status, p.source_platform,
+      SELECT p.id, p.title, p.brand_id, b.name as brand_name,
+        p.category, p.price_cents, p.sale_status,
+        p.visibility_status, p.source_platform,
         p.created_at, p.updated_at
       FROM products p
       LEFT JOIN brands b ON b.id = p.brand_id
@@ -121,14 +109,12 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
     return success(request, {
       items: rows.map(r => ({
         id: String(r.id),
-        canonical_name: String(r.canonical_name),
+        title: String(r.title),
         brand_name: String(r.brand_name ?? ''),
-        pit_type: String(r.pit_type),
         category: String(r.category),
-        current_price: Number(r.current_price),
+        price_cents: Number(r.price_cents ?? 0),
         sale_status: String(r.sale_status),
         visibility_status: String(r.visibility_status),
-        review_status: String(r.review_status),
         source_platform: String(r.source_platform),
         created_at: String(r.created_at),
         updated_at: String(r.updated_at),
@@ -137,38 +123,5 @@ export async function registerReviewRoutes(app: FastifyInstance, sql: postgres.S
       limit,
       offset,
     });
-  });
-
-  // ── 查询审核历史 ──
-  app.get('/api/v1/review/history', async (request) => {
-    const query = (request.query as Record<string, string>) ?? {};
-    const entityType = query.entity_type || 'product';
-    const entityId = query.entity_id || '';
-    const limit = Math.min(100, Math.max(1, parseInt(query.limit || '20', 10)));
-
-    let rows;
-    if (entityId) {
-      rows = await sql`
-        SELECT * FROM review_records WHERE entity_type = ${entityType} AND entity_id = ${entityId}
-        ORDER BY created_at DESC LIMIT ${limit}
-      `;
-    } else {
-      rows = await sql`
-        SELECT * FROM review_records WHERE entity_type = ${entityType}
-        ORDER BY created_at DESC LIMIT ${limit}
-      `;
-    }
-
-    return success(request, rows.map(r => ({
-      id: String(r.id),
-      entity_type: String(r.entity_type),
-      entity_id: String(r.entity_id),
-      action: String(r.action),
-      old_value: JSON.stringify(r.field_changes?.before ?? ''),
-      new_value: JSON.stringify(r.field_changes?.after ?? ''),
-      reviewer: String(r.reviewer_id ?? ''),
-      notes: String(r.reason ?? ''),
-      created_at: String(r.created_at),
-    })));
   });
 }

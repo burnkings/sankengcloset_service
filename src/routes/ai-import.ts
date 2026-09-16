@@ -13,7 +13,7 @@ const idSchema = z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9_-]+$/, 'id
 
 export const createSchema = z.object({
   mediaId: z.string().max(128).optional(),
-  objectKey: z.string().max(512).optional(), // 兼容旧客户端
+  objectKey: z.string().max(512).optional(),
   taskType: z.enum(['purchase_order']).default('purchase_order'),
   sourcePlatform: z.enum(['', 'taobao', 'weidian', 'tuanzhang', 'other']).default(''),
   sourceLink: z.string().max(1000).default(''),
@@ -43,7 +43,6 @@ export const confirmSchema = z.object({
   confirmed: confirmSuggestionSchema,
 });
 
-/** 对外响应：只暴露规格声明的字段（model 去掉内部 provider）。 */
 function toTaskResponse(task: AiImportTask) {
   return {
     taskId: task.taskId,
@@ -91,9 +90,8 @@ export async function registerAiImportRoutes(
     });
     await repository.createAiTask(task);
 
-    // 异步 worker：pending → processing → ready | failed（绝不阻塞响应、绝不伪造 ready）
     queueMicrotask(() => {
-      runImportTaskWorker({ repository, storage, recognizer, task, media }).catch(() => { /* worker 内部已兜底 */ });
+      runImportTaskWorker({ repository, storage, recognizer, task, media }).catch(() => {});
     });
     return reply.code(202).send(success(request, toTaskResponse(task)));
   });
@@ -103,7 +101,6 @@ export async function registerAiImportRoutes(
     const { taskId } = taskParamsSchema.parse(request.params);
     let task = await repository.getAiTask(userId, taskId);
     if (!task) throw notFound('AI 导入任务不存在');
-    // 处理中超时兜底：进程重启/识别挂起时避免永久 processing
     if (task.state === 'processing' && Date.now() - new Date(task.createdAt).getTime() > PROCESSING_STALE_MS) {
       task = await repository.updateAiTask(taskId, userId, {
         state: 'failed',
@@ -137,7 +134,7 @@ export async function registerAiImportRoutes(
     const { taskId } = taskParamsSchema.parse(request.params);
     const task = await repository.getAiTask(userId, taskId);
     if (!task) return reply.code(204).send();
-    await repository.deleteMediaByObjectKey(userId, task.objectKey);
+    await repository.deleteMediaByObjectKey(userId, task.mediaId);
     return reply.code(204).send();
   });
 }

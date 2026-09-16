@@ -62,7 +62,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
         description: '三坑绮橱（JK / Lolita / 汉服）——商品发现、个人衣橱管理、圈子穿搭分享后端 API。登录接口返回 Bearer 令牌后，可在 Swagger UI 右上角 Authorize 填入（仅填 accessToken 即可）。',
       },
       servers: [{ url: config.PUBLIC_BASE_URL }],
-      tags: [...API_TAGS],
+      tags: API_TAGS.map(t => ({ name: t })),
       components: {
         securitySchemes: {
           bearerAuth: {

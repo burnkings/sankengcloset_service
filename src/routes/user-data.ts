@@ -18,7 +18,6 @@ export const wardrobeSchema = z.object({
   name: z.string().trim().min(1).max(160),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'OTHER']),
   style: z.string().max(100).default(''),
-  // 汉服形制/年代；与 style（部件/衣型）并列，确保用户资产同步不丢字段。
   silhouette: z.string().max(100).default(''),
   brand: z.string().max(120).default(''),
   color: z.string().max(80).default(''),
@@ -28,7 +27,7 @@ export const wardrobeSchema = z.object({
   images: z.array(z.string().max(512)).max(12).default([]),
   tags: z.array(z.string().max(40)).max(30).default([]),
   purchaseDate: z.string().max(32).default(''),
-  purchasePrice: z.number().min(0).max(100_000_000).default(0),
+  purchasePriceCents: z.number().int().min(0).max(100_000_000).default(0),
   purchaseSource: z.string().max(120).default(''),
   purchaseId: idSchema.or(z.literal('')).default(''),
   wishId: idSchema.or(z.literal('')).default(''),
@@ -40,9 +39,7 @@ export const purchaseSchema = z.object({
   id: idSchema.optional(),
   name: z.string().trim().min(1).max(160),
   brand: z.string().max(120).default(''),
-  shopName: z.string().max(120).default(''),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'OTHER']).default('OTHER'),
-  // 规格字段（金额一律整数分）：orderNumber/totalCents/depositCents/paidCents/balanceDueDate/arrivalDate/status
   orderNumber: z.string().max(64).default(''),
   totalCents: z.number().int().min(0).max(100_000_000).default(0),
   depositCents: z.number().int().min(0).max(100_000_000).default(0),
@@ -50,18 +47,9 @@ export const purchaseSchema = z.object({
   remainingCents: z.number().int().min(0).max(100_000_000).default(0),
   balanceDueDate: z.string().max(32).default(''),
   arrivalDate: z.string().max(32).default(''),
-  status: z.string().max(32).default(''),
-  // 图片/媒体关联（订单截图 mediaId 或公开 imageUrl）
-  mediaId: idSchema.optional(),
-  image: z.string().max(512).default(''),
-  // 兼容旧前端字段
-  totalAmount: z.number().int().min(0).max(100_000_000).default(0),
-  depositAmount: z.number().int().min(0).max(100_000_000).default(0),
-  paidAmount: z.number().int().min(0).max(100_000_000).default(0),
-  remainingAmount: z.number().int().min(0).max(100_000_000).default(0),
   paymentStatus: z.enum(['PRE_ORDER', 'DEPOSIT_PAID', 'BALANCE_PENDING', 'COMPLETED', 'CANCELLED']).default('PRE_ORDER'),
   purchaseDate: z.string().max(32).default(''),
-  deadline: z.string().max(32).default(''),
+  mediaId: idSchema.optional(),
   wishId: idSchema.or(z.literal('')).default(''),
   wardrobeId: idSchema.or(z.literal('')).default(''),
   productId: idSchema.or(z.literal('')).default(''),
@@ -76,15 +64,15 @@ export const reminderSchema = z.object({
   type: z.enum(['ARRIVAL', 'BALANCE', 'RELEASE', 'OUTFIT', 'PHOTO', 'ORGANIZE', 'WISH', 'CHECKIN', 'CUSTOM']).default('CUSTOM'),
   remindDate: z.string().min(1).max(32),
   remindTime: z.string().max(16).default(''),
+  timeZone: z.string().max(40).default('Asia/Shanghai'),
   isAllDay: z.boolean().default(false),
   relatedPurchaseId: idSchema.or(z.literal('')).default(''),
   relatedWishId: idSchema.or(z.literal('')).default(''),
-  // Phase 1.1-C：商品锚 + 批次锚（user_assets jsonb 透传，零 migration；旧数据缺省为空串兼容）
   productId: idSchema.or(z.literal('')).default(''),
   relatedReleaseId: idSchema.or(z.literal('')).default(''),
   wardrobeBindings: z.array(idSchema).max(50).default([]),
   note: z.string().max(2_000).default(''),
-  status: z.enum(['PENDING', 'DONE', 'MISSED']).default('PENDING'),
+  status: z.enum(['PENDING', 'DONE', 'MISSED', 'CANCELLED']).default('PENDING'),
 });
 
 export const wishSchema = z.object({
@@ -92,7 +80,7 @@ export const wishSchema = z.object({
   name: z.string().trim().min(1).max(160),
   coverImage: z.string().max(512).default(''),
   brand: z.string().max(120).default(''),
-  estimatedPrice: z.number().int().min(0).max(100_000_000).default(0),
+  estimatedPriceCents: z.number().int().min(0).max(100_000_000).default(0),
   priority: z.enum(['HIGH', 'MEDIUM', 'LOW']).default('MEDIUM'),
   status: z.enum(['WISH', 'WATCHING', 'DECIDED', 'PURCHASED', 'PAUSED', 'CANCELED']).default('WISH'),
   source: z.enum(['MANUAL', 'AI_IMPORT', 'DISCOVERY']).default('MANUAL'),
@@ -115,13 +103,12 @@ export const notificationSchema = z.object({
 
 export const preferenceSchema = z.object({
   pitTypes: z.array(z.enum(['JK', 'LOLITA', 'HANFU'])).max(3).default([]),
-  followedBrands: z.array(z.string().max(128)).max(200).default([]),
   priceRange: z.string().max(40).default('all'),
   themeMode: z.enum(['system', 'light', 'dark']).default('system'),
 });
 
 export const budgetSchema = z.object({
-  monthlyLimit: z.number().int().min(0).max(100_000_000),
+  monthlyLimitCents: z.number().int().min(0).max(100_000_000),
   alertPercent: z.number().int().min(1).max(100),
 });
 
@@ -130,7 +117,6 @@ export const postCreateSchema = z.object({
   caption: z.string().trim().max(600).default(''),
   category: z.enum(['JK', 'LOLITA', 'HANFU', 'MIXED']),
   topic: z.string().trim().max(80).default(''),
-  // Phase 2.3-A：可选商品关联（可空）；非空时服务端校验商品存在且已发布
   productId: z.string().trim().min(1).max(128).nullable().optional(),
 });
 export const postParamsSchema = z.object({ id: idSchema });
@@ -181,7 +167,6 @@ function registerAssetRoutes(app: FastifyInstance, repository: AppRepository, de
     const userId = await requireUser(request);
     const { id } = assetParamsSchema.parse(request.params);
     const patch = definition.updateSchema.parse(request.body) as Record<string, unknown>;
-    // Zod 默认值可穿过 partial；PATCH 仅更新请求中显式提交的字段。
     const submitted = request.body as Record<string, unknown>;
     for (const key of Object.keys(patch)) {
       if (!Object.prototype.hasOwnProperty.call(submitted, key)) delete patch[key];
@@ -210,13 +195,14 @@ export async function registerUserDataRoutes(app: FastifyInstance, config: AppCo
   ];
   for (const asset of assets) registerAssetRoutes(app, repository, asset);
 
-  // 通知生成：基于用户 reminders/purchases/关注品牌 生成真实通知（幂等，可重复调用）
+  // 通知生成
   app.post('/api/v1/me/notifications:generate', async (request) => {
     const userId = await requireUser(request);
     const items = await repository.generateNotifications(userId);
     return success(request, items);
   });
 
+  // Budget/Preferences - stored in users table
   app.get('/api/v1/me/budget', async (request) => {
     const userId = await requireUser(request);
     return success(request, await repository.getUserSetting(userId, 'budget'));
@@ -237,6 +223,7 @@ export async function registerUserDataRoutes(app: FastifyInstance, config: AppCo
     return success(request, await repository.putUserSetting(userId, 'preferences', payload));
   });
 
+  // Community posts
   app.get('/api/v1/community/posts', async (request) => {
     let viewerUserId: string | null = null;
     try { viewerUserId = await requireUser(request); } catch { /* public read */ }
@@ -259,7 +246,6 @@ export async function registerUserDataRoutes(app: FastifyInstance, config: AppCo
     if (!media || media.ownerUserId !== userId || media.deletedAt !== null || media.sizeBytes <= 0 || media.purpose !== 'outfit') {
       throw new AppProblem(400, 'VALIDATION_FAILED', '请先上传有效的穿搭图片', false);
     }
-    // Phase 2.3-A：productId 非空时校验商品存在且已发布（不存在的商品明确拒绝，不静默创建）
     let productId: string | null = null;
     if (body.productId != null && body.productId !== '') {
       const product = await repository.getProduct(null, body.productId);
@@ -291,7 +277,7 @@ export async function registerUserDataRoutes(app: FastifyInstance, config: AppCo
     const userId = await requireUser(request);
     const { id } = postParamsSchema.parse(request.params);
     const { liked } = postLikeSchema.parse(request.body);
-    const result = await repository.setCommunityPostLike(userId, id, liked);
+    const result = await repository.setPostLike(userId, id, liked);
     if (!result) throw notFound('动态不存在');
     return success(request, result);
   });

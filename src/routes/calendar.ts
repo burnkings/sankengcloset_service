@@ -14,8 +14,7 @@ function currentMonthKey(): string {
 }
 
 /**
- * 发售日历：按月聚合 product_releases（published）与 sale_events 的发售事件。
- * 数据由爬虫/导入域填充；无数据时返回空数组（前端空态兜底）。
+ * 发售日历：按月聚合 product_releases（published）。
  */
 export async function registerCalendarRoutes(app: FastifyInstance, repository: AppRepository) {
   app.get('/api/v1/calendar', async (request) => {

@@ -49,10 +49,10 @@ async function uploadOutfit(instance: FastifyInstance, headers: Record<string, s
 function seedProduct(id: string, title: string, category: string): void {
   const now = '2026-08-20T00:00:00.000Z';
   const product: Product = {
-    id, brandId: 'br_rabbit', brandName: '兔缝缝', title, category: category as Category, subCategory: '', status: 'ON_SALE',
+    id, brandId: 'br_rabbit', brandName: '兔缝缝', title, category: category as Category, subCategory: '', saleStatus: 'ON_SALE',
     coverUrl: `https://img.example.invalid/${id}.jpg`, images: [], priceCents: 12800, originalPriceCents: 0,
-    priceType: 'FULL', depositCents: 0, balanceCents: 0, colorTags: [], materialTags: [], featureTags: [], variants: [],
-    description: '', shopUrl: '', createdAt: now, updatedAt: now, styleId: null, currentRelease: null,
+    priceType: 'FULL', colorTags: [], materialTags: [], featureTags: [], variants: [],
+    description: '', shopName: '', canonicalUrl: '', sourcePlatform: 'taobao', externalId: null, groupKey: null, viewCount: 0, feedScore: 0, visibilityStatus: 'published', createdAt: now, updatedAt: now,  currentRelease: null,
   };
   repository.seedProduct(product);
 }

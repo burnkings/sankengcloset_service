@@ -19,7 +19,6 @@ try {
     const alreadyApplied = await sql`select 1 from schema_migrations where filename = ${filename}`;
     if (alreadyApplied.length > 0) continue;
     const migration = await readFile(resolve(directory, filename), 'utf8');
-    // migration source is repository-controlled; user input never reaches unsafe().
     await sql.begin(async (tx) => {
       await tx.unsafe(migration);
       await tx`insert into schema_migrations (filename) values (${filename})`;
