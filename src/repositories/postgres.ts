@@ -65,6 +65,7 @@ function decodePageCursor(value: string, expectedScope: string): PageCursor | nu
 
 function stringValue(value: unknown): string { return value == null ? '' : String(value); }
 function numberValue(value: unknown): number { return Number(value ?? 0); }
+function nullableNumber(value: unknown): number | null { return value == null ? null : Number(value); }
 function dateValue(value: unknown): string { return value instanceof Date ? value.toISOString() : stringValue(value); }
 
 function mapUser(row: Row): UserProfile {
@@ -387,14 +388,14 @@ export class PostgresRepository implements AppRepository {
       const hasPriceDrop = product.priceCents != null && product.priceCents > 0
         && product.originalPriceCents != null && product.originalPriceCents > product.priceCents;
       const feedReason = generateFeedReason({ saleStatus, releaseType, isRerelease: false, isNew, brandHeatScore: 0, hasPriceDrop, priceTrend: hasPriceDrop ? 'down' : 'stable', feedScore, eventEndAt: releaseEndAt });
-      const badgeText = hasPriceDrop ? '降价' : saleStatus === 'PRE_ORDER' ? '预约' : isNew ? '新品' : '';
+      const badgeText = hasPriceDrop ? '降价' : saleStatus === 'PRE_ORDER' ? '预约' : (isNew && saleStatus !== 'UNKNOWN') ? '新品' : '';
       return {
         id: `feed_${product.id}`, feedType: 'product', entityId: product.id, title: product.title, subtitle: product.brandName,
         coverUrl: product.coverUrl, secondaryCoverUrl: images.length > 1 ? images[1]?.url ?? "" : '', brandId: product.brandId, brandName: product.brandName,
         category: product.category, pitType: product.category, subCategory: product.subCategory, price: product.priceCents, originalPrice: product.originalPriceCents,
         priceType: product.priceType, depositCents: null, balanceCents: null,
         colorTags: product.colorTags, materialTags: product.materialTags,
-        fullPriceCents: numberValue(r.release_full_price),
+        fullPriceCents: nullableNumber(r.release_full_price),
         priceSummary: formatPriceSummary(product.priceCents ?? 0), saleStatus, releaseType, releaseTypeName: getReleaseTypeName(releaseType),
         tags: mergeTags(
           Array.isArray(r.season_tags) ? r.season_tags.map(String) : [],
@@ -403,7 +404,7 @@ export class PostgresRepository implements AppRepository {
           Array.isArray(r.recommended_tags) ? r.recommended_tags.map(String) : [],
         ),
         feedScore, rankingScore: feedScore, feedReason, badgeText, eventStartAt: '', eventEndAt: releaseEndAt,
-        liked: false, saved: savedSet.has(product.id), sourceLabel: '品牌官方', publishedAt: product.createdAt, createdAt: product.createdAt,
+        liked: false, saved: savedSet.has(product.id), sourceLabel: stringValue(r.shop_name) || '', publishedAt: product.createdAt, createdAt: product.createdAt,
       };
     });
     const last = visible.at(-1) as Row | undefined;
