@@ -128,7 +128,7 @@ export interface AppRepository {
 
   // Feed & Content
   listFeed(userId: string | null, query: FeedQuery): Promise<FeedResult>;
-  getProduct(userId: string | null, productId: string, releaseId?: string): Promise<Product | null>;
+  getProduct(userId: string | null, productId: string, releaseId?: string, countView?: boolean): Promise<Product | null>;
   searchProducts(query: SearchQuery, userId?: string | null): Promise<SearchResult>;
 
   // Calendar
@@ -202,3 +202,4 @@ export interface AppRepository {
   setPostLike(userId: string, postId: string, liked: boolean): Promise<{ liked: boolean; likeCount: number } | null>;
   deleteCommunityPost(userId: string, postId: string): Promise<boolean>;
 }
+
