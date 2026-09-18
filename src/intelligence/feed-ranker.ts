@@ -34,8 +34,8 @@ export function mergeTags(...args: unknown[]): string[] {
 }
 
 export function generateFeedReason(row: Record<string, unknown>): string {
-  const saleStatus = String(row.sale_status ?? '');
-  const feedScore = Number(row.feed_score ?? 0);
+  const saleStatus = String(row.saleStatus ?? row.sale_status ?? '');
+  const feedScore = Number(row.feedScore ?? row.feed_score ?? 0);
   if (saleStatus === 'PRE_ORDER') return '预约中';
   if (saleStatus === 'ON_SALE') return '在售';
   if (feedScore > 50) return '热门商品';
