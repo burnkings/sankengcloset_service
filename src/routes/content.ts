@@ -77,7 +77,7 @@ export async function registerContentRoutes(app: FastifyInstance, repository: Ap
     const { id } = productParamsSchema.parse(request.params);
     const q = request.query as Record<string, unknown>;
     const releaseId = typeof q.releaseId === 'string' && q.releaseId !== '' ? q.releaseId : undefined;
-    const product = await repository.getProduct(null, id, releaseId);
+    const product = await repository.getProduct(null, id, releaseId, true);
     if (!product) throw notFound('商品不存在');
     return success(request, product);
   });
@@ -142,3 +142,4 @@ export async function registerContentRoutes(app: FastifyInstance, repository: Ap
     throw notFound('款式功能已移除');
   });
 }
+
