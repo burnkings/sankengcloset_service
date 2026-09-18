@@ -703,7 +703,7 @@ export class PostgresRepository implements AppRepository {
 
   // ─── Product Detail ─────────────────────────────────────
 
-  async getProduct(_userId: string | null, productId: string, releaseId?: string): Promise<Product | null> {
+  async getProduct(_userId: string | null, productId: string, releaseId?: string, countView = false): Promise<Product | null> {
     const rows = await this.sql`
       select p.*, b.name as brand_name,
         pr.id as release_id, pr.release_name, pr.release_type, pr.sale_status as release_sale_status,
@@ -741,7 +741,10 @@ export class PostgresRepository implements AppRepository {
       };
     }
     // Increment view count
-    await this.sql`update products set view_count = view_count + 1 where id = ${productId}`;
+    if (countView) {
+      await this.sql`update products set view_count = view_count + 1 where id = ${productId}`;
+      product.viewCount += 1;
+    }
     return product;
   }
 
@@ -857,7 +860,7 @@ export class PostgresRepository implements AppRepository {
         from products p
         left join brands b on b.id = p.brand_id
         where p.deleted_at is null and p.visibility_status = 'published'
-        order by case when ${tab} = 'favorite' then (select count(*)::int from user_interactions w where w.product_id = p.id and w.kind = 'PRODUCT_FAVORITE') else p.feed_score end desc, p.id desc
+        order by case when ${tab} = 'favorite' then (select count(*)::int from user_interactions w where w.product_id = p.id and w.kind = 'PRODUCT_FAVORITE') else p.view_count end desc, p.id desc
         limit ${cap}
       `;
       rows = result as Row[];
@@ -1396,3 +1399,4 @@ export class PostgresRepository implements AppRepository {
     };
   }
 }
+
